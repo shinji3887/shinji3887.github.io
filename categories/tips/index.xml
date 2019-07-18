@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tips on L&#39; Blog</title>
+    <link>/categories/tips/</link>
+    <description>Recent content in Tips on L&#39; Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 02 Jun 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/tips/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>通过阿里云快速获取gcr.io上的镜像文件</title>
+      <link>/post/get-images-from-gcr-io/</link>
+      <pubDate>Sun, 02 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/get-images-from-gcr-io/</guid>
+      <description>gcr.io是谷歌家的镜像仓库，我们在学习k8或者其他的云原生项目的时候不可避免的会用到上面的镜像。因为某些原因该站点无法访问，本文讲述如何</description>
+    </item>
+    
+    <item>
+      <title>vue-cli3.0使用proxytable解决跨域问题</title>
+      <link>/post/vue-cli3.0-proxytable/</link>
+      <pubDate>Sat, 11 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/vue-cli3.0-proxytable/</guid>
+      <description>现代的web开发一般都是前后端分离，前后端使用rest api进行交互，分离使得前后端服务器一般都不在一起，这导致了跨域问题，本文说明在vue</description>
+    </item>
+    
+    <item>
+      <title>linux下使用npm install报EACCES的解决方法</title>
+      <link>/post/linux-npm-install-eacces/</link>
+      <pubDate>Wed, 21 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/linux-npm-install-eacces/</guid>
+      <description>前端项目需要进行CI/CD集成，CI服务器是linux版本的，所以需要在服务器上安装npm环境，记录一下安装过程以及碰到的坑。安装很简单，直</description>
+    </item>
+    
+    <item>
+      <title>docker与kubernetes常用命令集合</title>
+      <link>/post/docker-kubernetes-commands/</link>
+      <pubDate>Tue, 20 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/docker-kubernetes-commands/</guid>
+      <description>docker与kubernetes常用命令行集合，做个整理，妈妈再也不用担心我记不住命令了。只根据需要记录了主要的命令和参数，应该足够用了，</description>
+    </item>
+    
+    <item>
+      <title>使用ThreadPoolTaskExecutor对任务进行异步阻塞处理</title>
+      <link>/post/thread-pool-task-executor/</link>
+      <pubDate>Mon, 19 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/thread-pool-task-executor/</guid>
+      <description>最近项目中要用到多线程处理任务，自然就用到了ThreadPoolTaskExecutor这个对象，这个是spring对于Java的concu</description>
+    </item>
+    
+    <item>
+      <title>vue-cli3.0项目中[WDS] Disconnected!的解决方法</title>
+      <link>/post/vue-cli3-wds-ipv6/</link>
+      <pubDate>Tue, 13 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/vue-cli3-wds-ipv6/</guid>
+      <description>项目中的前端工程用到了vue-cli3.0脚手架，启动后console一直报错 Failed to load resource: net::ERR_EMPTY_RESPONSE [http://localhost:8080/sockjs-node/info?t=1541988880077] [WDS] Disconnected! 查了下应该是webpack中的用到的热加载功能</description>
+    </item>
+    
+  </channel>
+</rss>

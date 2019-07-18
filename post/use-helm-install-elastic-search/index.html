@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><head>
+    <meta name="referrer" content="no-referrer"/>
+    <meta name="google-site-verification" content="9vIieCe-Qpd78QOmBl63rGtIVbhY6sYyuxX3j8XWBA4" />
+    <meta name="baidu-site-verification" content="LRrmH41lz7" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="description" content="使用heml charts方式安装一个高可用的es集群">
+    
+    <meta name="keyword"  content="暴走的初号机, shinji3887, 暴走的初号机的网络日志, 暴走的初号机的博客, shinji3887 Blog, 博客, 个人网站, 互联网, Web, 云原生, PaaS, Istio, Kubernetes, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>使用helm charts安装elasticsearch集群-同步率400%</title>
+
+    <link rel="canonical" href="/post/use-helm-install-elastic-search/">
+
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/syntax.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/zanshang.css">
+
+    
+    <link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/jquery.min.js"></script>
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/bootstrap.min.js"></script>
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/hux-blog.min.js"></script>
+</head>
+</head>
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">L&#39; Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="categories/tech">Tech</a>
+                    </li>
+                    
+                    <li>
+                        <a href="categories/tips">Tips</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about">About</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header{
+        background-image: url('https://lupeier.cn-sh2.ufileos.com/adult-beach-boat-1121797.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                       
+                       <a class="tag" href="/tags/kubernetes" title="Kubernetes">
+                           Kubernetes
+                        </a>
+                        
+                       <a class="tag" href="/tags/helm" title="helm">
+                           helm
+                        </a>
+                        
+                    </div>
+                    <h1>使用helm charts安装elasticsearch集群</h1>
+                    <h2 class="subheading"></h2>
+                    <span  class="meta">Posted by L&#39; on Sunday, April 28, 2019
+                        
+                    </span>
+					<br>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+        		
+                        <header>
+                        <h2>TOC</h2>
+                        </header>
+                        <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#安装helm">安装helm</a>
+<ul>
+<li><a href="#方式一-使用官方脚本一键安装">方式一：使用官方脚本一键安装</a></li>
+<li><a href="#方式二-手动下载安装-这里安装目前最新的2-13-1版本">方式二：手动下载安装(这里安装目前最新的2.13.1版本)</a></li>
+<li><a href="#安装tiller">安装Tiller</a></li>
+<li><a href="#tiller授权">Tiller授权</a></li>
+<li><a href="#更换仓库">更换仓库</a></li>
+</ul></li>
+<li><a href="#搭建es集群">搭建ES集群</a>
+<ul>
+<li><a href="#kibana安装">kibana安装</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        		
+        		
+
+<blockquote>
+<p>helm是kubernetes的包管理器，可以管理k8s的各种资源，并利用charts描述文件做非常复杂的编排功能，可以说是各种有状态发行软件的安装利器。现在各大厂商都出了自身产品的helm安装包，本文尝试使用helm进行es集群的搭建</p>
+</blockquote>
+
+<p>前提条件：一个可用的kuberenetes集群（1.10以上版本）</p>
+
+<h3 id="安装helm">安装helm</h3>
+
+<h4 id="方式一-使用官方脚本一键安装">方式一：使用官方脚本一键安装</h4>
+
+<pre><code class="language-bash">curl https://raw.githubusercontent.com/helm/helm/master/scripts/get &gt; get_helm.sh
+$ chmod 700 get_helm.sh
+$ ./get_helm.sh
+</code></pre>
+
+<h4 id="方式二-手动下载安装-这里安装目前最新的2-13-1版本">方式二：手动下载安装(这里安装目前最新的2.13.1版本)</h4>
+
+<pre><code class="language-bash">#从官网下载最新版本的二进制安装包到本地：https://github.com/kubernetes/helm/releases
+# 解压压缩包
+tar -zxvf helm-2.13.1.tar.gz 
+# 把 helm 指令放到bin目录下
+mv helm-2.13.1/helm /usr/local/bin/helm
+helm help # 验证
+</code></pre>
+
+<h4 id="安装tiller">安装Tiller</h4>
+
+<p>注意：先在 K8S 集群上每个节点安装 socat 软件(yum install -y socat )，不然会报错，如果当初使用的kubeadm安装的k8s，socat是自动安装好的</p>
+
+<p>Tiller 是以 Deployment 方式部署在 Kubernetes 集群中的，只需使用以下指令便可简单的完成安装。</p>
+
+<pre><code class="language-bash">$ helm init
+</code></pre>
+
+<p>由于 Helm 默认会去 storage.googleapis.com 拉取镜像，很可能访问不了。可以直接去阿里云下载镜像，并打tag，镜像地址为<code>registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:v2.13.1</code></p>
+
+<h4 id="tiller授权">Tiller授权</h4>
+
+<p>k8s1.6版本以后默认使用RBAC授权模式，需要添加账号及角色才能使tiller正常访问api-server
+创建 Kubernetes 的服务帐号(tiller)和绑定角色(这里赋予cluster-admin角色)</p>
+
+<pre><code class="language-bash">$ kubectl create serviceaccount --namespace kube-system tiller
+$ kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+</code></pre>
+
+<p>为 Tiller 这个deploy设置刚才创建的帐号</p>
+
+<pre><code class="language-bash"># 使用 kubectl patch 更新 API 对象
+$ kubectl patch deploy --namespace kube-system tiller-deploy -p '{&quot;spec&quot;:{&quot;template&quot;:{&quot;spec&quot;:{&quot;serviceAccount&quot;:&quot;tiller&quot;}}}}'
+deployment.extensions &quot;tiller-deploy&quot; patched
+</code></pre>
+
+<p>验证tiller是否安装成功</p>
+
+<pre><code class="language-bash">[root@MiWiFi-R1CM-srv _state]# kubectl get po -n kube-system|grep tiller
+tiller-deploy-7cb87ddf7d-274ph            1/1     Running   1          2d1h
+[root@MiWiFi-R1CM-srv _state]# helm version
+Client: &amp;version.Version{SemVer:&quot;v2.13.1&quot;, GitCommit:&quot;618447cbf203d147601b4b9bd7f8c37a5d39fbb4&quot;, GitTreeState:&quot;clean&quot;}
+Server: &amp;version.Version{SemVer:&quot;v2.13.1&quot;, GitCommit:&quot;618447cbf203d147601b4b9bd7f8c37a5d39fbb4&quot;, GitTreeState:&quot;clean&quot;}
+</code></pre>
+
+<h4 id="更换仓库">更换仓库</h4>
+
+<p>默认的charts仓库在googleapi网站上，速度比较慢，这里我们更换为阿里云的charts仓库</p>
+
+<pre><code class="language-bash"># 先移除原先的仓库
+helm repo remove stable
+# 添加新的仓库地址
+helm repo add stable https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts
+# 更新仓库
+helm repo update
+</code></pre>
+
+<p>执行<code>helm search</code>看一下目前可用的charts，现在还不多，但很多大名鼎鼎的中间件，比如<code>rabbit mq</code>、<code>mysql</code>、<code>redis</code>、<code>mangodb</code>等等都针对helm charts出了高可用版本，要知道这些中间件的集群搭建可是非常麻烦的，使用helm可以非常方便的一键搭建集群，并且还可以一键删除（为啥不早五年出来。。。），以后有机会尝试一下，这次我们要试验的是elasticsearch集群的搭建。</p>
+
+<h3 id="搭建es集群">搭建ES集群</h3>
+
+<p>es集群的具体介绍我这里就不展开了，简单说是一个基于lucene的高效的分布式全文搜索引擎，在搜索领域有着十分广泛的应用。之前弄好了helm环境，这边的操作就十分简单了，登陆es的官方helm charts仓库<a href="https://github.com/elastic/helm-charts">https://github.com/elastic/helm-charts</a>
+按照里面的说明，添加repo源</p>
+
+<pre><code class="language-bash">helm repo add elastic https://helm.elastic.co
+</code></pre>
+
+<p>安装</p>
+
+<pre><code class="language-bash">helm install --name elasticsearch elastic/elasticsearch --version 7.0.0-alpha1
+</code></pre>
+
+<p>执行<code>helm inspect</code>可查看各种helm的安装参数，每个参数都有详细说明，根据需要选择即可</p>
+
+<p>由于es的helm安装的是statefulset（有状态副本），里面用到了pvc，所以还需要添加pv信息，否则pod是起不来的，因为我这边只有一个虚拟机，所以使用的是hostpath方式的pv，实际生产还是要用<code>Local Persistent Volume</code>或者挂载ceph、nfs这样的外置存储，pv文件如下</p>
+
+<pre><code class="language-bash">apiVersion: &quot;v1&quot;
+kind: &quot;PersistentVolume&quot;
+metadata:
+  name: &quot;elasticsearch-master-elasticsearch-master-0&quot;
+spec:
+  capacity:
+    storage: &quot;30Gi&quot;
+  accessModes:
+    - &quot;ReadWriteOnce&quot;
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /root/esdata
+</code></pre>
+
+<p>这样就声明了一个name为<code>elasticsearch-master-elasticsearch-master-0</code>的pv，容量为30G，挂载在本地的<code>/root/esdata</code>目录下
+执行</p>
+
+<pre><code class="language-bash">kubectl create -f local-pv.yaml
+</code></pre>
+
+<p>创建pv，完成后执行</p>
+
+<pre><code class="language-bash">[root@MiWiFi-R1CM-srv ~]# kubectl get pv
+NAME                                          CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                                                 STORAGECLASS   REASON   AGE
+elasticsearch-master-elasticsearch-master-0   30Gi       RWO            Recycle          Bound       default/elasticsearch-master-elasticsearch-master-0                           4d1h
+</code></pre>
+
+<p>可以看到状态为<code>BOUND</code>，绑定成功，这里是因为name相同，自动绑定到helm创建的同名pvc上去了。
+这时候再执行</p>
+
+<pre><code class="language-bash">[root@MiWiFi-R1CM-srv ~]# kubectl get po
+NAME                             READY   STATUS    RESTARTS   AGE
+elasticsearch-master-0           1/1     Running   0          89m
+</code></pre>
+
+<p>可以看到状态都ok了，单节点的es集群搭建完成
+&gt;这里面有一个问题，发现单节点的情况下，一旦往集群内写入数据后，再删除该pod，sts会重新分配一个pod起来，名字还是叫elasticsearch-master-0，挂载目录也不变，但是就无法加入集群，不知道是否和es集群脑裂有关系，有懂的高人请指点一下</p>
+
+<h4 id="kibana安装">kibana安装</h4>
+
+<p>kibana是es官配的ui图形界面，功能十分强大，这边安装也十分简单，直接执行</p>
+
+<pre><code class="language-bash">helm install --name kibana elastic/kibana --version 7.0.0-alpha1
+</code></pre>
+
+<p>即可，集群默认会找<code>http://elasticsearch-master:9200</code>的es集群，之前装es的时候已经设置过（通过k8s的service以及dns服务发现），修改一下kibana的service默认配置，改成nodeport模式，就可以通过浏览器直接访问了
+<img src="https://upload-images.jianshu.io/upload_images/14871146-030f321267b15f6a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="kibana.png" /></p>
+
+        
+                
+        
+              <hr>
+              <ul class="pager">
+                  
+                  <li class="previous">
+                      <a href="/post/vue-cli3.0-proxytable/" data-toggle="tooltip" data-placement="top" title="vue-cli3.0使用proxytable解决跨域问题">&larr; Previous Post</a>
+                  </li>
+                  
+                  
+                  <li class="next">
+                      <a href="/post/create-eureka-ha-cluster/" data-toggle="tooltip" data-placement="top" title="搭建eureka高可用集群">Next Post &rarr;</a>
+                  </li>
+                  
+              </ul>
+  
+              
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+	const gitalk = new Gitalk({
+	  clientID: 'aff2580d8cc58af83367',
+	  clientSecret: '747547f5f87fcc5145b847ab76a498d7e501319f',
+	  repo: 'comment',
+	  owner: 'shinji3887',
+	  admin: ['shinji3887'],
+	  id: location.pathname,      
+	  distractionFreeMode: false  
+	})
+
+	gitalk.render('gitalk-container')
+</script>
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                     
+                    
+                        
+                    
+                        
+                            <a href="/tags/cloud-native" title="Cloud Native">
+                                Cloud Native
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/devops" title="DevOps">
+                                DevOps
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/docker" title="Docker">
+                                Docker
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="Kubernetes">
+                                Kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="Microservice">
+                                Microservice
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/restful" title="RESTful">
+                                RESTful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="Spring Cloud">
+                                Spring Cloud
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/vue" title="vue">
+                                vue
+                            </a>
+                        
+                    
+                        
+                    
+                    </div>
+                </section>
+
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                        <li><a target="_blank" href="https://skyao.io/">小剑的博客</a></li>
+                    
+                        <li><a target="_blank" href="https://zhaohuabing.com/">huabing的博客</a></li>
+                    
+                        <li><a target="_blank" href="http://blog.didispace.com/">程序猿DD的博客</a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href="" rel="alternate" type="application/rss+xml" title="L&#39; Blog" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:18016380795@163.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    <li>
+                        <a target="_blank" href="/link%20of%20wechat%20QR%20code%20image">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-wechat fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/shinji3887">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    <li>
+                        <a target="_blank" href="full%20profile%20url%20in%20linkedin">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; L&#39; Blog , 2019
+		
+                    <br>
+                    <br>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("/js/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

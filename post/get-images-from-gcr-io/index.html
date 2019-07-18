@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><head>
+    <meta name="referrer" content="no-referrer"/>
+    <meta name="google-site-verification" content="9vIieCe-Qpd78QOmBl63rGtIVbhY6sYyuxX3j8XWBA4" />
+    <meta name="baidu-site-verification" content="LRrmH41lz7" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="description" content="通过阿里云快速获取gcr.io上的镜像文件">
+    
+    <meta name="keyword"  content="暴走的初号机, shinji3887, 暴走的初号机的网络日志, 暴走的初号机的博客, shinji3887 Blog, 博客, 个人网站, 互联网, Web, 云原生, PaaS, Istio, Kubernetes, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>通过阿里云快速获取gcr.io上的镜像文件-同步率400%</title>
+
+    <link rel="canonical" href="/post/get-images-from-gcr-io/">
+
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/syntax.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/zanshang.css">
+
+    
+    <link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/jquery.min.js"></script>
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/bootstrap.min.js"></script>
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/hux-blog.min.js"></script>
+</head>
+</head>
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">L&#39; Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="categories/tech">Tech</a>
+                    </li>
+                    
+                    <li>
+                        <a href="categories/tips">Tips</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about">About</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header{
+        background-image: url('https://lupeier.cn-sh2.ufileos.com/agfa-antiquarian-camera-46794.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                       
+                       <a class="tag" href="/tags/kubernetes" title="Kubernetes">
+                           Kubernetes
+                        </a>
+                        
+                       <a class="tag" href="/tags/docker" title="Docker">
+                           Docker
+                        </a>
+                        
+                    </div>
+                    <h1>通过阿里云快速获取gcr.io上的镜像文件</h1>
+                    <h2 class="subheading"></h2>
+                    <span  class="meta">Posted by L&#39; on Sunday, June 2, 2019
+                        
+                    </span>
+					<br>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+        		
+                        <header>
+                        <h2>TOC</h2>
+                        </header>
+                        <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#注册阿里云账号">注册阿里云账号</a></li>
+<li><a href="#创建镜像">创建镜像</a></li>
+<li><a href="#构建镜像">构建镜像</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        		
+        		
+
+<blockquote>
+<p>gcr.io是谷歌家的镜像仓库，我们在学习k8或者其他的云原生项目的时候不可避免的会用到上面的镜像。因为某些原因该站点无法访问，本文讲述如何通过阿里云获取gcr.io上面的镜像文件。</p>
+</blockquote>
+
+<h3 id="注册阿里云账号">注册阿里云账号</h3>
+
+<p>首先需要注册一个阿里云账号，登陆后选择<a href="https://cr.console.aliyun.com/cn-hangzhou/instances/repositories">容器镜像服务</a>
+，这个服务可以方便快速的帮助你从本地构建镜像或者直接从github代码仓库拉取代码构建镜像
+<img src="https://upload-images.jianshu.io/upload_images/14871146-ffd4543b59629cf1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="aliyun.png" /></p>
+
+<h3 id="创建镜像">创建镜像</h3>
+
+<p>点击创建镜像仓库，填写好镜像的相关信息，进入下一步，这时候需要绑定一个github账号（没有的话就创建一个），并选择github中对应的仓库地址，注意下面的<strong>海外机器构建</strong>一定要选上，这样阿里云就会使用海外的服务器进行源镜像的拉取，以此获取gcr.io的镜像。
+<img src="https://upload-images.jianshu.io/upload_images/14871146-02d09f03610e15b1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="2019-06-02 10.24.56.png" /></p>
+
+<p><img src="https://upload-images.jianshu.io/upload_images/14871146-fe6dee4ed3090c99.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="2019-06-02 10.25.59.png" />
+github 仓库的设置其实非常简单，只需要在根目录下面设置一个Dockerfile，里面设置好你需要拉取的源镜像地址就ok了
+<img src="https://upload-images.jianshu.io/upload_images/14871146-5d891ca6f8d5396c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="2019-06-02 10.32.49.png" /></p>
+
+<h3 id="构建镜像">构建镜像</h3>
+
+<p>创建完镜像之后，有一条默认的构建规则，需要你打一个tag，会自动触发构建，我们这里选择手动构建，添加一条构建规则，按提示输入相关信息，版本可以自己定义，为了清楚起见建议最好和源镜像的版本保持一致
+<img src="https://upload-images.jianshu.io/upload_images/14871146-b17f6296dfb2e93f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="2019-06-02 10.36.15.png" />
+设置好构建规则之后点击立即构建按钮，下面就会开始构建了，看到构建状态为成功说明构建成功了
+<img src="https://upload-images.jianshu.io/upload_images/14871146-d4135eceabd86eee.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="2019-06-02 10.37.15.png" />
+这时候点击基本信息，里面会显示镜像的地址，以及pull、push等一些基本操作。如果想把这个镜像提供给大家使用，选择仓库为<strong>公共</strong>就ok了。</p>
+
+        
+                
+        
+              <hr>
+              <ul class="pager">
+                  
+                  <li class="previous">
+                      <a href="/post/gitlab-flow-introduce/" data-toggle="tooltip" data-placement="top" title="GitLab Flow工作流介绍">&larr; Previous Post</a>
+                  </li>
+                  
+                  
+                  <li class="next">
+                      <a href="/post/vue-spring-security-login/" data-toggle="tooltip" data-placement="top" title="使用vue集成spring security进行安全登陆">Next Post &rarr;</a>
+                  </li>
+                  
+              </ul>
+  
+              
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+	const gitalk = new Gitalk({
+	  clientID: 'aff2580d8cc58af83367',
+	  clientSecret: '747547f5f87fcc5145b847ab76a498d7e501319f',
+	  repo: 'comment',
+	  owner: 'shinji3887',
+	  admin: ['shinji3887'],
+	  id: location.pathname,      
+	  distractionFreeMode: false  
+	})
+
+	gitalk.render('gitalk-container')
+</script>
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                     
+                    
+                        
+                    
+                        
+                            <a href="/tags/cloud-native" title="Cloud Native">
+                                Cloud Native
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/devops" title="DevOps">
+                                DevOps
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/docker" title="Docker">
+                                Docker
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="Kubernetes">
+                                Kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="Microservice">
+                                Microservice
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/restful" title="RESTful">
+                                RESTful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="Spring Cloud">
+                                Spring Cloud
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/vue" title="vue">
+                                vue
+                            </a>
+                        
+                    
+                        
+                    
+                    </div>
+                </section>
+
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                        <li><a target="_blank" href="https://skyao.io/">小剑的博客</a></li>
+                    
+                        <li><a target="_blank" href="https://zhaohuabing.com/">huabing的博客</a></li>
+                    
+                        <li><a target="_blank" href="http://blog.didispace.com/">程序猿DD的博客</a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href="" rel="alternate" type="application/rss+xml" title="L&#39; Blog" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:18016380795@163.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    <li>
+                        <a target="_blank" href="/link%20of%20wechat%20QR%20code%20image">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-wechat fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/shinji3887">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    <li>
+                        <a target="_blank" href="full%20profile%20url%20in%20linkedin">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; L&#39; Blog , 2019
+		
+                    <br>
+                    <br>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("/js/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Spring Cloud on L&#39; Blog</title>
+    <link>/tags/spring-cloud/</link>
+    <description>Recent content in Spring Cloud on L&#39; Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 17 May 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/spring-cloud/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>使用vue集成spring security进行安全登陆</title>
+      <link>/post/vue-spring-security-login/</link>
+      <pubDate>Fri, 17 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/vue-spring-security-login/</guid>
+      <description>在前后端分离的状态下，传统的spring security认证模式也需要做一点改造，以适应ajax的前端访问模式 现在前后端分离的开发模式已经成</description>
+    </item>
+    
+    <item>
+      <title>搭建eureka高可用集群</title>
+      <link>/post/create-eureka-ha-cluster/</link>
+      <pubDate>Fri, 08 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/create-eureka-ha-cluster/</guid>
+      <description>eureka高可用集群搭建 通常来说，高可用集群需要3个节点，通过各个节点之间进行复制和互相注册来保障注册中心的高可用。任何一个注册中心节点挂</description>
+    </item>
+    
+    <item>
+      <title>深入理解Spring Cloud Security OAuth2及JWT</title>
+      <link>/post/spring-coud-security-oauth2-jwt/</link>
+      <pubDate>Sun, 16 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/spring-coud-security-oauth2-jwt/</guid>
+      <description>因项目需要，需要和三方的oauth2服务器进行集成。网上关于spring cloud security oauth2的相关资料，一般都是讲如何配置，而能把这块原理讲透彻</description>
+    </item>
+    
+    <item>
+      <title>基于Spring Cloud Config和Kubernetes ConfigMap进行微服务集群的配置管理</title>
+      <link>/post/spring-cloud-config-kubernetes-configmap/</link>
+      <pubDate>Mon, 12 Nov 2018 22:57:00 +0800</pubDate>
+      
+      <guid>/post/spring-cloud-config-kubernetes-configmap/</guid>
+      <description>众所周知，配置管理是微服务中非常重要的一环。通过集中化的配置中心，可以使维护人员统一管理dev、test、stage、prod等各类环境的配</description>
+    </item>
+    
+    <item>
+      <title>Spring Cloud升级Finchley版本小结及遇到的坑</title>
+      <link>/post/spring-cloud-finchley-update/</link>
+      <pubDate>Thu, 08 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/spring-cloud-finchley-update/</guid>
+      <description>Finchley正式RELEASE版本发布也有段时间了，如果想体验spring boot2.0的魅力以及spring 5.0的新功能，自然是要把</description>
+    </item>
+    
+  </channel>
+</rss>

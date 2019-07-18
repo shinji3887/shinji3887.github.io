@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><head>
+    <meta name="referrer" content="no-referrer"/>
+    <meta name="google-site-verification" content="9vIieCe-Qpd78QOmBl63rGtIVbhY6sYyuxX3j8XWBA4" />
+    <meta name="baidu-site-verification" content="LRrmH41lz7" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="description" content="spring cloud config分布式配置中心实践">
+    
+    <meta name="keyword"  content="暴走的初号机, shinji3887, 暴走的初号机的网络日志, 暴走的初号机的博客, shinji3887 Blog, 博客, 个人网站, 互联网, Web, 云原生, PaaS, Istio, Kubernetes, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>基于Spring Cloud Config和Kubernetes ConfigMap进行微服务集群的配置管理-同步率400%</title>
+
+    <link rel="canonical" href="/post/spring-cloud-config-kubernetes-configmap/">
+
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/syntax.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/zanshang.css">
+
+    
+    <link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/jquery.min.js"></script>
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/bootstrap.min.js"></script>
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/hux-blog.min.js"></script>
+</head>
+</head>
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">L&#39; Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="categories/tech">Tech</a>
+                    </li>
+                    
+                    <li>
+                        <a href="categories/tips">Tips</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about">About</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header{
+        background-image: url('https://lupeier.cn-sh2.ufileos.com/clouds-dawn-dock-891822.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                       
+                       <a class="tag" href="/tags/spring-cloud" title="Spring Cloud">
+                           Spring Cloud
+                        </a>
+                        
+                       <a class="tag" href="/tags/kubernetes" title="Kubernetes">
+                           Kubernetes
+                        </a>
+                        
+                    </div>
+                    <h1>基于Spring Cloud Config和Kubernetes ConfigMap进行微服务集群的配置管理</h1>
+                    <h2 class="subheading"></h2>
+                    <span  class="meta">Posted by L&#39; on Monday, November 12, 2018
+                        
+                    </span>
+					<br>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+        		
+                        <header>
+                        <h2>TOC</h2>
+                        </header>
+                        <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#方案选择">方案选择</a></li>
+<li><a href="#环境变量配置">环境变量配置</a>
+<ul>
+<li><a href="#开发终端配置">开发终端配置</a></li>
+<li><a href="#configmap配置">ConfigMap配置</a></li>
+</ul></li>
+<li><a href="#spring-cloud-config配置">Spring Cloud Config配置</a></li>
+<li><a href="#应用配置">应用配置</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        		
+        		
+
+<blockquote>
+<p>众所周知，配置管理是微服务中非常重要的一环。通过集中化的配置中心，可以使维护人员统一管理<code>dev</code>、<code>test</code>、<code>stage</code>、<code>prod</code>等各类环境的配置，大大提高了维护效率，并使得配置变更可以实时下发给各节点，并被追踪和审计，本文探讨云原生环境下基于Spring Cloud Config+kubernetes ConfigMap的配置管理实践，大家如果有更好的实现方式，也欢迎一起探讨。</p>
+</blockquote>
+
+<h3 id="方案选择">方案选择</h3>
+
+<p>目前的配置获取方式，基本上有以下几种</p>
+
+<ul>
+<li><p>环境变量注入：这种方式把配置参数直接注入系统环境变量，应用直接从环境变量中获取配置信息，配置项较少的情况还是可以用用的，多了麻烦不说，配置的变更审计也是问题，<code>configmap</code>即是这种方式，好处是系统级，外部依赖较少</p></li>
+
+<li><p>通过maven工具：执行类似<code>mvn cleanpackage-Penv</code>这样的命令，在编译打包阶段将环境信息注入</p></li>
+
+<li><p>spring boot：Spring Boot中也提供了多环境配置功能，可以设置<code>application-{env}.properties</code>区分环境信息，启动时增加
+<code>spring.profiles.active=dev</code>这样的参数，在启动时将配置信息注入</p></li>
+
+<li><p>配置中心：这是微服务架构中比较主流的解决方案，有代表性的有携程的apollo、百度disconf以及spring自己的 spring cloud config</p></li>
+</ul>
+
+<p>综合几种方式的优缺点，我选择了Spring Cloud Config+kubernetes ConfigMap的解决方案。选择Spring Cloud Config的原因是比较轻量级，配合eureka可以快速搭建一个分布式的配置中心，再结合一些开源的配置管理UI框架（比如SCCA，后面会提到），基本可以满足目前的需要。结合Spring Cloud Bus组件可以实现实时的配置下发，另外由于是原生的，和Spring其他组件的集成也比较方便，不像apollo都是自己一套（自带eureka），个人感觉有点重了。为便于叙述，下文假设有dev、test、prod三个配置中心，分别对应三个不同的环境。</p>
+
+<h3 id="环境变量配置">环境变量配置</h3>
+
+<p>使用环境变量的原因，是开发和测试的环境不一致，开发一般在自己电脑上进行开发，所以需要设置自己终端的环境变量，而测试及生产环境都是在K8S集群内，所以需要通过ConfigMap来进行环境变量配置，从而实现了配置中心地址与环境的解耦。</p>
+
+<h4 id="开发终端配置">开发终端配置</h4>
+
+<p>比较简单，直接在环境变量中设置如下参数，注意这里设置的是dev环境的配置中心
+<img src="https://lupeier.cn-sh2.ufileos.com/config1.jpg" alt="env.jpg" /></p>
+
+<p>注意设置完之后eclipse需要重启一下，否则读不到变更的环境变量（IDEA我没有测过，不知道是不是一样）。可以通过下面这段代码看看环境变量是否正确获取</p>
+
+<pre><code class="language-java">@RestController
+public class WebController {
+
+   @Autowired
+   private Environment env;
+
+   @RequestMapping(value = &quot;getEnvParam&quot;, method = RequestMethod.GET)
+   public String getEnvParam() {
+        return &quot;config server : &quot; + env.getProperty(&quot;CONFIG_SERVER_ADDRESS&quot;);
+   }
+
+}
+</code></pre>
+
+<p>在浏览器输入URL后应该可以显示对应的环境变量值</p>
+
+<h4 id="configmap配置">ConfigMap配置</h4>
+
+<p>使用kubectl创建configmap资源有几种方式，这里我们直接使用命令行参数的方式创建配置信息对象，注意这里配置的是test环境的配置中心</p>
+
+<pre><code class="language-bash">[root@localhost ~]# kubectl create configmap config-server --from-literal=config.address=http://10.10.0.2:10002 --from-literal=config.profile=test
+configmap &quot;config-server&quot; created
+</code></pre>
+
+<p>执行如下命令确认configmap资源被成功创建</p>
+
+<pre><code class="language-bash">[root@localhost ~]# kubectl get configmap config-server -o yaml
+apiVersion: v1
+data:
+  config.address: http://10.10.0.2:10002
+  config.profile: test
+kind: ConfigMap
+metadata:
+   creationTimestamp: 2018-11-07T11:14:27Z
+   name: config-server
+   namespace: default
+   resourceVersion: &quot;18390952&quot;
+   selfLink: /api/v1/namespaces/default/configmaps/config-server
+   uid: 4a4b3713-e27e-11e8-8088-005056bd4c7c
+</code></pre>
+
+<p>将configmap对象注入我们创建的应用deployment对象中，可以直接edit资源，也可以使用patch方式，注意<code>spec.containers.env</code>部分，即是我们注入的configmap信息</p>
+
+<pre><code class="language-yaml">spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: service-base
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: service-base
+    spec:
+      containers:
+      - command:
+        - java
+        - -Djava.security.egd=file:/dev/./urandom
+        - -jar
+        - /home/app.jar
+        env:
+        - name: CONFIG_SERVER_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              key: config.uri
+              name: config-server
+        - name: CONFIG_SERVER_PROFILE
+          valueFrom:
+            configMapKeyRef:
+              key: config.profile
+              name: config-server
+        image: 10.0.0.62:5000/alpine/jre:8
+        imagePullPolicy: IfNotPresent
+        name: service-base
+        ports:
+        - containerPort: 33300
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /home
+          name: app-volume
+      dnsPolicy: ClusterFirst
+</code></pre>
+
+<h3 id="spring-cloud-config配置">Spring Cloud Config配置</h3>
+
+<p>这其实就是一个标准的Spring Cloud Config配置中心配置，这里不展开了，需要的同学可以直接看<a href="http://blog.didispace.com/spring-cloud-starter-dalston-3">这篇教程</a>。考虑到开发生产环境的隔离、管理和可靠性的需要，我这边使用的是db存储模式（需要edgware以上版本），配置文件如下</p>
+
+<pre><code class="language-yaml">spring:
+    application:
+        name: config-server
+    datasource:  
+        driver-class-name: oracle.jdbc.driver.OracleDriver
+        url: jdbc:oracle:thin:@10.0.0.56:1521/orac
+        username: test
+        password: test
+    jpa:
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.Oracle10gDialect
+    profiles:
+        active: jdbc
+    cloud:
+         config:
+             server:
+                 jdbc: 
+                     sql: SELECT P_KEY, P_VALUE from PROPERTY where APPLICATION=? and PROFILE=? and LABEL=?
+server:
+    port: 10002
+encrypt:
+    key: test
+</code></pre>
+
+<p>之后配合一个程序猿DD同学开源的配置管理项目SCCA（<a href="https://github.com/dyc87112/spring-cloud-config-admin">github地址</a>）,能以可视化方式管理各环境配置，基本满足目前要求。如果想和内部已有的服务管理平台集成，也非常方便，只要实现对property这张配置表的CRUD就行了，spring cloud config会自动监听property里的变化并刷新参数，这也是我比较推荐db模式的原因。SCCA配置界面如下：</p>
+
+<p><img src="https://lupeier.cn-sh2.ufileos.com/admin1.jpg" alt="admin1.jpg" />
+<img src="https://lupeier.cn-sh2.ufileos.com/admin2.jpg" alt="admin2.jpg" /></p>
+
+<h3 id="应用配置">应用配置</h3>
+
+<p>至此所有准备工作完成，在应用里直接配置上配置中心的环境变量，就可以在各环境中无缝切换了，应用配置如下</p>
+
+<pre><code class="language-yaml">spring:
+    application:
+         name: service-base
+    cloud:
+         config:
+             uri: ${CONFIG_SERVER_ADDRESS}
+             profile: ${CONFIG_SERVER_PROFILE}
+             label: master
+server:
+    port: 33000
+</code></pre>
+
+        
+                
+        
+              <hr>
+              <ul class="pager">
+                  
+                  <li class="previous">
+                      <a href="/post/vue-cli3-wds-ipv6/" data-toggle="tooltip" data-placement="top" title="vue-cli3.0项目中[WDS] Disconnected!的解决方法">&larr; Previous Post</a>
+                  </li>
+                  
+                  
+                  <li class="next">
+                      <a href="/post/spring-cloud-finchley-update/" data-toggle="tooltip" data-placement="top" title="Spring Cloud升级Finchley版本小结及遇到的坑">Next Post &rarr;</a>
+                  </li>
+                  
+              </ul>
+  
+              
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+	const gitalk = new Gitalk({
+	  clientID: 'aff2580d8cc58af83367',
+	  clientSecret: '747547f5f87fcc5145b847ab76a498d7e501319f',
+	  repo: 'comment',
+	  owner: 'shinji3887',
+	  admin: ['shinji3887'],
+	  id: location.pathname,      
+	  distractionFreeMode: false  
+	})
+
+	gitalk.render('gitalk-container')
+</script>
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                     
+                    
+                        
+                    
+                        
+                            <a href="/tags/cloud-native" title="Cloud Native">
+                                Cloud Native
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/devops" title="DevOps">
+                                DevOps
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/docker" title="Docker">
+                                Docker
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="Kubernetes">
+                                Kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="Microservice">
+                                Microservice
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/restful" title="RESTful">
+                                RESTful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="Spring Cloud">
+                                Spring Cloud
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/vue" title="vue">
+                                vue
+                            </a>
+                        
+                    
+                        
+                    
+                    </div>
+                </section>
+
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                        <li><a target="_blank" href="https://skyao.io/">小剑的博客</a></li>
+                    
+                        <li><a target="_blank" href="https://zhaohuabing.com/">huabing的博客</a></li>
+                    
+                        <li><a target="_blank" href="http://blog.didispace.com/">程序猿DD的博客</a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href="" rel="alternate" type="application/rss+xml" title="L&#39; Blog" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:18016380795@163.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    <li>
+                        <a target="_blank" href="/link%20of%20wechat%20QR%20code%20image">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-wechat fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/shinji3887">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    <li>
+                        <a target="_blank" href="full%20profile%20url%20in%20linkedin">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; L&#39; Blog , 2018
+		
+                    <br>
+                    <br>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("/js/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

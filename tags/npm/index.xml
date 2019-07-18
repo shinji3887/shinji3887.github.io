@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>npm on L&#39; Blog</title>
+    <link>/tags/npm/</link>
+    <description>Recent content in npm on L&#39; Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 21 Nov 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/npm/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>linux下使用npm install报EACCES的解决方法</title>
+      <link>/post/linux-npm-install-eacces/</link>
+      <pubDate>Wed, 21 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/linux-npm-install-eacces/</guid>
+      <description>前端项目需要进行CI/CD集成，CI服务器是linux版本的，所以需要在服务器上安装npm环境，记录一下安装过程以及碰到的坑。安装很简单，直</description>
+    </item>
+    
+  </channel>
+</rss>

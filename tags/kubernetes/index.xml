@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Kubernetes on L&#39; Blog</title>
+    <link>/tags/kubernetes/</link>
+    <description>Recent content in Kubernetes on L&#39; Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 02 Jun 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>通过阿里云快速获取gcr.io上的镜像文件</title>
+      <link>/post/get-images-from-gcr-io/</link>
+      <pubDate>Sun, 02 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/get-images-from-gcr-io/</guid>
+      <description>gcr.io是谷歌家的镜像仓库，我们在学习k8或者其他的云原生项目的时候不可避免的会用到上面的镜像。因为某些原因该站点无法访问，本文讲述如何</description>
+    </item>
+    
+    <item>
+      <title>使用helm charts安装elasticsearch集群</title>
+      <link>/post/use-helm-install-elastic-search/</link>
+      <pubDate>Sun, 28 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/use-helm-install-elastic-search/</guid>
+      <description>helm是kubernetes的包管理器，可以管理k8s的各种资源，并利用charts描述文件做非常复杂的编排功能，可以说是各种有状态发行软</description>
+    </item>
+    
+    <item>
+      <title>解读2017之容器篇：后Kubernetes时代 </title>
+      <link>/post/after-kubernetest-genereation/</link>
+      <pubDate>Thu, 17 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/after-kubernetest-genereation/</guid>
+      <description>作 者 张磊，浙江大学博士研究员，Hyper 项目成员，Kubernetes 项目资深成员与社区维护者。长期专注并活跃于容器集群管理与云计算数据中心</description>
+    </item>
+    
+    <item>
+      <title>使用kubeadm快速搭建单机kubernetes 1.13集群</title>
+      <link>/post/kubeadmin-create-cluster/</link>
+      <pubDate>Sat, 12 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/kubeadmin-create-cluster/</guid>
+      <description>kubeadm可谓是快速搭建k8集群的神器，想当年有多少人倒在k8集群搭建的这道坎上，我自己去年也是通过二进制方式手动搭了一个k8 1.9的集</description>
+    </item>
+    
+    <item>
+      <title>使用runC创建容器</title>
+      <link>/post/use-runc-to-create-container/</link>
+      <pubDate>Fri, 11 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/use-runc-to-create-container/</guid>
+      <description>上一篇文章中写道了docker的底层是使用runC来管理镜像的创建，启动，监控及删除的，这次就来看一下如何使用runC工具来管理镜像的生命周</description>
+    </item>
+    
+    <item>
+      <title>深入理解容器基础概念</title>
+      <link>/post/understand-contianer-concept/</link>
+      <pubDate>Thu, 10 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/understand-contianer-concept/</guid>
+      <description>容器技术近年来越来越火，作为云原生技术的最底层基石，要开发云原生应用，就有必要对于容器技术有一个更加深入的了解。容器的概念特别多，docke</description>
+    </item>
+    
+    <item>
+      <title>docker与kubernetes常用命令集合</title>
+      <link>/post/docker-kubernetes-commands/</link>
+      <pubDate>Tue, 20 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/docker-kubernetes-commands/</guid>
+      <description>docker与kubernetes常用命令行集合，做个整理，妈妈再也不用担心我记不住命令了。只根据需要记录了主要的命令和参数，应该足够用了，</description>
+    </item>
+    
+    <item>
+      <title>基于Spring Cloud Config和Kubernetes ConfigMap进行微服务集群的配置管理</title>
+      <link>/post/spring-cloud-config-kubernetes-configmap/</link>
+      <pubDate>Mon, 12 Nov 2018 22:57:00 +0800</pubDate>
+      
+      <guid>/post/spring-cloud-config-kubernetes-configmap/</guid>
+      <description>众所周知，配置管理是微服务中非常重要的一环。通过集中化的配置中心，可以使维护人员统一管理dev、test、stage、prod等各类环境的配</description>
+    </item>
+    
+  </channel>
+</rss>

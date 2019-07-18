@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>protobuf on L&#39; Blog</title>
+    <link>/tags/protobuf/</link>
+    <description>Recent content in protobuf on L&#39; Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 03 Dec 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/protobuf/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>protobuf协议介绍及性能实测</title>
+      <link>/post/protobuf-introduce-and-test/</link>
+      <pubDate>Mon, 03 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/protobuf-introduce-and-test/</guid>
+      <description>protobuf是谷歌开源的一款高性能序列化框架，特点是性能优异，数据结构设计优秀并具有良好的可扩展性，并且配合官方的java、python</description>
+    </item>
+    
+  </channel>
+</rss>

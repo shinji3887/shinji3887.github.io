@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><head>
+    <meta name="referrer" content="no-referrer"/>
+    <meta name="google-site-verification" content="9vIieCe-Qpd78QOmBl63rGtIVbhY6sYyuxX3j8XWBA4" />
+    <meta name="baidu-site-verification" content="LRrmH41lz7" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="description" content="vue-cli3.0使用proxytable解决跨域问题">
+    
+    <meta name="keyword"  content="暴走的初号机, shinji3887, 暴走的初号机的网络日志, 暴走的初号机的博客, shinji3887 Blog, 博客, 个人网站, 互联网, Web, 云原生, PaaS, Istio, Kubernetes, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>vue-cli3.0使用proxytable解决跨域问题-同步率400%</title>
+
+    <link rel="canonical" href="/post/vue-cli3.0-proxytable/">
+
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/syntax.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/zanshang.css">
+
+    
+    <link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/jquery.min.js"></script>
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/bootstrap.min.js"></script>
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/hux-blog.min.js"></script>
+</head>
+</head>
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">L&#39; Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="categories/tech">Tech</a>
+                    </li>
+                    
+                    <li>
+                        <a href="categories/tips">Tips</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about">About</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header{
+        background-image: url('https://lupeier.cn-sh2.ufileos.com/blackboard-chalkboard-communication-355988.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                       
+                       <a class="tag" href="/tags/vue" title="vue">
+                           vue
+                        </a>
+                        
+                    </div>
+                    <h1>vue-cli3.0使用proxytable解决跨域问题</h1>
+                    <h2 class="subheading"></h2>
+                    <span  class="meta">Posted by L&#39; on Saturday, May 11, 2019
+                        
+                    </span>
+					<br>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+        		
+                        <header>
+                        <h2>TOC</h2>
+                        </header>
+                        <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#跨域问题简述">跨域问题简述</a></li>
+<li><a href="#解决方案">解决方案</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+        		
+        		
+
+<blockquote>
+<p>现代的web开发一般都是前后端分离，前后端使用rest api进行交互，分离使得前后端服务器一般都不在一起，这导致了跨域问题，本文说明在vue-cli中解决这一问题</p>
+</blockquote>
+
+<h3 id="跨域问题简述">跨域问题简述</h3>
+
+<p>如果浏览器有类似下面的报错信息，则说明碰到跨域问题了</p>
+
+<pre><code class="language-bash">localhost/:1 Failed to load http://www.abc.cn/test/testToken.php: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://localhost:8080' is therefore not allowed access. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+</code></pre>
+
+<p>在没有设置<code>Access-Control-Allow-Origin</code>这个标签的情况下，浏览器默认是不允许跨域发送请求的，这里面涉及到安全问题，XSS、CSRF等攻击手段都是恶意脚本的跨站访问，所以一般在服务端没有特殊说明的情况下，浏览器都是禁用CORS的。</p>
+
+<p>浏览器如何判断是否是跨域访问呢？这里面就要讲到<code>同源策略</code>。同源策略（Same origin policy）是一种约定，它是浏览器最核心也最基本的安全功能，如果缺少了同源策略，则基于互联网的web访问安全会受到巨大威胁。可以说Web是构建在同源策略基础之上的，浏览器只是针对同源策略的一种实现。</p>
+
+<p>简单的来说：<strong>协议、IP、端口三者都相同，则为同源</strong>。不是同源的脚本不能操作其他源下面的对象。
+<img src="https://upload-images.jianshu.io/upload_images/14871146-70d0f99e722432dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="cors.png" /></p>
+
+<h3 id="解决方案">解决方案</h3>
+
+<p><code>同源策略</code>保障了互联网的安全访问，但是却对于前后端分离的应用带来了挑战。幸运的是，现在的解决方案也很多，比如<code>script标签</code>、<code>jsonp</code>、<code>后端设置cors</code>等等。之前我是用的方式即是服务端设置cors，返回标头内携带<code>access-control-allow-origin: *</code>标签，可解决跨域问题。配置如下（使用spring boot开发的后端服务）</p>
+
+<pre><code class="language-java">@Configuration
+public class CorsConfig {
+    private CorsConfiguration buildConfig() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOrigin(&quot;*&quot;); // 1
+        corsConfiguration.addAllowedHeader(&quot;*&quot;); // 2
+        corsConfiguration.addAllowedMethod(&quot;*&quot;); // 3
+        return corsConfiguration;
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration(&quot;/**&quot;, buildConfig()); // 4
+        return new CorsFilter(source);
+    }
+}
+</code></pre>
+
+<p>但这种方式一方面使得后端服务产生安全问题，另外如果碰到需要使用cookie的场景（比如会话保持），仍然还是失效的（cookie严格限制无法进行跨域访问）。所以比较推荐的做法还是在前端设置proxy代理，来解决跨域问题。这边使用的是vue-cli3.0，配置和之前略有不同,在根目录的<code>vue.config.js</code>下加入如下配置:</p>
+
+<pre><code class="language-js">devServer: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:33000/api',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+      }
+    }
+  }
+</code></pre>
+
+<p>如此在前端所有发往<code>/api</code>的请求都会转发至后端服务<code>http://127.0.0.1:33000/api</code>,问题解决。注意这边配置的是开发环境,供调试使用,生产环境可使用nginx或haproxy的代理功能进行转发.</p>
+
+        
+                
+        
+              <hr>
+              <ul class="pager">
+                  
+                  <li class="previous">
+                      <a href="/post/vue-spring-security-login/" data-toggle="tooltip" data-placement="top" title="使用vue集成spring security进行安全登陆">&larr; Previous Post</a>
+                  </li>
+                  
+                  
+                  <li class="next">
+                      <a href="/post/use-helm-install-elastic-search/" data-toggle="tooltip" data-placement="top" title="使用helm charts安装elasticsearch集群">Next Post &rarr;</a>
+                  </li>
+                  
+              </ul>
+  
+              
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+	const gitalk = new Gitalk({
+	  clientID: 'aff2580d8cc58af83367',
+	  clientSecret: '747547f5f87fcc5145b847ab76a498d7e501319f',
+	  repo: 'comment',
+	  owner: 'shinji3887',
+	  admin: ['shinji3887'],
+	  id: location.pathname,      
+	  distractionFreeMode: false  
+	})
+
+	gitalk.render('gitalk-container')
+</script>
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                     
+                    
+                        
+                    
+                        
+                            <a href="/tags/cloud-native" title="Cloud Native">
+                                Cloud Native
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/devops" title="DevOps">
+                                DevOps
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/docker" title="Docker">
+                                Docker
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="Kubernetes">
+                                Kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="Microservice">
+                                Microservice
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/restful" title="RESTful">
+                                RESTful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="Spring Cloud">
+                                Spring Cloud
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/vue" title="vue">
+                                vue
+                            </a>
+                        
+                    
+                        
+                    
+                    </div>
+                </section>
+
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                        <li><a target="_blank" href="https://skyao.io/">小剑的博客</a></li>
+                    
+                        <li><a target="_blank" href="https://zhaohuabing.com/">huabing的博客</a></li>
+                    
+                        <li><a target="_blank" href="http://blog.didispace.com/">程序猿DD的博客</a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href="" rel="alternate" type="application/rss+xml" title="L&#39; Blog" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:18016380795@163.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    <li>
+                        <a target="_blank" href="/link%20of%20wechat%20QR%20code%20image">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-wechat fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/shinji3887">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    <li>
+                        <a target="_blank" href="full%20profile%20url%20in%20linkedin">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; L&#39; Blog , 2019
+		
+                    <br>
+                    <br>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("/js/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

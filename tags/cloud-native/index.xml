@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Cloud Native on L&#39; Blog</title>
+    <link>/tags/cloud-native/</link>
+    <description>Recent content in Cloud Native on L&#39; Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 29 Jun 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/cloud-native/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Richardson Maturity Model-迈向REST的顶点</title>
+      <link>/post/steps-toward-the-glory-of-rest/</link>
+      <pubDate>Sat, 29 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/steps-toward-the-glory-of-rest/</guid>
+      <description>一个由Leonard Richardson开发的模型将REST架构的主要元素分解为三个层级。 分别是资源，http动词和超媒体控制。 最近我一直在</description>
+    </item>
+    
+    <item>
+      <title>云计算的前世今生</title>
+      <link>/post/cloud-computing-history/</link>
+      <pubDate>Sun, 06 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/cloud-computing-history/</guid>
+      <description>最近因为微服务项目的实施，开始深入了解云计算的基础架构。越往前推进，越发现微服务架构要能成功，绝对离不开基础设施的支撑，基础架构的云化，项目</description>
+    </item>
+    
+  </channel>
+</rss>

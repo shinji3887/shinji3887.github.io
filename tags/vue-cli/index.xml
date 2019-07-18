@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>vue-cli on L&#39; Blog</title>
+    <link>/tags/vue-cli/</link>
+    <description>Recent content in vue-cli on L&#39; Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 13 Nov 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/vue-cli/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>vue-cli3.0项目中[WDS] Disconnected!的解决方法</title>
+      <link>/post/vue-cli3-wds-ipv6/</link>
+      <pubDate>Tue, 13 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/vue-cli3-wds-ipv6/</guid>
+      <description>项目中的前端工程用到了vue-cli3.0脚手架，启动后console一直报错 Failed to load resource: net::ERR_EMPTY_RESPONSE [http://localhost:8080/sockjs-node/info?t=1541988880077] [WDS] Disconnected! 查了下应该是webpack中的用到的热加载功能</description>
+    </item>
+    
+  </channel>
+</rss>

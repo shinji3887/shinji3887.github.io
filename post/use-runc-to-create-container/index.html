@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><head>
+    <meta name="referrer" content="no-referrer"/>
+    <meta name="google-site-verification" content="9vIieCe-Qpd78QOmBl63rGtIVbhY6sYyuxX3j8XWBA4" />
+    <meta name="baidu-site-verification" content="LRrmH41lz7" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="description" content="runC工具创建容器实战">
+    
+    <meta name="keyword"  content="暴走的初号机, shinji3887, 暴走的初号机的网络日志, 暴走的初号机的博客, shinji3887 Blog, 博客, 个人网站, 互联网, Web, 云原生, PaaS, Istio, Kubernetes, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>使用runC创建容器-同步率400%</title>
+
+    <link rel="canonical" href="/post/use-runc-to-create-container/">
+
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/iDisqus.min.css"/>
+	
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/syntax.css">
+
+    
+    <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/zanshang.css">
+
+    
+    <link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/jquery.min.js"></script>
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/bootstrap.min.js"></script>
+    
+    
+    <script src="https://lupeier.cn-sh2.ufileos.com/hux-blog.min.js"></script>
+</head>
+</head>
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">L&#39; Blog</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="categories/tech">Tech</a>
+                    </li>
+                    
+                    <li>
+                        <a href="categories/tips">Tips</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/about">About</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header{
+        background-image: url('https://lupeier.cn-sh2.ufileos.com/back-view-boy-child-2495567.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                       
+                       <a class="tag" href="/tags/docker" title="Docker">
+                           Docker
+                        </a>
+                        
+                       <a class="tag" href="/tags/kubernetes" title="Kubernetes">
+                           Kubernetes
+                        </a>
+                        
+                    </div>
+                    <h1>使用runC创建容器</h1>
+                    <h2 class="subheading"></h2>
+                    <span  class="meta">Posted by L&#39; on Friday, January 11, 2019
+                        
+                    </span>
+					<br>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+        		
+                        <header>
+                        <h2>TOC</h2>
+                        </header>
+                        
+        		
+        		<blockquote>
+<p>上一篇文章中写道了docker的底层是使用runC来管理镜像的创建，启动，监控及删除的，这次就来看一下如何使用runC工具来管理镜像的生命周期</p>
+</blockquote>
+
+<p>runC的使用非常简单，首先去github下载已经编译好的二进制文件（写文章的时候版本是1.0-rc6），文件名一般为runc.amd64，直接拷贝进usr/bin目录即可。先执行一下runc命令，有如下显示</p>
+
+<pre><code class="language-bash">NAME:
+   runc - Open Container Initiative runtime
+
+runc is a command line client for running applications packaged according to
+the Open Container Initiative (OCI) format and is a compliant implementation of the
+Open Container Initiative specification.
+
+runc integrates well with existing process supervisors to provide a production
+container runtime environment for applications. It can be used with your
+existing process monitoring tools and the container will be spawned as a
+direct child of the process supervisor.
+
+Containers are configured using bundles. A bundle for a container is a directory
+that includes a specification file named &quot;config.json&quot; and a root filesystem.
+The root filesystem contains the contents of the container.
+
+To start a new instance of a container:
+
+    # runc run [ -b bundle ] &lt;container-id&gt;
+
+Where &quot;&lt;container-id&gt;&quot; is your name for the instance of the container that you
+are starting. The name you provide for the container instance must be unique on
+your host. Providing the bundle directory using &quot;-b&quot; is optional. The default
+value for &quot;bundle&quot; is the current directory.
+
+USAGE:
+   runc [global options] command [command options] [arguments...]
+   
+VERSION:
+   1.0.0-rc6
+spec: 1.0.1-dev
+   
+COMMANDS:
+     checkpoint  checkpoint a running container
+     create      create a container
+     delete      delete any resources held by the container often used with detached container
+     events      display container events such as OOM notifications, cpu, memory, and IO usage statistics
+     exec        execute new process inside the container
+     init        initialize the namespaces and launch the process (do not call it outside of runc)
+     kill        kill sends the specified signal (default: SIGTERM) to the container's init process
+     list        lists containers started by runc with the given root
+     pause       pause suspends all processes inside the container
+     ps          ps displays the processes running inside a container
+     restore     restore a container from a previous checkpoint
+     resume      resumes all processes that have been previously paused
+     run         create and run a container
+     spec        create a new specification file
+     start       executes the user defined process in a created container
+     state       output the state of a container
+     update      update container resource constraints
+     help, h     Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --debug             enable debug output for logging
+   --log value         set the log file path where internal debug information is written (default: &quot;/dev/null&quot;)
+   --log-format value  set the format used by logs ('text' (default), or 'json') (default: &quot;text&quot;)
+   --root value        root directory for storage of container state (this should be located in tmpfs) (default: &quot;/run/runc&quot;)
+   --criu value        path to the criu binary used for checkpoint and restore (default: &quot;criu&quot;)
+   --systemd-cgroup    enable systemd cgroup support, expects cgroupsPath to be of form &quot;slice:prefix:name&quot; for e.g. &quot;system.slice:runc:434234&quot;
+   --rootless value    ignore cgroup permission errors ('true', 'false', or 'auto') (default: &quot;auto&quot;)
+   --help, -h          show help
+   --version, -v       print the version
+</code></pre>
+
+<p>简单的说，runC是一个命令行工具，用来运行按照OCI标准格式打包过的应用，容器使用bundle进行配置。bundle的概念，简单来说就是一个目录，目录里包含一个配置文件<code>config.son</code>和一个root文件系统（rootfs目录），使用命令</p>
+
+<pre><code class="language-bash"># runc run [ -b bundle ] &lt;container-id&gt;
+</code></pre>
+
+<p>来启动一个容器，其中<code>-b</code>是可选项，用来指定bundle的位置（默认为当前目录），注意<code>container-id</code>必须在host上唯一。</p>
+
+<p>因为需要制作root filesystem，所以还需要安装好docker并设置好镜像仓库（这步不是必须的，理论上只要你制作出一个符合OCI规范的filesystem都可以，只是自己弄比较麻烦）</p>
+
+<p>准备工作都完成后，接下来就可以开始测试了</p>
+
+<pre><code class="language-bash"># create the top most bundle directory
+mkdir /mycontainer
+cd /mycontainer
+
+# create the rootfs directory
+mkdir rootfs
+
+# export busybox via Docker into the rootfs directory
+docker export $(docker create busybox) | tar -C rootfs -xvf -
+</code></pre>
+
+<p>这几步是先创建容器目录，再创建一个名字叫rootfs的目录，之后使用一个docker的镜像busybox（一个轻量级的linux工具集）来制作root filesystem(docker镜像都是符合OCI格式规范的)。完成后rootfs目录下会有如下文件</p>
+
+<pre><code class="language-bash">[root@localhost rootfs]# ls -l
+总用量 16
+drwxr-xr-x. 2 root      root      12288 1月   1 02:16 bin
+drwxr-xr-x. 4 root      root         43 1月  11 09:20 dev
+drwxr-xr-x. 3 root      root        139 1月  11 09:20 etc
+drwxr-xr-x. 2 nfsnobody nfsnobody     6 1月   1 02:16 home
+drwxr-xr-x. 2 root      root          6 1月  11 09:20 proc
+drwx------. 2 root      root          6 1月   1 02:16 root
+drwxr-xr-x. 2 root      root          6 1月  11 09:20 sys
+drwxrwxrwt. 2 root      root          6 1月   1 02:16 tmp
+drwxr-xr-x. 3 root      root         18 1月   1 02:16 usr
+drwxr-xr-x. 4 root      root         30 1月   1 02:16 var
+</code></pre>
+
+<p>有了rootfs之后，我们就可以执行如下命令</p>
+
+<pre><code class="language-bash">runc spec
+</code></pre>
+
+<p>来创建一个<code>config.json</code>文件，这个文件是一个标准的OCI格式的文件，内容如下</p>
+
+<pre><code class="language-json">{
+	&quot;ociVersion&quot;: &quot;1.0.1-dev&quot;,
+	&quot;process&quot;: {
+		&quot;terminal&quot;: true,
+		&quot;user&quot;: {
+			&quot;uid&quot;: 0,
+			&quot;gid&quot;: 0
+		},
+		&quot;args&quot;: [
+			&quot;sh&quot;
+		],
+		&quot;env&quot;: [
+			&quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
+			&quot;TERM=xterm&quot;
+		],
+		&quot;cwd&quot;: &quot;/&quot;,
+		&quot;capabilities&quot;: {
+			&quot;bounding&quot;: [
+				&quot;CAP_AUDIT_WRITE&quot;,
+				&quot;CAP_KILL&quot;,
+				&quot;CAP_NET_BIND_SERVICE&quot;
+			],
+			&quot;effective&quot;: [
+				&quot;CAP_AUDIT_WRITE&quot;,
+				&quot;CAP_KILL&quot;,
+				&quot;CAP_NET_BIND_SERVICE&quot;
+			],
+			&quot;inheritable&quot;: [
+				&quot;CAP_AUDIT_WRITE&quot;,
+				&quot;CAP_KILL&quot;,
+				&quot;CAP_NET_BIND_SERVICE&quot;
+			],
+			&quot;permitted&quot;: [
+				&quot;CAP_AUDIT_WRITE&quot;,
+				&quot;CAP_KILL&quot;,
+				&quot;CAP_NET_BIND_SERVICE&quot;
+			],
+			&quot;ambient&quot;: [
+				&quot;CAP_AUDIT_WRITE&quot;,
+				&quot;CAP_KILL&quot;,
+				&quot;CAP_NET_BIND_SERVICE&quot;
+			]
+		},
+		&quot;rlimits&quot;: [
+			{
+				&quot;type&quot;: &quot;RLIMIT_NOFILE&quot;,
+				&quot;hard&quot;: 1024,
+				&quot;soft&quot;: 1024
+			}
+		],
+		&quot;noNewPrivileges&quot;: true
+	},
+	&quot;root&quot;: {
+		&quot;path&quot;: &quot;rootfs&quot;,
+		&quot;readonly&quot;: true
+	},
+	&quot;hostname&quot;: &quot;runc&quot;,
+	&quot;mounts&quot;: [
+		{
+			&quot;destination&quot;: &quot;/proc&quot;,
+			&quot;type&quot;: &quot;proc&quot;,
+			&quot;source&quot;: &quot;proc&quot;
+		},
+		{
+			&quot;destination&quot;: &quot;/dev&quot;,
+			&quot;type&quot;: &quot;tmpfs&quot;,
+			&quot;source&quot;: &quot;tmpfs&quot;,
+			&quot;options&quot;: [
+				&quot;nosuid&quot;,
+				&quot;strictatime&quot;,
+				&quot;mode=755&quot;,
+				&quot;size=65536k&quot;
+			]
+		},
+		{
+			&quot;destination&quot;: &quot;/dev/pts&quot;,
+			&quot;type&quot;: &quot;devpts&quot;,
+			&quot;source&quot;: &quot;devpts&quot;,
+			&quot;options&quot;: [
+				&quot;nosuid&quot;,
+				&quot;noexec&quot;,
+				&quot;newinstance&quot;,
+				&quot;ptmxmode=0666&quot;,
+				&quot;mode=0620&quot;,
+				&quot;gid=5&quot;
+			]
+		},
+		{
+			&quot;destination&quot;: &quot;/dev/shm&quot;,
+			&quot;type&quot;: &quot;tmpfs&quot;,
+			&quot;source&quot;: &quot;shm&quot;,
+			&quot;options&quot;: [
+				&quot;nosuid&quot;,
+				&quot;noexec&quot;,
+				&quot;nodev&quot;,
+				&quot;mode=1777&quot;,
+				&quot;size=65536k&quot;
+			]
+		},
+		{
+			&quot;destination&quot;: &quot;/dev/mqueue&quot;,
+			&quot;type&quot;: &quot;mqueue&quot;,
+			&quot;source&quot;: &quot;mqueue&quot;,
+			&quot;options&quot;: [
+				&quot;nosuid&quot;,
+				&quot;noexec&quot;,
+				&quot;nodev&quot;
+			]
+		},
+		{
+			&quot;destination&quot;: &quot;/sys&quot;,
+			&quot;type&quot;: &quot;sysfs&quot;,
+			&quot;source&quot;: &quot;sysfs&quot;,
+			&quot;options&quot;: [
+				&quot;nosuid&quot;,
+				&quot;noexec&quot;,
+				&quot;nodev&quot;,
+				&quot;ro&quot;
+			]
+		},
+		{
+			&quot;destination&quot;: &quot;/sys/fs/cgroup&quot;,
+			&quot;type&quot;: &quot;cgroup&quot;,
+			&quot;source&quot;: &quot;cgroup&quot;,
+			&quot;options&quot;: [
+				&quot;nosuid&quot;,
+				&quot;noexec&quot;,
+				&quot;nodev&quot;,
+				&quot;relatime&quot;,
+				&quot;ro&quot;
+			]
+		}
+	],
+	&quot;linux&quot;: {
+		&quot;resources&quot;: {
+			&quot;devices&quot;: [
+				{
+					&quot;allow&quot;: false,
+					&quot;access&quot;: &quot;rwm&quot;
+				}
+			]
+		},
+		&quot;namespaces&quot;: [
+			{
+				&quot;type&quot;: &quot;pid&quot;
+			},
+			{
+				&quot;type&quot;: &quot;network&quot;
+			},
+			{
+				&quot;type&quot;: &quot;ipc&quot;
+			},
+			{
+				&quot;type&quot;: &quot;uts&quot;
+			},
+			{
+				&quot;type&quot;: &quot;mount&quot;
+			}
+		],
+		&quot;maskedPaths&quot;: [
+			&quot;/proc/kcore&quot;,
+			&quot;/proc/latency_stats&quot;,
+			&quot;/proc/timer_list&quot;,
+			&quot;/proc/timer_stats&quot;,
+			&quot;/proc/sched_debug&quot;,
+			&quot;/sys/firmware&quot;,
+			&quot;/proc/scsi&quot;
+		],
+		&quot;readonlyPaths&quot;: [
+			&quot;/proc/asound&quot;,
+			&quot;/proc/bus&quot;,
+			&quot;/proc/fs&quot;,
+			&quot;/proc/irq&quot;,
+			&quot;/proc/sys&quot;,
+			&quot;/proc/sysrq-trigger&quot;
+		]
+	}
+}
+</code></pre>
+
+<p>这边再说一下OCI规范，援引一段OCI官网的说明</p>
+
+<blockquote>
+<p>Established in June 2015 by Docker and other leaders in the container industry, the OCI currently contains two specifications: the Runtime Specification (<a href="http://www.github.com/opencontainers/runtime-spec">runtime-spec</a>) and the Image Specification (<a href="http://www.github.com/opencontainers/image-spec">image-spec</a>). The Runtime Specification outlines how to run a “<a href="https://github.com/opencontainers/runtime-spec/blob/master/bundle.md">filesystem bundle</a>” that is unpacked on disk. At a high-level an OCI implementation would download an OCI Image then unpack that image into an OCI Runtime filesystem bundle. At this point the OCI Runtime Bundle would be run by an OCI Runtime.</p>
+</blockquote>
+
+<p>简单的说，OCI有两个规范，一个是容器运行时规范<code>runtime-spec</code>，一个是镜像格式规范<code>image-spec</code>。一个镜像，简单来说就是一个打包好的符合OCI规范的<code>filesystem bundule</code>。而bundile的话，前面介绍过，包含一个配置文件<code>config.json</code>和一个rootfs目录。</p>
+
+<p>现在<code>rootfs</code>和<code>config.json</code>都有了，我们可以创建容器了，执行</p>
+
+<pre><code class="language-bash">runc run mycontainerid
+</code></pre>
+
+<p>创建容器，成功后会自动进入容器
+这时候我们执行<code>ps</code>一下，可以看到</p>
+
+<pre><code class="language-bash">/ # ps
+PID   USER     TIME  COMMAND
+    1 root      0:00 sh
+    7 root      0:00 ps
+</code></pre>
+
+<p>可以看到这个容器里面的1号进程就是sh那个进程，看不到其他进程，容器启动试验成功。</p>
+
+<p>现在我们可以做容器的整个生命周期管理了</p>
+
+<pre><code class="language-bash"># run as root
+cd /mycontainer
+runc create mycontainerid
+
+# view the container is created and in the &quot;created&quot; state
+runc list
+
+# start the process inside the container
+runc start mycontainerid
+
+# after 5 seconds view that the container has exited and is now in the stopped state
+runc list
+
+# now delete the container
+runc delete mycontainerid
+</code></pre>
+
+<p>注意在执行<code>runc create mycontainerid</code>命令时，会报错</p>
+
+<pre><code class="language-bash">cannot allocate tty if runc will detach without setting console socket
+</code></pre>
+
+<p>这是由于在<code>config.json</code>文件中的配置<code>&quot;terminal&quot;: true</code>，这个默认是true，即以终端方式启动，需要改成false。</p>
+
+        
+                
+        
+              <hr>
+              <ul class="pager">
+                  
+                  <li class="previous">
+                      <a href="/post/kubeadmin-create-cluster/" data-toggle="tooltip" data-placement="top" title="使用kubeadm快速搭建单机kubernetes 1.13集群">&larr; Previous Post</a>
+                  </li>
+                  
+                  
+                  <li class="next">
+                      <a href="/post/understand-contianer-concept/" data-toggle="tooltip" data-placement="top" title="深入理解容器基础概念">Next Post &rarr;</a>
+                  </li>
+                  
+              </ul>
+  
+              
+
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script>
+	const gitalk = new Gitalk({
+	  clientID: 'aff2580d8cc58af83367',
+	  clientSecret: '747547f5f87fcc5145b847ab76a498d7e501319f',
+	  repo: 'comment',
+	  owner: 'shinji3887',
+	  admin: ['shinji3887'],
+	  id: location.pathname,      
+	  distractionFreeMode: false  
+	})
+
+	gitalk.render('gitalk-container')
+</script>
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                     
+                    
+                        
+                    
+                        
+                            <a href="/tags/cloud-native" title="Cloud Native">
+                                Cloud Native
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/devops" title="DevOps">
+                                DevOps
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/docker" title="Docker">
+                                Docker
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="Kubernetes">
+                                Kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="Microservice">
+                                Microservice
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/restful" title="RESTful">
+                                RESTful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="Spring Cloud">
+                                Spring Cloud
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/vue" title="vue">
+                                vue
+                            </a>
+                        
+                    
+                        
+                    
+                    </div>
+                </section>
+
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                        <li><a target="_blank" href="https://skyao.io/">小剑的博客</a></li>
+                    
+                        <li><a target="_blank" href="https://zhaohuabing.com/">huabing的博客</a></li>
+                    
+                        <li><a target="_blank" href="http://blog.didispace.com/">程序猿DD的博客</a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href="" rel="alternate" type="application/rss+xml" title="L&#39; Blog" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:18016380795@163.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    <li>
+                        <a target="_blank" href="/link%20of%20wechat%20QR%20code%20image">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-wechat fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/shinji3887">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    <li>
+                        <a target="_blank" href="full%20profile%20url%20in%20linkedin">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; L&#39; Blog , 2019
+		
+                    <br>
+                    <br>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("/js/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

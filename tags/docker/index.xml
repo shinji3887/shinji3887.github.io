@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Docker on L&#39; Blog</title>
+    <link>/tags/docker/</link>
+    <description>Recent content in Docker on L&#39; Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 02 Jun 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>通过阿里云快速获取gcr.io上的镜像文件</title>
+      <link>/post/get-images-from-gcr-io/</link>
+      <pubDate>Sun, 02 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/get-images-from-gcr-io/</guid>
+      <description>gcr.io是谷歌家的镜像仓库，我们在学习k8或者其他的云原生项目的时候不可避免的会用到上面的镜像。因为某些原因该站点无法访问，本文讲述如何</description>
+    </item>
+    
+    <item>
+      <title>使用runC创建容器</title>
+      <link>/post/use-runc-to-create-container/</link>
+      <pubDate>Fri, 11 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/use-runc-to-create-container/</guid>
+      <description>上一篇文章中写道了docker的底层是使用runC来管理镜像的创建，启动，监控及删除的，这次就来看一下如何使用runC工具来管理镜像的生命周</description>
+    </item>
+    
+    <item>
+      <title>深入理解容器基础概念</title>
+      <link>/post/understand-contianer-concept/</link>
+      <pubDate>Thu, 10 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/understand-contianer-concept/</guid>
+      <description>容器技术近年来越来越火，作为云原生技术的最底层基石，要开发云原生应用，就有必要对于容器技术有一个更加深入的了解。容器的概念特别多，docke</description>
+    </item>
+    
+    <item>
+      <title>docker与kubernetes常用命令集合</title>
+      <link>/post/docker-kubernetes-commands/</link>
+      <pubDate>Tue, 20 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/docker-kubernetes-commands/</guid>
+      <description>docker与kubernetes常用命令行集合，做个整理，妈妈再也不用担心我记不住命令了。只根据需要记录了主要的命令和参数，应该足够用了，</description>
+    </item>
+    
+  </channel>
+</rss>
