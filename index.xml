@@ -1,15 +1,33 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>L&#39; HandBook</title>
+    <title>L&#39;s Blog</title>
     <link>/</link>
-    <description>Recent content on L&#39; HandBook</description>
+    <description>Recent content on L&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 30 Jun 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 02 Sep 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>使用spring boot&#43;kubernetes构建完整微服务平台</title>
+      <link>/post/use-kubernetes-to-build-microservices/</link>
+      <pubDate>Mon, 02 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/use-kubernetes-to-build-microservices/</guid>
+      <description>微服务架构被认为是构建大型复杂系统的最佳理论指导，其采用了分而治之、单一职责、关注点分离等方法论来设计系统架构。微服务的实现方式和思路有很多</description>
+    </item>
+    
+    <item>
+      <title>构建云原生微服务网关系列-篇一：Ambassador</title>
+      <link>/post/cloud-native-api-gateway-part-1/</link>
+      <pubDate>Tue, 30 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/cloud-native-api-gateway-part-1/</guid>
+      <description>在微服务架构中，api网关是一个十分重要的存在。一方面它为外部的流量访问提供了统一的入口，使得可以方便的进行防火墙的策略实施；另一方面，可以</description>
+    </item>
     
     <item>
       <title>深入了解Cilium多集群</title>
