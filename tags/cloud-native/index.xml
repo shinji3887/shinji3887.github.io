@@ -6,10 +6,19 @@
     <description>Recent content in Cloud Native on L&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 30 Jul 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 29 Sep 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/cloud-native/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>构建云原生微服务网关系列-篇二：Zuul</title>
+      <link>/post/cloud-native-api-gateway-part-2/</link>
+      <pubDate>Sun, 29 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/cloud-native-api-gateway-part-2/</guid>
+      <description>使用Spring Cloud的api网关组件Zuul结合Spring Cloud Kubernetes项目构建云原生网关 这篇是云原生网关系列的第二篇，这次</description>
+    </item>
     
     <item>
       <title>构建云原生微服务网关系列-篇一：Ambassador</title>

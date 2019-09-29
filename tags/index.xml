@@ -6,7 +6,7 @@
     <description>Recent content in Tags on L&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 30 Jul 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 29 Sep 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>Api Gateway</title>
       <link>/tags/api-gateway/</link>
-      <pubDate>Tue, 30 Jul 2019 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 29 Sep 2019 00:00:00 +0000</pubDate>
       
       <guid>/tags/api-gateway/</guid>
       <description></description>
@@ -32,7 +32,7 @@
     <item>
       <title>Cloud Native</title>
       <link>/tags/cloud-native/</link>
-      <pubDate>Tue, 30 Jul 2019 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 29 Sep 2019 00:00:00 +0000</pubDate>
       
       <guid>/tags/cloud-native/</guid>
       <description></description>
