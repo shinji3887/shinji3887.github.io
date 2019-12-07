@@ -6,10 +6,19 @@
     <description>Recent content on L&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 29 Sep 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 07 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>CKA考试经验总结</title>
+      <link>/post/cka-preparation-experience/</link>
+      <pubDate>Sat, 07 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/post/cka-preparation-experience/</guid>
+      <description>CKA考试相关说明及经验总结 什么是CKA考试？ CKA全称是Certified Kubernetes Administrator，即Kubernetes认证管理员，</description>
+    </item>
     
     <item>
       <title>构建云原生微服务网关系列-篇二：Zuul</title>
