@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>/post/webassembly-in-envoy/</loc>
+    <lastmod>2020-03-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/post/redefining-extensibility-in-proxies/</loc>
     <lastmod>2020-03-07T00:00:00+00:00</lastmod>
   </url>
@@ -193,6 +198,12 @@
   </url>
   
   <url>
+    <loc>/tags/envoy/</loc>
+    <lastmod>2020-03-08T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>/tags/git/</loc>
     <lastmod>2018-11-26T00:00:00+00:00</lastmod>
     <priority>0</priority>
@@ -206,7 +217,7 @@
   
   <url>
     <loc>/tags/istio/</loc>
-    <lastmod>2020-03-07T00:00:00+00:00</lastmod>
+    <lastmod>2020-03-08T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -218,7 +229,7 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2020-03-07T00:00:00+00:00</lastmod>
+    <lastmod>2020-03-08T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -242,7 +253,7 @@
   
   <url>
     <loc>/post/</loc>
-    <lastmod>2020-03-07T00:00:00+00:00</lastmod>
+    <lastmod>2020-03-08T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -260,7 +271,7 @@
   
   <url>
     <loc>/tags/servicemesh/</loc>
-    <lastmod>2020-03-07T00:00:00+00:00</lastmod>
+    <lastmod>2020-03-08T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -278,13 +289,19 @@
   
   <url>
     <loc>/categories/tech/</loc>
-    <lastmod>2020-03-07T00:00:00+00:00</lastmod>
+    <lastmod>2020-03-08T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/categories/tips/</loc>
     <lastmod>2019-12-07T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/webassembly/</loc>
+    <lastmod>2020-03-08T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

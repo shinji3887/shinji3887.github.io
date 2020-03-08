@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Envoy on L&#39;s Blog</title>
+    <link>/tags/envoy/</link>
+    <description>Recent content in Envoy on L&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 08 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/envoy/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>WebAssembly in Envoy</title>
+      <link>/post/webassembly-in-envoy/</link>
+      <pubDate>Sun, 08 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/webassembly-in-envoy/</guid>
+      <description>译者注：WebAssembly in Envoy的第二弹，继续探讨在Envoy中使用Wasm进行扩展。可以看到官方是下了很大的决心推广Wasm这种</description>
+    </item>
+    
+  </channel>
+</rss>
