@@ -69,11 +69,11 @@
                     </li>
                     
                     <li>
-                        <a href="categories/tech">Tech</a>
+                        <a href="categories/tech">tech</a>
                     </li>
                     
                     <li>
-                        <a href="categories/tips">Tips</a>
+                        <a href="categories/tips">tips</a>
                     </li>
                     
                     <li>
@@ -169,41 +169,39 @@
                         <header>
                         <h2>TOC</h2>
                         </header>
-                        
+                        <nav id="TableOfContents"></nav>
         		
         		<blockquote>
 <p>上一篇文章中写道了docker的底层是使用runC来管理镜像的创建，启动，监控及删除的，这次就来看一下如何使用runC工具来管理镜像的生命周期</p>
 </blockquote>
-
 <p>runC的使用非常简单，首先去github下载已经编译好的二进制文件（写文章的时候版本是1.0-rc6），文件名一般为runc.amd64，直接拷贝进usr/bin目录即可。先执行一下runc命令，有如下显示</p>
-
-<pre><code class="language-bash">NAME:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">NAME:
    runc - Open Container Initiative runtime
 
-runc is a command line client for running applications packaged according to
-the Open Container Initiative (OCI) format and is a compliant implementation of the
+runc is a command line client <span style="color:#66d9ef">for</span> running applications packaged according to
+the Open Container Initiative <span style="color:#f92672">(</span>OCI<span style="color:#f92672">)</span> format and is a compliant implementation of the
 Open Container Initiative specification.
 
 runc integrates well with existing process supervisors to provide a production
-container runtime environment for applications. It can be used with your
+container runtime environment <span style="color:#66d9ef">for</span> applications. It can be used with your
 existing process monitoring tools and the container will be spawned as a
 direct child of the process supervisor.
 
-Containers are configured using bundles. A bundle for a container is a directory
-that includes a specification file named &quot;config.json&quot; and a root filesystem.
+Containers are configured using bundles. A bundle <span style="color:#66d9ef">for</span> a container is a directory
+that includes a specification file named <span style="color:#e6db74">&#34;config.json&#34;</span> and a root filesystem.
 The root filesystem contains the contents of the container.
 
 To start a new instance of a container:
 
-    # runc run [ -b bundle ] &lt;container-id&gt;
+    <span style="color:#75715e"># runc run [ -b bundle ] &lt;container-id&gt;</span>
 
-Where &quot;&lt;container-id&gt;&quot; is your name for the instance of the container that you
-are starting. The name you provide for the container instance must be unique on
-your host. Providing the bundle directory using &quot;-b&quot; is optional. The default
-value for &quot;bundle&quot; is the current directory.
+Where <span style="color:#e6db74">&#34;&lt;container-id&gt;&#34;</span> is your name <span style="color:#66d9ef">for</span> the instance of the container that you
+are starting. The name you provide <span style="color:#66d9ef">for</span> the container instance must be unique on
+your host. Providing the bundle directory using <span style="color:#e6db74">&#34;-b&#34;</span> is optional. The default
+value <span style="color:#66d9ef">for</span> <span style="color:#e6db74">&#34;bundle&#34;</span> is the current directory.
 
 USAGE:
-   runc [global options] command [command options] [arguments...]
+   runc <span style="color:#f92672">[</span>global options<span style="color:#f92672">]</span> command <span style="color:#f92672">[</span>command options<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>arguments...<span style="color:#f92672">]</span>
    
 VERSION:
    1.0.0-rc6
@@ -215,306 +213,271 @@ COMMANDS:
      delete      delete any resources held by the container often used with detached container
      events      display container events such as OOM notifications, cpu, memory, and IO usage statistics
      exec        execute new process inside the container
-     init        initialize the namespaces and launch the process (do not call it outside of runc)
-     kill        kill sends the specified signal (default: SIGTERM) to the container's init process
-     list        lists containers started by runc with the given root
-     pause       pause suspends all processes inside the container
-     ps          ps displays the processes running inside a container
-     restore     restore a container from a previous checkpoint
-     resume      resumes all processes that have been previously paused
-     run         create and run a container
-     spec        create a new specification file
-     start       executes the user defined process in a created container
-     state       output the state of a container
-     update      update container resource constraints
-     help, h     Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --debug             enable debug output for logging
-   --log value         set the log file path where internal debug information is written (default: &quot;/dev/null&quot;)
-   --log-format value  set the format used by logs ('text' (default), or 'json') (default: &quot;text&quot;)
-   --root value        root directory for storage of container state (this should be located in tmpfs) (default: &quot;/run/runc&quot;)
-   --criu value        path to the criu binary used for checkpoint and restore (default: &quot;criu&quot;)
-   --systemd-cgroup    enable systemd cgroup support, expects cgroupsPath to be of form &quot;slice:prefix:name&quot; for e.g. &quot;system.slice:runc:434234&quot;
-   --rootless value    ignore cgroup permission errors ('true', 'false', or 'auto') (default: &quot;auto&quot;)
+     init        initialize the namespaces and launch the process <span style="color:#f92672">(</span><span style="color:#66d9ef">do</span> not call it outside of runc<span style="color:#f92672">)</span>
+     kill        kill sends the specified signal <span style="color:#f92672">(</span>default: SIGTERM<span style="color:#f92672">)</span> to the container<span style="color:#e6db74">&#39;s init process
+</span><span style="color:#e6db74">     list        lists containers started by runc with the given root
+</span><span style="color:#e6db74">     pause       pause suspends all processes inside the container
+</span><span style="color:#e6db74">     ps          ps displays the processes running inside a container
+</span><span style="color:#e6db74">     restore     restore a container from a previous checkpoint
+</span><span style="color:#e6db74">     resume      resumes all processes that have been previously paused
+</span><span style="color:#e6db74">     run         create and run a container
+</span><span style="color:#e6db74">     spec        create a new specification file
+</span><span style="color:#e6db74">     start       executes the user defined process in a created container
+</span><span style="color:#e6db74">     state       output the state of a container
+</span><span style="color:#e6db74">     update      update container resource constraints
+</span><span style="color:#e6db74">     help, h     Shows a list of commands or help for one command
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">GLOBAL OPTIONS:
+</span><span style="color:#e6db74">   --debug             enable debug output for logging
+</span><span style="color:#e6db74">   --log value         set the log file path where internal debug information is written (default: &#34;/dev/null&#34;)
+</span><span style="color:#e6db74">   --log-format value  set the format used by logs (&#39;</span>text<span style="color:#e6db74">&#39; (default), or &#39;</span>json<span style="color:#e6db74">&#39;) (default: &#34;text&#34;)
+</span><span style="color:#e6db74">   --root value        root directory for storage of container state (this should be located in tmpfs) (default: &#34;/run/runc&#34;)
+</span><span style="color:#e6db74">   --criu value        path to the criu binary used for checkpoint and restore (default: &#34;criu&#34;)
+</span><span style="color:#e6db74">   --systemd-cgroup    enable systemd cgroup support, expects cgroupsPath to be of form &#34;slice:prefix:name&#34; for e.g. &#34;system.slice:runc:434234&#34;
+</span><span style="color:#e6db74">   --rootless value    ignore cgroup permission errors (&#39;</span>true<span style="color:#e6db74">&#39;, &#39;</span>false<span style="color:#e6db74">&#39;, or &#39;</span>auto<span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#f92672">)</span> <span style="color:#f92672">(</span>default: <span style="color:#e6db74">&#34;auto&#34;</span><span style="color:#f92672">)</span>
    --help, -h          show help
    --version, -v       print the version
-</code></pre>
-
-<p>简单的说，runC是一个命令行工具，用来运行按照OCI标准格式打包过的应用，容器使用bundle进行配置。bundle的概念，简单来说就是一个目录，目录里包含一个配置文件<code>config.son</code>和一个root文件系统（rootfs目录），使用命令</p>
-
-<pre><code class="language-bash"># runc run [ -b bundle ] &lt;container-id&gt;
-</code></pre>
-
-<p>来启动一个容器，其中<code>-b</code>是可选项，用来指定bundle的位置（默认为当前目录），注意<code>container-id</code>必须在host上唯一。</p>
-
+</code></pre></div><p>简单的说，runC是一个命令行工具，用来运行按照OCI标准格式打包过的应用，容器使用bundle进行配置。bundle的概念，简单来说就是一个目录，目录里包含一个配置文件<code>config.son</code>和一个root文件系统（rootfs目录），使用命令</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># runc run [ -b bundle ] &lt;container-id&gt;</span>
+</code></pre></div><p>来启动一个容器，其中<code>-b</code>是可选项，用来指定bundle的位置（默认为当前目录），注意<code>container-id</code>必须在host上唯一。</p>
 <p>因为需要制作root filesystem，所以还需要安装好docker并设置好镜像仓库（这步不是必须的，理论上只要你制作出一个符合OCI规范的filesystem都可以，只是自己弄比较麻烦）</p>
-
 <p>准备工作都完成后，接下来就可以开始测试了</p>
-
-<pre><code class="language-bash"># create the top most bundle directory
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># create the top most bundle directory</span>
 mkdir /mycontainer
 cd /mycontainer
 
-# create the rootfs directory
+<span style="color:#75715e"># create the rootfs directory</span>
 mkdir rootfs
 
-# export busybox via Docker into the rootfs directory
-docker export $(docker create busybox) | tar -C rootfs -xvf -
-</code></pre>
-
-<p>这几步是先创建容器目录，再创建一个名字叫rootfs的目录，之后使用一个docker的镜像busybox（一个轻量级的linux工具集）来制作root filesystem(docker镜像都是符合OCI格式规范的)。完成后rootfs目录下会有如下文件</p>
-
-<pre><code class="language-bash">[root@localhost rootfs]# ls -l
-总用量 16
-drwxr-xr-x. 2 root      root      12288 1月   1 02:16 bin
-drwxr-xr-x. 4 root      root         43 1月  11 09:20 dev
-drwxr-xr-x. 3 root      root        139 1月  11 09:20 etc
-drwxr-xr-x. 2 nfsnobody nfsnobody     6 1月   1 02:16 home
-drwxr-xr-x. 2 root      root          6 1月  11 09:20 proc
-drwx------. 2 root      root          6 1月   1 02:16 root
-drwxr-xr-x. 2 root      root          6 1月  11 09:20 sys
-drwxrwxrwt. 2 root      root          6 1月   1 02:16 tmp
-drwxr-xr-x. 3 root      root         18 1月   1 02:16 usr
-drwxr-xr-x. 4 root      root         30 1月   1 02:16 var
-</code></pre>
-
-<p>有了rootfs之后，我们就可以执行如下命令</p>
-
-<pre><code class="language-bash">runc spec
-</code></pre>
-
-<p>来创建一个<code>config.json</code>文件，这个文件是一个标准的OCI格式的文件，内容如下</p>
-
-<pre><code class="language-json">{
-	&quot;ociVersion&quot;: &quot;1.0.1-dev&quot;,
-	&quot;process&quot;: {
-		&quot;terminal&quot;: true,
-		&quot;user&quot;: {
-			&quot;uid&quot;: 0,
-			&quot;gid&quot;: 0
+<span style="color:#75715e"># export busybox via Docker into the rootfs directory</span>
+docker export <span style="color:#66d9ef">$(</span>docker create busybox<span style="color:#66d9ef">)</span> | tar -C rootfs -xvf -
+</code></pre></div><p>这几步是先创建容器目录，再创建一个名字叫rootfs的目录，之后使用一个docker的镜像busybox（一个轻量级的linux工具集）来制作root filesystem(docker镜像都是符合OCI格式规范的)。完成后rootfs目录下会有如下文件</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>root@localhost rootfs<span style="color:#f92672">]</span><span style="color:#75715e"># ls -l</span>
+总用量 <span style="color:#ae81ff">16</span>
+drwxr-xr-x. <span style="color:#ae81ff">2</span> root      root      <span style="color:#ae81ff">12288</span> 1月   <span style="color:#ae81ff">1</span> 02:16 bin
+drwxr-xr-x. <span style="color:#ae81ff">4</span> root      root         <span style="color:#ae81ff">43</span> 1月  <span style="color:#ae81ff">11</span> 09:20 dev
+drwxr-xr-x. <span style="color:#ae81ff">3</span> root      root        <span style="color:#ae81ff">139</span> 1月  <span style="color:#ae81ff">11</span> 09:20 etc
+drwxr-xr-x. <span style="color:#ae81ff">2</span> nfsnobody nfsnobody     <span style="color:#ae81ff">6</span> 1月   <span style="color:#ae81ff">1</span> 02:16 home
+drwxr-xr-x. <span style="color:#ae81ff">2</span> root      root          <span style="color:#ae81ff">6</span> 1月  <span style="color:#ae81ff">11</span> 09:20 proc
+drwx------. <span style="color:#ae81ff">2</span> root      root          <span style="color:#ae81ff">6</span> 1月   <span style="color:#ae81ff">1</span> 02:16 root
+drwxr-xr-x. <span style="color:#ae81ff">2</span> root      root          <span style="color:#ae81ff">6</span> 1月  <span style="color:#ae81ff">11</span> 09:20 sys
+drwxrwxrwt. <span style="color:#ae81ff">2</span> root      root          <span style="color:#ae81ff">6</span> 1月   <span style="color:#ae81ff">1</span> 02:16 tmp
+drwxr-xr-x. <span style="color:#ae81ff">3</span> root      root         <span style="color:#ae81ff">18</span> 1月   <span style="color:#ae81ff">1</span> 02:16 usr
+drwxr-xr-x. <span style="color:#ae81ff">4</span> root      root         <span style="color:#ae81ff">30</span> 1月   <span style="color:#ae81ff">1</span> 02:16 var
+</code></pre></div><p>有了rootfs之后，我们就可以执行如下命令</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">runc spec
+</code></pre></div><p>来创建一个<code>config.json</code>文件，这个文件是一个标准的OCI格式的文件，内容如下</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+	<span style="color:#f92672">&#34;ociVersion&#34;</span>: <span style="color:#e6db74">&#34;1.0.1-dev&#34;</span>,
+	<span style="color:#f92672">&#34;process&#34;</span>: {
+		<span style="color:#f92672">&#34;terminal&#34;</span>: <span style="color:#66d9ef">true</span>,
+		<span style="color:#f92672">&#34;user&#34;</span>: {
+			<span style="color:#f92672">&#34;uid&#34;</span>: <span style="color:#ae81ff">0</span>,
+			<span style="color:#f92672">&#34;gid&#34;</span>: <span style="color:#ae81ff">0</span>
 		},
-		&quot;args&quot;: [
-			&quot;sh&quot;
+		<span style="color:#f92672">&#34;args&#34;</span>: [
+			<span style="color:#e6db74">&#34;sh&#34;</span>
 		],
-		&quot;env&quot;: [
-			&quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
-			&quot;TERM=xterm&quot;
+		<span style="color:#f92672">&#34;env&#34;</span>: [
+			<span style="color:#e6db74">&#34;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&#34;</span>,
+			<span style="color:#e6db74">&#34;TERM=xterm&#34;</span>
 		],
-		&quot;cwd&quot;: &quot;/&quot;,
-		&quot;capabilities&quot;: {
-			&quot;bounding&quot;: [
-				&quot;CAP_AUDIT_WRITE&quot;,
-				&quot;CAP_KILL&quot;,
-				&quot;CAP_NET_BIND_SERVICE&quot;
+		<span style="color:#f92672">&#34;cwd&#34;</span>: <span style="color:#e6db74">&#34;/&#34;</span>,
+		<span style="color:#f92672">&#34;capabilities&#34;</span>: {
+			<span style="color:#f92672">&#34;bounding&#34;</span>: [
+				<span style="color:#e6db74">&#34;CAP_AUDIT_WRITE&#34;</span>,
+				<span style="color:#e6db74">&#34;CAP_KILL&#34;</span>,
+				<span style="color:#e6db74">&#34;CAP_NET_BIND_SERVICE&#34;</span>
 			],
-			&quot;effective&quot;: [
-				&quot;CAP_AUDIT_WRITE&quot;,
-				&quot;CAP_KILL&quot;,
-				&quot;CAP_NET_BIND_SERVICE&quot;
+			<span style="color:#f92672">&#34;effective&#34;</span>: [
+				<span style="color:#e6db74">&#34;CAP_AUDIT_WRITE&#34;</span>,
+				<span style="color:#e6db74">&#34;CAP_KILL&#34;</span>,
+				<span style="color:#e6db74">&#34;CAP_NET_BIND_SERVICE&#34;</span>
 			],
-			&quot;inheritable&quot;: [
-				&quot;CAP_AUDIT_WRITE&quot;,
-				&quot;CAP_KILL&quot;,
-				&quot;CAP_NET_BIND_SERVICE&quot;
+			<span style="color:#f92672">&#34;inheritable&#34;</span>: [
+				<span style="color:#e6db74">&#34;CAP_AUDIT_WRITE&#34;</span>,
+				<span style="color:#e6db74">&#34;CAP_KILL&#34;</span>,
+				<span style="color:#e6db74">&#34;CAP_NET_BIND_SERVICE&#34;</span>
 			],
-			&quot;permitted&quot;: [
-				&quot;CAP_AUDIT_WRITE&quot;,
-				&quot;CAP_KILL&quot;,
-				&quot;CAP_NET_BIND_SERVICE&quot;
+			<span style="color:#f92672">&#34;permitted&#34;</span>: [
+				<span style="color:#e6db74">&#34;CAP_AUDIT_WRITE&#34;</span>,
+				<span style="color:#e6db74">&#34;CAP_KILL&#34;</span>,
+				<span style="color:#e6db74">&#34;CAP_NET_BIND_SERVICE&#34;</span>
 			],
-			&quot;ambient&quot;: [
-				&quot;CAP_AUDIT_WRITE&quot;,
-				&quot;CAP_KILL&quot;,
-				&quot;CAP_NET_BIND_SERVICE&quot;
+			<span style="color:#f92672">&#34;ambient&#34;</span>: [
+				<span style="color:#e6db74">&#34;CAP_AUDIT_WRITE&#34;</span>,
+				<span style="color:#e6db74">&#34;CAP_KILL&#34;</span>,
+				<span style="color:#e6db74">&#34;CAP_NET_BIND_SERVICE&#34;</span>
 			]
 		},
-		&quot;rlimits&quot;: [
+		<span style="color:#f92672">&#34;rlimits&#34;</span>: [
 			{
-				&quot;type&quot;: &quot;RLIMIT_NOFILE&quot;,
-				&quot;hard&quot;: 1024,
-				&quot;soft&quot;: 1024
+				<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;RLIMIT_NOFILE&#34;</span>,
+				<span style="color:#f92672">&#34;hard&#34;</span>: <span style="color:#ae81ff">1024</span>,
+				<span style="color:#f92672">&#34;soft&#34;</span>: <span style="color:#ae81ff">1024</span>
 			}
 		],
-		&quot;noNewPrivileges&quot;: true
+		<span style="color:#f92672">&#34;noNewPrivileges&#34;</span>: <span style="color:#66d9ef">true</span>
 	},
-	&quot;root&quot;: {
-		&quot;path&quot;: &quot;rootfs&quot;,
-		&quot;readonly&quot;: true
+	<span style="color:#f92672">&#34;root&#34;</span>: {
+		<span style="color:#f92672">&#34;path&#34;</span>: <span style="color:#e6db74">&#34;rootfs&#34;</span>,
+		<span style="color:#f92672">&#34;readonly&#34;</span>: <span style="color:#66d9ef">true</span>
 	},
-	&quot;hostname&quot;: &quot;runc&quot;,
-	&quot;mounts&quot;: [
+	<span style="color:#f92672">&#34;hostname&#34;</span>: <span style="color:#e6db74">&#34;runc&#34;</span>,
+	<span style="color:#f92672">&#34;mounts&#34;</span>: [
 		{
-			&quot;destination&quot;: &quot;/proc&quot;,
-			&quot;type&quot;: &quot;proc&quot;,
-			&quot;source&quot;: &quot;proc&quot;
+			<span style="color:#f92672">&#34;destination&#34;</span>: <span style="color:#e6db74">&#34;/proc&#34;</span>,
+			<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;proc&#34;</span>,
+			<span style="color:#f92672">&#34;source&#34;</span>: <span style="color:#e6db74">&#34;proc&#34;</span>
 		},
 		{
-			&quot;destination&quot;: &quot;/dev&quot;,
-			&quot;type&quot;: &quot;tmpfs&quot;,
-			&quot;source&quot;: &quot;tmpfs&quot;,
-			&quot;options&quot;: [
-				&quot;nosuid&quot;,
-				&quot;strictatime&quot;,
-				&quot;mode=755&quot;,
-				&quot;size=65536k&quot;
+			<span style="color:#f92672">&#34;destination&#34;</span>: <span style="color:#e6db74">&#34;/dev&#34;</span>,
+			<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;tmpfs&#34;</span>,
+			<span style="color:#f92672">&#34;source&#34;</span>: <span style="color:#e6db74">&#34;tmpfs&#34;</span>,
+			<span style="color:#f92672">&#34;options&#34;</span>: [
+				<span style="color:#e6db74">&#34;nosuid&#34;</span>,
+				<span style="color:#e6db74">&#34;strictatime&#34;</span>,
+				<span style="color:#e6db74">&#34;mode=755&#34;</span>,
+				<span style="color:#e6db74">&#34;size=65536k&#34;</span>
 			]
 		},
 		{
-			&quot;destination&quot;: &quot;/dev/pts&quot;,
-			&quot;type&quot;: &quot;devpts&quot;,
-			&quot;source&quot;: &quot;devpts&quot;,
-			&quot;options&quot;: [
-				&quot;nosuid&quot;,
-				&quot;noexec&quot;,
-				&quot;newinstance&quot;,
-				&quot;ptmxmode=0666&quot;,
-				&quot;mode=0620&quot;,
-				&quot;gid=5&quot;
+			<span style="color:#f92672">&#34;destination&#34;</span>: <span style="color:#e6db74">&#34;/dev/pts&#34;</span>,
+			<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;devpts&#34;</span>,
+			<span style="color:#f92672">&#34;source&#34;</span>: <span style="color:#e6db74">&#34;devpts&#34;</span>,
+			<span style="color:#f92672">&#34;options&#34;</span>: [
+				<span style="color:#e6db74">&#34;nosuid&#34;</span>,
+				<span style="color:#e6db74">&#34;noexec&#34;</span>,
+				<span style="color:#e6db74">&#34;newinstance&#34;</span>,
+				<span style="color:#e6db74">&#34;ptmxmode=0666&#34;</span>,
+				<span style="color:#e6db74">&#34;mode=0620&#34;</span>,
+				<span style="color:#e6db74">&#34;gid=5&#34;</span>
 			]
 		},
 		{
-			&quot;destination&quot;: &quot;/dev/shm&quot;,
-			&quot;type&quot;: &quot;tmpfs&quot;,
-			&quot;source&quot;: &quot;shm&quot;,
-			&quot;options&quot;: [
-				&quot;nosuid&quot;,
-				&quot;noexec&quot;,
-				&quot;nodev&quot;,
-				&quot;mode=1777&quot;,
-				&quot;size=65536k&quot;
+			<span style="color:#f92672">&#34;destination&#34;</span>: <span style="color:#e6db74">&#34;/dev/shm&#34;</span>,
+			<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;tmpfs&#34;</span>,
+			<span style="color:#f92672">&#34;source&#34;</span>: <span style="color:#e6db74">&#34;shm&#34;</span>,
+			<span style="color:#f92672">&#34;options&#34;</span>: [
+				<span style="color:#e6db74">&#34;nosuid&#34;</span>,
+				<span style="color:#e6db74">&#34;noexec&#34;</span>,
+				<span style="color:#e6db74">&#34;nodev&#34;</span>,
+				<span style="color:#e6db74">&#34;mode=1777&#34;</span>,
+				<span style="color:#e6db74">&#34;size=65536k&#34;</span>
 			]
 		},
 		{
-			&quot;destination&quot;: &quot;/dev/mqueue&quot;,
-			&quot;type&quot;: &quot;mqueue&quot;,
-			&quot;source&quot;: &quot;mqueue&quot;,
-			&quot;options&quot;: [
-				&quot;nosuid&quot;,
-				&quot;noexec&quot;,
-				&quot;nodev&quot;
+			<span style="color:#f92672">&#34;destination&#34;</span>: <span style="color:#e6db74">&#34;/dev/mqueue&#34;</span>,
+			<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;mqueue&#34;</span>,
+			<span style="color:#f92672">&#34;source&#34;</span>: <span style="color:#e6db74">&#34;mqueue&#34;</span>,
+			<span style="color:#f92672">&#34;options&#34;</span>: [
+				<span style="color:#e6db74">&#34;nosuid&#34;</span>,
+				<span style="color:#e6db74">&#34;noexec&#34;</span>,
+				<span style="color:#e6db74">&#34;nodev&#34;</span>
 			]
 		},
 		{
-			&quot;destination&quot;: &quot;/sys&quot;,
-			&quot;type&quot;: &quot;sysfs&quot;,
-			&quot;source&quot;: &quot;sysfs&quot;,
-			&quot;options&quot;: [
-				&quot;nosuid&quot;,
-				&quot;noexec&quot;,
-				&quot;nodev&quot;,
-				&quot;ro&quot;
+			<span style="color:#f92672">&#34;destination&#34;</span>: <span style="color:#e6db74">&#34;/sys&#34;</span>,
+			<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;sysfs&#34;</span>,
+			<span style="color:#f92672">&#34;source&#34;</span>: <span style="color:#e6db74">&#34;sysfs&#34;</span>,
+			<span style="color:#f92672">&#34;options&#34;</span>: [
+				<span style="color:#e6db74">&#34;nosuid&#34;</span>,
+				<span style="color:#e6db74">&#34;noexec&#34;</span>,
+				<span style="color:#e6db74">&#34;nodev&#34;</span>,
+				<span style="color:#e6db74">&#34;ro&#34;</span>
 			]
 		},
 		{
-			&quot;destination&quot;: &quot;/sys/fs/cgroup&quot;,
-			&quot;type&quot;: &quot;cgroup&quot;,
-			&quot;source&quot;: &quot;cgroup&quot;,
-			&quot;options&quot;: [
-				&quot;nosuid&quot;,
-				&quot;noexec&quot;,
-				&quot;nodev&quot;,
-				&quot;relatime&quot;,
-				&quot;ro&quot;
+			<span style="color:#f92672">&#34;destination&#34;</span>: <span style="color:#e6db74">&#34;/sys/fs/cgroup&#34;</span>,
+			<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;cgroup&#34;</span>,
+			<span style="color:#f92672">&#34;source&#34;</span>: <span style="color:#e6db74">&#34;cgroup&#34;</span>,
+			<span style="color:#f92672">&#34;options&#34;</span>: [
+				<span style="color:#e6db74">&#34;nosuid&#34;</span>,
+				<span style="color:#e6db74">&#34;noexec&#34;</span>,
+				<span style="color:#e6db74">&#34;nodev&#34;</span>,
+				<span style="color:#e6db74">&#34;relatime&#34;</span>,
+				<span style="color:#e6db74">&#34;ro&#34;</span>
 			]
 		}
 	],
-	&quot;linux&quot;: {
-		&quot;resources&quot;: {
-			&quot;devices&quot;: [
+	<span style="color:#f92672">&#34;linux&#34;</span>: {
+		<span style="color:#f92672">&#34;resources&#34;</span>: {
+			<span style="color:#f92672">&#34;devices&#34;</span>: [
 				{
-					&quot;allow&quot;: false,
-					&quot;access&quot;: &quot;rwm&quot;
+					<span style="color:#f92672">&#34;allow&#34;</span>: <span style="color:#66d9ef">false</span>,
+					<span style="color:#f92672">&#34;access&#34;</span>: <span style="color:#e6db74">&#34;rwm&#34;</span>
 				}
 			]
 		},
-		&quot;namespaces&quot;: [
+		<span style="color:#f92672">&#34;namespaces&#34;</span>: [
 			{
-				&quot;type&quot;: &quot;pid&quot;
+				<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;pid&#34;</span>
 			},
 			{
-				&quot;type&quot;: &quot;network&quot;
+				<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;network&#34;</span>
 			},
 			{
-				&quot;type&quot;: &quot;ipc&quot;
+				<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;ipc&#34;</span>
 			},
 			{
-				&quot;type&quot;: &quot;uts&quot;
+				<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;uts&#34;</span>
 			},
 			{
-				&quot;type&quot;: &quot;mount&quot;
+				<span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;mount&#34;</span>
 			}
 		],
-		&quot;maskedPaths&quot;: [
-			&quot;/proc/kcore&quot;,
-			&quot;/proc/latency_stats&quot;,
-			&quot;/proc/timer_list&quot;,
-			&quot;/proc/timer_stats&quot;,
-			&quot;/proc/sched_debug&quot;,
-			&quot;/sys/firmware&quot;,
-			&quot;/proc/scsi&quot;
+		<span style="color:#f92672">&#34;maskedPaths&#34;</span>: [
+			<span style="color:#e6db74">&#34;/proc/kcore&#34;</span>,
+			<span style="color:#e6db74">&#34;/proc/latency_stats&#34;</span>,
+			<span style="color:#e6db74">&#34;/proc/timer_list&#34;</span>,
+			<span style="color:#e6db74">&#34;/proc/timer_stats&#34;</span>,
+			<span style="color:#e6db74">&#34;/proc/sched_debug&#34;</span>,
+			<span style="color:#e6db74">&#34;/sys/firmware&#34;</span>,
+			<span style="color:#e6db74">&#34;/proc/scsi&#34;</span>
 		],
-		&quot;readonlyPaths&quot;: [
-			&quot;/proc/asound&quot;,
-			&quot;/proc/bus&quot;,
-			&quot;/proc/fs&quot;,
-			&quot;/proc/irq&quot;,
-			&quot;/proc/sys&quot;,
-			&quot;/proc/sysrq-trigger&quot;
+		<span style="color:#f92672">&#34;readonlyPaths&#34;</span>: [
+			<span style="color:#e6db74">&#34;/proc/asound&#34;</span>,
+			<span style="color:#e6db74">&#34;/proc/bus&#34;</span>,
+			<span style="color:#e6db74">&#34;/proc/fs&#34;</span>,
+			<span style="color:#e6db74">&#34;/proc/irq&#34;</span>,
+			<span style="color:#e6db74">&#34;/proc/sys&#34;</span>,
+			<span style="color:#e6db74">&#34;/proc/sysrq-trigger&#34;</span>
 		]
 	}
 }
-</code></pre>
-
-<p>这边再说一下OCI规范，援引一段OCI官网的说明</p>
-
+</code></pre></div><p>这边再说一下OCI规范，援引一段OCI官网的说明</p>
 <blockquote>
 <p>Established in June 2015 by Docker and other leaders in the container industry, the OCI currently contains two specifications: the Runtime Specification (<a href="http://www.github.com/opencontainers/runtime-spec">runtime-spec</a>) and the Image Specification (<a href="http://www.github.com/opencontainers/image-spec">image-spec</a>). The Runtime Specification outlines how to run a “<a href="https://github.com/opencontainers/runtime-spec/blob/master/bundle.md">filesystem bundle</a>” that is unpacked on disk. At a high-level an OCI implementation would download an OCI Image then unpack that image into an OCI Runtime filesystem bundle. At this point the OCI Runtime Bundle would be run by an OCI Runtime.</p>
 </blockquote>
-
 <p>简单的说，OCI有两个规范，一个是容器运行时规范<code>runtime-spec</code>，一个是镜像格式规范<code>image-spec</code>。一个镜像，简单来说就是一个打包好的符合OCI规范的<code>filesystem bundule</code>。而bundile的话，前面介绍过，包含一个配置文件<code>config.json</code>和一个rootfs目录。</p>
-
 <p>现在<code>rootfs</code>和<code>config.json</code>都有了，我们可以创建容器了，执行</p>
-
-<pre><code class="language-bash">runc run mycontainerid
-</code></pre>
-
-<p>创建容器，成功后会自动进入容器
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">runc run mycontainerid
+</code></pre></div><p>创建容器，成功后会自动进入容器
 这时候我们执行<code>ps</code>一下，可以看到</p>
-
-<pre><code class="language-bash">/ # ps
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">/ <span style="color:#75715e"># ps</span>
 PID   USER     TIME  COMMAND
-    1 root      0:00 sh
-    7 root      0:00 ps
-</code></pre>
-
-<p>可以看到这个容器里面的1号进程就是sh那个进程，看不到其他进程，容器启动试验成功。</p>
-
+    <span style="color:#ae81ff">1</span> root      0:00 sh
+    <span style="color:#ae81ff">7</span> root      0:00 ps
+</code></pre></div><p>可以看到这个容器里面的1号进程就是sh那个进程，看不到其他进程，容器启动试验成功。</p>
 <p>现在我们可以做容器的整个生命周期管理了</p>
-
-<pre><code class="language-bash"># run as root
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># run as root</span>
 cd /mycontainer
 runc create mycontainerid
 
-# view the container is created and in the &quot;created&quot; state
+<span style="color:#75715e"># view the container is created and in the &#34;created&#34; state</span>
 runc list
 
-# start the process inside the container
+<span style="color:#75715e"># start the process inside the container</span>
 runc start mycontainerid
 
-# after 5 seconds view that the container has exited and is now in the stopped state
+<span style="color:#75715e"># after 5 seconds view that the container has exited and is now in the stopped state</span>
 runc list
 
-# now delete the container
+<span style="color:#75715e"># now delete the container</span>
 runc delete mycontainerid
-</code></pre>
-
-<p>注意在执行<code>runc create mycontainerid</code>命令时，会报错</p>
-
-<pre><code class="language-bash">cannot allocate tty if runc will detach without setting console socket
-</code></pre>
-
-<p>这是由于在<code>config.json</code>文件中的配置<code>&quot;terminal&quot;: true</code>，这个默认是true，即以终端方式启动，需要改成false。</p>
+</code></pre></div><p>注意在执行<code>runc create mycontainerid</code>命令时，会报错</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cannot allocate tty <span style="color:#66d9ef">if</span> runc will detach without setting console socket
+</code></pre></div><p>这是由于在<code>config.json</code>文件中的配置<code>&quot;terminal&quot;: true</code>，这个默认是true，即以终端方式启动，需要改成false。</p>
 
         
                 
@@ -523,12 +486,12 @@ runc delete mycontainerid
               <ul class="pager">
                   
                   <li class="previous">
-                      <a href="/post/kubeadmin-create-cluster/" data-toggle="tooltip" data-placement="top" title="使用kubeadm快速搭建单机kubernetes 1.13集群">&larr; Previous Post</a>
+                      <a href="/post/understand-contianer-concept/" data-toggle="tooltip" data-placement="top" title="深入理解容器基础概念">&larr; Previous Post</a>
                   </li>
                   
                   
                   <li class="next">
-                      <a href="/post/understand-contianer-concept/" data-toggle="tooltip" data-placement="top" title="深入理解容器基础概念">Next Post &rarr;</a>
+                      <a href="/post/kubeadmin-create-cluster/" data-toggle="tooltip" data-placement="top" title="使用kubeadm快速搭建单机kubernetes 1.13集群">Next Post &rarr;</a>
                   </li>
                   
               </ul>
@@ -569,76 +532,28 @@ runc delete mycontainerid
                      
                     
                         
-                            <a href="/tags/api-gateway" title="Api Gateway">
-                                Api Gateway
+                            <a href="/tags/api-gateway" title="api-gateway">
+                                api-gateway
                             </a>
                         
                     
                         
                     
                         
-                            <a href="/tags/cloud-native" title="Cloud Native">
-                                Cloud Native
+                            <a href="/tags/cloud-native" title="cloud-native">
+                                cloud-native
                             </a>
                         
                     
                         
-                            <a href="/tags/devops" title="DevOps">
-                                DevOps
+                            <a href="/tags/devops" title="devops">
+                                devops
                             </a>
                         
                     
                         
-                            <a href="/tags/docker" title="Docker">
-                                Docker
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/istio" title="Istio">
-                                Istio
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/kubernetes" title="Kubernetes">
-                                Kubernetes
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/microservice" title="Microservice">
-                                Microservice
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/restful" title="RESTful">
-                                RESTful
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/servicemesh" title="ServiceMesh">
-                                ServiceMesh
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/spring-cloud" title="Spring Cloud">
-                                Spring Cloud
+                            <a href="/tags/docker" title="docker">
+                                docker
                             </a>
                         
                     
@@ -650,12 +565,60 @@ runc delete mycontainerid
                     
                         
                     
+                        
+                            <a href="/tags/istio" title="istio">
+                                istio
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="kubernetes">
+                                kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="microservice">
+                                microservice
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/restful" title="restful">
+                                restful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/servicemesh" title="servicemesh">
+                                servicemesh
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="spring-cloud">
+                                spring-cloud
+                            </a>
                         
                     
                         
                             <a href="/tags/vue" title="vue">
                                 vue
                             </a>
+                        
+                    
                         
                     
                         

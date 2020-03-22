@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>HTTP/2 on L&#39;s Blog</title>
+    <link>/tags/http/2/</link>
+    <description>Recent content in HTTP/2 on L&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="/tags/http/2/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>HTTP/2协议介绍</title>
+      <link>/post/http2-introduce/</link>
+      <pubDate>Sat, 08 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/http2-introduce/</guid>
+      <description>http协议是互联网上使用最广泛、最通用的通讯协议，也可以说是互联网通讯协议的事实标准。任何一个语言，只要说涉及通讯，就不可能不支持http</description>
+    </item>
+    
+  </channel>
+</rss>

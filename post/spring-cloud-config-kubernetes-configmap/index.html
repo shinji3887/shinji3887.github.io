@@ -69,11 +69,11 @@
                     </li>
                     
                     <li>
-                        <a href="categories/tech">Tech</a>
+                        <a href="categories/tech">tech</a>
                     </li>
                     
                     <li>
-                        <a href="categories/tips">Tips</a>
+                        <a href="categories/tips">tips</a>
                     </li>
                     
                     <li>
@@ -170,85 +170,64 @@
                         <h2>TOC</h2>
                         </header>
                         <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#方案选择">方案选择</a></li>
-<li><a href="#环境变量配置">环境变量配置</a>
-<ul>
-<li><a href="#开发终端配置">开发终端配置</a></li>
-<li><a href="#configmap配置">ConfigMap配置</a></li>
-</ul></li>
-<li><a href="#spring-cloud-config配置">Spring Cloud Config配置</a></li>
-<li><a href="#应用配置">应用配置</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#方案选择">方案选择</a></li>
+        <li><a href="#环境变量配置">环境变量配置</a></li>
+        <li><a href="#spring-cloud-config配置">Spring Cloud Config配置</a></li>
+        <li><a href="#应用配置">应用配置</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
         		
-        		
-
-<blockquote>
+        		<blockquote>
 <p>众所周知，配置管理是微服务中非常重要的一环。通过集中化的配置中心，可以使维护人员统一管理<code>dev</code>、<code>test</code>、<code>stage</code>、<code>prod</code>等各类环境的配置，大大提高了维护效率，并使得配置变更可以实时下发给各节点，并被追踪和审计，本文探讨云原生环境下基于Spring Cloud Config+kubernetes ConfigMap的配置管理实践，大家如果有更好的实现方式，也欢迎一起探讨。</p>
 </blockquote>
-
 <h3 id="方案选择">方案选择</h3>
-
 <p>目前的配置获取方式，基本上有以下几种</p>
-
 <ul>
-<li><p>环境变量注入：这种方式把配置参数直接注入系统环境变量，应用直接从环境变量中获取配置信息，配置项较少的情况还是可以用用的，多了麻烦不说，配置的变更审计也是问题，<code>configmap</code>即是这种方式，好处是系统级，外部依赖较少</p></li>
-
-<li><p>通过maven工具：执行类似<code>mvn cleanpackage-Penv</code>这样的命令，在编译打包阶段将环境信息注入</p></li>
-
-<li><p>spring boot：Spring Boot中也提供了多环境配置功能，可以设置<code>application-{env}.properties</code>区分环境信息，启动时增加
-<code>spring.profiles.active=dev</code>这样的参数，在启动时将配置信息注入</p></li>
-
-<li><p>配置中心：这是微服务架构中比较主流的解决方案，有代表性的有携程的apollo、百度disconf以及spring自己的 spring cloud config</p></li>
+<li>
+<p>环境变量注入：这种方式把配置参数直接注入系统环境变量，应用直接从环境变量中获取配置信息，配置项较少的情况还是可以用用的，多了麻烦不说，配置的变更审计也是问题，<code>configmap</code>即是这种方式，好处是系统级，外部依赖较少</p>
+</li>
+<li>
+<p>通过maven工具：执行类似<code>mvn cleanpackage-Penv</code>这样的命令，在编译打包阶段将环境信息注入</p>
+</li>
+<li>
+<p>spring boot：Spring Boot中也提供了多环境配置功能，可以设置<code>application-{env}.properties</code>区分环境信息，启动时增加
+<code>spring.profiles.active=dev</code>这样的参数，在启动时将配置信息注入</p>
+</li>
+<li>
+<p>配置中心：这是微服务架构中比较主流的解决方案，有代表性的有携程的apollo、百度disconf以及spring自己的 spring cloud config</p>
+</li>
 </ul>
-
 <p>综合几种方式的优缺点，我选择了Spring Cloud Config+kubernetes ConfigMap的解决方案。选择Spring Cloud Config的原因是比较轻量级，配合eureka可以快速搭建一个分布式的配置中心，再结合一些开源的配置管理UI框架（比如SCCA，后面会提到），基本可以满足目前的需要。结合Spring Cloud Bus组件可以实现实时的配置下发，另外由于是原生的，和Spring其他组件的集成也比较方便，不像apollo都是自己一套（自带eureka），个人感觉有点重了。为便于叙述，下文假设有dev、test、prod三个配置中心，分别对应三个不同的环境。</p>
-
 <h3 id="环境变量配置">环境变量配置</h3>
-
 <p>使用环境变量的原因，是开发和测试的环境不一致，开发一般在自己电脑上进行开发，所以需要设置自己终端的环境变量，而测试及生产环境都是在K8S集群内，所以需要通过ConfigMap来进行环境变量配置，从而实现了配置中心地址与环境的解耦。</p>
-
 <h4 id="开发终端配置">开发终端配置</h4>
-
 <p>比较简单，直接在环境变量中设置如下参数，注意这里设置的是dev环境的配置中心
-<img src="https://lupeier.cn-sh2.ufileos.com/config1.jpg" alt="env.jpg" /></p>
-
+<img src="https://lupeier.cn-sh2.ufileos.com/config1.jpg" alt="env.jpg"></p>
 <p>注意设置完之后eclipse需要重启一下，否则读不到变更的环境变量（IDEA我没有测过，不知道是不是一样）。可以通过下面这段代码看看环境变量是否正确获取</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@RestController</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">WebController</span> <span style="color:#f92672">{</span>
 
-<pre><code class="language-java">@RestController
-public class WebController {
+   <span style="color:#a6e22e">@Autowired</span>
+   <span style="color:#66d9ef">private</span> Environment env<span style="color:#f92672">;</span>
 
-   @Autowired
-   private Environment env;
+   <span style="color:#a6e22e">@RequestMapping</span><span style="color:#f92672">(</span>value <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;getEnvParam&#34;</span><span style="color:#f92672">,</span> method <span style="color:#f92672">=</span> RequestMethod<span style="color:#f92672">.</span><span style="color:#a6e22e">GET</span><span style="color:#f92672">)</span>
+   <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getEnvParam</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;config server : &#34;</span> <span style="color:#f92672">+</span> env<span style="color:#f92672">.</span><span style="color:#a6e22e">getProperty</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;CONFIG_SERVER_ADDRESS&#34;</span><span style="color:#f92672">);</span>
+   <span style="color:#f92672">}</span>
 
-   @RequestMapping(value = &quot;getEnvParam&quot;, method = RequestMethod.GET)
-   public String getEnvParam() {
-        return &quot;config server : &quot; + env.getProperty(&quot;CONFIG_SERVER_ADDRESS&quot;);
-   }
-
-}
-</code></pre>
-
-<p>在浏览器输入URL后应该可以显示对应的环境变量值</p>
-
+<span style="color:#f92672">}</span>
+</code></pre></div><p>在浏览器输入URL后应该可以显示对应的环境变量值</p>
 <h4 id="configmap配置">ConfigMap配置</h4>
-
 <p>使用kubectl创建configmap资源有几种方式，这里我们直接使用命令行参数的方式创建配置信息对象，注意这里配置的是test环境的配置中心</p>
-
-<pre><code class="language-bash">[root@localhost ~]# kubectl create configmap config-server --from-literal=config.address=http://10.10.0.2:10002 --from-literal=config.profile=test
-configmap &quot;config-server&quot; created
-</code></pre>
-
-<p>执行如下命令确认configmap资源被成功创建</p>
-
-<pre><code class="language-bash">[root@localhost ~]# kubectl get configmap config-server -o yaml
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl create configmap config-server --from-literal=config.address=http://10.10.0.2:10002 --from-literal=config.profile=test</span>
+configmap <span style="color:#e6db74">&#34;config-server&#34;</span> created
+</code></pre></div><p>执行如下命令确认configmap资源被成功创建</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>root@localhost ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get configmap config-server -o yaml</span>
 apiVersion: v1
 data:
   config.address: http://10.10.0.2:10002
@@ -258,111 +237,97 @@ metadata:
    creationTimestamp: 2018-11-07T11:14:27Z
    name: config-server
    namespace: default
-   resourceVersion: &quot;18390952&quot;
+   resourceVersion: <span style="color:#e6db74">&#34;18390952&#34;</span>
    selfLink: /api/v1/namespaces/default/configmaps/config-server
    uid: 4a4b3713-e27e-11e8-8088-005056bd4c7c
-</code></pre>
-
-<p>将configmap对象注入我们创建的应用deployment对象中，可以直接edit资源，也可以使用patch方式，注意<code>spec.containers.env</code>部分，即是我们注入的configmap信息</p>
-
-<pre><code class="language-yaml">spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      run: service-base
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        run: service-base
-    spec:
-      containers:
-      - command:
+</code></pre></div><p>将configmap对象注入我们创建的应用deployment对象中，可以直接edit资源，也可以使用patch方式，注意<code>spec.containers.env</code>部分，即是我们注入的configmap信息</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#66d9ef">selector</span>:
+    <span style="color:#66d9ef">matchLabels</span>:
+      <span style="color:#66d9ef">run</span>: service-base
+  <span style="color:#66d9ef">strategy</span>:
+    <span style="color:#66d9ef">rollingUpdate</span>:
+      <span style="color:#66d9ef">maxSurge</span>: <span style="color:#ae81ff">1</span>
+      <span style="color:#66d9ef">maxUnavailable</span>: <span style="color:#ae81ff">1</span>
+    <span style="color:#66d9ef">type</span>: RollingUpdate
+  <span style="color:#66d9ef">template</span>:
+    <span style="color:#66d9ef">metadata</span>:
+      <span style="color:#66d9ef">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+      <span style="color:#66d9ef">labels</span>:
+        <span style="color:#66d9ef">run</span>: service-base
+    <span style="color:#66d9ef">spec</span>:
+      <span style="color:#66d9ef">containers</span>:
+      - <span style="color:#66d9ef">command</span>:
         - java
         - -Djava.security.egd=file:/dev/./urandom
         - -jar
         - /home/app.jar
-        env:
-        - name: CONFIG_SERVER_ADDRESS
-          valueFrom:
-            configMapKeyRef:
-              key: config.uri
-              name: config-server
-        - name: CONFIG_SERVER_PROFILE
-          valueFrom:
-            configMapKeyRef:
-              key: config.profile
-              name: config-server
-        image: 10.0.0.62:5000/alpine/jre:8
-        imagePullPolicy: IfNotPresent
-        name: service-base
-        ports:
-        - containerPort: 33300
-          protocol: TCP
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /home
-          name: app-volume
-      dnsPolicy: ClusterFirst
-</code></pre>
-
-<h3 id="spring-cloud-config配置">Spring Cloud Config配置</h3>
-
+        <span style="color:#66d9ef">env</span>:
+        - <span style="color:#66d9ef">name</span>: CONFIG_SERVER_ADDRESS
+          <span style="color:#66d9ef">valueFrom</span>:
+            <span style="color:#66d9ef">configMapKeyRef</span>:
+              <span style="color:#66d9ef">key</span>: config.uri
+              <span style="color:#66d9ef">name</span>: config-server
+        - <span style="color:#66d9ef">name</span>: CONFIG_SERVER_PROFILE
+          <span style="color:#66d9ef">valueFrom</span>:
+            <span style="color:#66d9ef">configMapKeyRef</span>:
+              <span style="color:#66d9ef">key</span>: config.profile
+              <span style="color:#66d9ef">name</span>: config-server
+        <span style="color:#66d9ef">image</span>: <span style="color:#ae81ff">10.0.0.62</span>:<span style="color:#ae81ff">5000</span>/alpine/jre:<span style="color:#ae81ff">8</span>
+        <span style="color:#66d9ef">imagePullPolicy</span>: IfNotPresent
+        <span style="color:#66d9ef">name</span>: service-base
+        <span style="color:#66d9ef">ports</span>:
+        - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">33300</span>
+          <span style="color:#66d9ef">protocol</span>: TCP
+        <span style="color:#66d9ef">resources</span>: {}
+        <span style="color:#66d9ef">terminationMessagePath</span>: /dev/termination-log
+        <span style="color:#66d9ef">terminationMessagePolicy</span>: File
+        <span style="color:#66d9ef">volumeMounts</span>:
+        - <span style="color:#66d9ef">mountPath</span>: /home
+          <span style="color:#66d9ef">name</span>: app-volume
+      <span style="color:#66d9ef">dnsPolicy</span>: ClusterFirst
+</code></pre></div><h3 id="spring-cloud-config配置">Spring Cloud Config配置</h3>
 <p>这其实就是一个标准的Spring Cloud Config配置中心配置，这里不展开了，需要的同学可以直接看<a href="http://blog.didispace.com/spring-cloud-starter-dalston-3">这篇教程</a>。考虑到开发生产环境的隔离、管理和可靠性的需要，我这边使用的是db存储模式（需要edgware以上版本），配置文件如下</p>
-
-<pre><code class="language-yaml">spring:
-    application:
-        name: config-server
-    datasource:  
-        driver-class-name: oracle.jdbc.driver.OracleDriver
-        url: jdbc:oracle:thin:@10.0.0.56:1521/orac
-        username: test
-        password: test
-    jpa:
-        properties:
-            hibernate:
-                dialect: org.hibernate.dialect.Oracle10gDialect
-    profiles:
-        active: jdbc
-    cloud:
-         config:
-             server:
-                 jdbc: 
-                     sql: SELECT P_KEY, P_VALUE from PROPERTY where APPLICATION=? and PROFILE=? and LABEL=?
-server:
-    port: 10002
-encrypt:
-    key: test
-</code></pre>
-
-<p>之后配合一个程序猿DD同学开源的配置管理项目SCCA（<a href="https://github.com/dyc87112/spring-cloud-config-admin">github地址</a>）,能以可视化方式管理各环境配置，基本满足目前要求。如果想和内部已有的服务管理平台集成，也非常方便，只要实现对property这张配置表的CRUD就行了，spring cloud config会自动监听property里的变化并刷新参数，这也是我比较推荐db模式的原因。SCCA配置界面如下：</p>
-
-<p><img src="https://lupeier.cn-sh2.ufileos.com/admin1.jpg" alt="admin1.jpg" />
-<img src="https://lupeier.cn-sh2.ufileos.com/admin2.jpg" alt="admin2.jpg" /></p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">spring</span>:
+    <span style="color:#66d9ef">application</span>:
+        <span style="color:#66d9ef">name</span>: config-server
+    <span style="color:#66d9ef">datasource</span>:  
+        <span style="color:#66d9ef">driver-class-name</span>: oracle.jdbc.driver.OracleDriver
+        <span style="color:#66d9ef">url</span>: jdbc:oracle:thin:@<span style="color:#ae81ff">10.0.0.56</span>:<span style="color:#ae81ff">1521</span>/orac
+        <span style="color:#66d9ef">username</span>: test
+        <span style="color:#66d9ef">password</span>: test
+    <span style="color:#66d9ef">jpa</span>:
+        <span style="color:#66d9ef">properties</span>:
+            <span style="color:#66d9ef">hibernate</span>:
+                <span style="color:#66d9ef">dialect</span>: org.hibernate.dialect.Oracle10gDialect
+    <span style="color:#66d9ef">profiles</span>:
+        <span style="color:#66d9ef">active</span>: jdbc
+    <span style="color:#66d9ef">cloud</span>:
+         <span style="color:#66d9ef">config</span>:
+             <span style="color:#66d9ef">server</span>:
+                 <span style="color:#66d9ef">jdbc</span>: 
+                     <span style="color:#66d9ef">sql</span>: SELECT P_KEY, P_VALUE from PROPERTY where APPLICATION=? and PROFILE=? and LABEL=?
+<span style="color:#66d9ef">server</span>:
+    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">10002</span>
+<span style="color:#66d9ef">encrypt</span>:
+    <span style="color:#66d9ef">key</span>: test
+</code></pre></div><p>之后配合一个程序猿DD同学开源的配置管理项目SCCA（<a href="https://github.com/dyc87112/spring-cloud-config-admin">github地址</a>）,能以可视化方式管理各环境配置，基本满足目前要求。如果想和内部已有的服务管理平台集成，也非常方便，只要实现对property这张配置表的CRUD就行了，spring cloud config会自动监听property里的变化并刷新参数，这也是我比较推荐db模式的原因。SCCA配置界面如下：</p>
+<p><img src="https://lupeier.cn-sh2.ufileos.com/admin1.jpg" alt="admin1.jpg">
+<img src="https://lupeier.cn-sh2.ufileos.com/admin2.jpg" alt="admin2.jpg"></p>
 <h3 id="应用配置">应用配置</h3>
-
 <p>至此所有准备工作完成，在应用里直接配置上配置中心的环境变量，就可以在各环境中无缝切换了，应用配置如下</p>
-
-<pre><code class="language-yaml">spring:
-    application:
-         name: service-base
-    cloud:
-         config:
-             uri: ${CONFIG_SERVER_ADDRESS}
-             profile: ${CONFIG_SERVER_PROFILE}
-             label: master
-server:
-    port: 33000
-</code></pre>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">spring</span>:
+    <span style="color:#66d9ef">application</span>:
+         <span style="color:#66d9ef">name</span>: service-base
+    <span style="color:#66d9ef">cloud</span>:
+         <span style="color:#66d9ef">config</span>:
+             <span style="color:#66d9ef">uri</span>: ${CONFIG_SERVER_ADDRESS}
+             <span style="color:#66d9ef">profile</span>: ${CONFIG_SERVER_PROFILE}
+             <span style="color:#66d9ef">label</span>: master
+<span style="color:#66d9ef">server</span>:
+    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">33000</span>
+</code></pre></div>
         
                 
         
@@ -370,12 +335,12 @@ server:
               <ul class="pager">
                   
                   <li class="previous">
-                      <a href="/post/vue-cli3-wds-ipv6/" data-toggle="tooltip" data-placement="top" title="vue-cli3.0项目中[WDS] Disconnected!的解决方法">&larr; Previous Post</a>
+                      <a href="/post/spring-cloud-finchley-update/" data-toggle="tooltip" data-placement="top" title="Spring Cloud升级Finchley版本小结及遇到的坑">&larr; Previous Post</a>
                   </li>
                   
                   
                   <li class="next">
-                      <a href="/post/spring-cloud-finchley-update/" data-toggle="tooltip" data-placement="top" title="Spring Cloud升级Finchley版本小结及遇到的坑">Next Post &rarr;</a>
+                      <a href="/post/vue-cli3-wds-ipv6/" data-toggle="tooltip" data-placement="top" title="vue-cli3.0项目中[WDS] Disconnected!的解决方法">Next Post &rarr;</a>
                   </li>
                   
               </ul>
@@ -416,76 +381,28 @@ server:
                      
                     
                         
-                            <a href="/tags/api-gateway" title="Api Gateway">
-                                Api Gateway
+                            <a href="/tags/api-gateway" title="api-gateway">
+                                api-gateway
                             </a>
                         
                     
                         
                     
                         
-                            <a href="/tags/cloud-native" title="Cloud Native">
-                                Cloud Native
+                            <a href="/tags/cloud-native" title="cloud-native">
+                                cloud-native
                             </a>
                         
                     
                         
-                            <a href="/tags/devops" title="DevOps">
-                                DevOps
+                            <a href="/tags/devops" title="devops">
+                                devops
                             </a>
                         
                     
                         
-                            <a href="/tags/docker" title="Docker">
-                                Docker
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/istio" title="Istio">
-                                Istio
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/kubernetes" title="Kubernetes">
-                                Kubernetes
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/microservice" title="Microservice">
-                                Microservice
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/restful" title="RESTful">
-                                RESTful
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/servicemesh" title="ServiceMesh">
-                                ServiceMesh
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/spring-cloud" title="Spring Cloud">
-                                Spring Cloud
+                            <a href="/tags/docker" title="docker">
+                                docker
                             </a>
                         
                     
@@ -497,12 +414,60 @@ server:
                     
                         
                     
+                        
+                            <a href="/tags/istio" title="istio">
+                                istio
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="kubernetes">
+                                kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="microservice">
+                                microservice
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/restful" title="restful">
+                                restful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/servicemesh" title="servicemesh">
+                                servicemesh
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="spring-cloud">
+                                spring-cloud
+                            </a>
                         
                     
                         
                             <a href="/tags/vue" title="vue">
                                 vue
                             </a>
+                        
+                    
                         
                     
                         

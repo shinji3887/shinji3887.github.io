@@ -69,11 +69,11 @@
                     </li>
                     
                     <li>
-                        <a href="categories/tech">Tech</a>
+                        <a href="categories/tech">tech</a>
                     </li>
                     
                     <li>
-                        <a href="categories/tips">Tips</a>
+                        <a href="categories/tips">tips</a>
                     </li>
                     
                     <li>
@@ -170,116 +170,64 @@
                         <h2>TOC</h2>
                         </header>
                         <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#consul是什么">Consul是什么?</a></li>
-<li><a href="#consul功能概述">Consul功能概述</a>
-<ul>
-<li><a href="#服务注册">服务注册</a></li>
-<li><a href="#服务发现">服务发现</a></li>
-<li><a href="#键值存储">键值存储</a></li>
-</ul></li>
-<li><a href="#consul部署架构">Consul部署架构</a>
-<ul>
-<li><a href="#集群">集群</a></li>
-<li><a href="#服务器和客户端">服务器和客户端</a></li>
-<li><a href="#数据中心">数据中心</a></li>
-</ul></li>
-<li><a href="#consul能做什么">Consul能做什么?</a></li>
-<li><a href="#集群搭建">集群搭建</a>
-<ul>
-<li><a href="#下载安装">下载安装</a>
-<ul>
-<li><a href="#consul参数说明">consul参数说明</a></li>
-<li><a href="#agent参数说明">agent参数说明</a></li>
-</ul></li>
-<li><a href="#启动节点">启动节点</a></li>
-</ul></li>
-<li><a href="#spring-cloud-集成">Spring Cloud 集成</a>
-<ul>
-<li><a href="#配置中心">配置中心</a></li>
-<li><a href="#动态配置更新">动态配置更新</a></li>
-</ul></li>
-<li><a href="#参考资料">参考资料</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#consul是什么">Consul是什么?</a></li>
+        <li><a href="#consul功能概述">Consul功能概述</a></li>
+        <li><a href="#consul部署架构">Consul部署架构</a></li>
+        <li><a href="#consul能做什么">Consul能做什么?</a></li>
+        <li><a href="#集群搭建">集群搭建</a></li>
+        <li><a href="#spring-cloud-集成">Spring Cloud 集成</a></li>
+        <li><a href="#参考资料">参考资料</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
         		
-        		
-
-<blockquote>
+        		<blockquote>
 <p>consul概念解析，集群搭建及作为配置中心与spring cloud集成</p>
 </blockquote>
-
 <h3 id="consul是什么">Consul是什么?</h3>
-
 <p>Consul 官方站点：<a href="https://www.consul.io/">https://www.consul.io/</a></p>
-
 <p>官方介绍是：Consul 是一种服务网格的解决方案，在 Consul 中，提供了服务发现、配置、分段等控制管理平台，Consul 中的每项功能都可以单独使用，也可以一起使用来构建完整的服务网格；在 Consul 内部，有一个简单的代理服务，所以在安装 Consul 后，马上就可以开始使用 Consul ；当然，Consul 也支持集成第三方代理，比如 Envoy。</p>
-
 <p>Consul 是一个服务组件，在用户下载 Consul 的安装包后，可以立即运行它，或者通过其它托管程序运行它，Consul 只有一个程序包，无需另行安装；当运行 Consul 的时候，需要为其指定一些必须的参数，以供 Consul 在运行时使用；（比如参数 -data-dir 表示指定 Consul 存放数据的目录）。</p>
-
 <p>我们不整那些服务网格之类的概念，简单说，Consul在整个微服务架构体系里面就是起了注册中心和配置中心的作用。</p>
-
 <h3 id="consul功能概述">Consul功能概述</h3>
-
 <h4 id="服务注册">服务注册</h4>
-
 <p>Consul 内部侦听 8500 端口，提供给 Consul 的客户端注册服务，比如张三开发了一个购物车程序，该购物车程序包含了“加入购物车”、“清空购物车” 两个接口，张三在开发购物车程序的时候，使用了 Consul 的客户端包组件，在程序运行起来以后，购物车程序就自动的连接到 Consul 的 8500 端口，注册了一个服务，该服务被命名为“购物车程序”，此时，Consul 并不知道 “购物车程序”有多少个接口，Consul 只知道 “购物车程序”的服务地址、端口。</p>
-
 <h4 id="服务发现">服务发现</h4>
-
 <p>在“购物车程序”注册到 Consul 后，Consul 也仅仅知道有这么一个服务注册进来了，并且还配置了健康检查， Consul 会定时的去连接 “购物车程序”，确保其还处于可提供服务的状态，任何人（程序）都可以通过 Consul 的外部地址访问 Consul 内部的已注册的服务列表，从而获得真实的服务地址，然后调用该真实地址，获得结果。</p>
-
 <h4 id="键值存储">键值存储</h4>
-
 <p>在 Consul 内部，提供了简单的数据存储，也就是 key/value 系统，kv 系统非常强大，它的作用包括允许节点动态修改配置、执行 leader 选举、服务发现、集成健康检查、或者其它你想要存储到 Consul 中的内容</p>
-
 <h3 id="consul部署架构">Consul部署架构</h3>
-
 <h4 id="集群">集群</h4>
-
 <p>Consul 是一个分布式的解决方案，可以部署多个 Consul 实例，确保数据中心的持续稳定，在 Consul 集群中，内部采用投票的方式选举出 leader，然后才开始运行整个集群，只有正确选举出 leader 后，集群才开始工作，当一个服务注册到 Consul 后，集群将该服务进行同步，确保 Consul 集群内的每个节点都存储了该服务的信息；然后，Consul 集群将对该服务进行健康检查和投票，超过半数通过，即认为该服务为正常（或者异常）；一旦被投票认定为异常的服务，该服务将不会被外部发现（不可访问），在此过程中，Consul 将持续的对该异常的服务进行检查，一旦服务恢复，Consul 即刻将其加入正常服务。</p>
-
 <h4 id="服务器和客户端">服务器和客户端</h4>
-
 <p>Consul 支持两种运行的方式，即 server 和 client 模式，当一个 Consul 节点以 server 模式运行的时候，就表示该 Consul 节点会存储服务和配置等相关信息，并且参与到健康检查、leader 选举等服务器事务中，与之相反的是，client 模式不会存储服务信息。</p>
-
 <h4 id="数据中心">数据中心</h4>
-
 <p>每个 Consul 节点都需要加入一个命名的数据中心（DataCenter），一个节点上，可以运行多个数据中心，数据中心的作用在于应用隔离，相当于服务分组。可以简单理解为，一个数据中心域为一个二层联通的子网。</p>
-
 <p>下图为consul的官方架构图：
-<img src="https://upload-images.jianshu.io/upload_images/14871146-f93f234dafbdebbc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="consul.png" /></p>
-
+<img src="https://upload-images.jianshu.io/upload_images/14871146-f93f234dafbdebbc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="consul.png"></p>
 <h3 id="consul能做什么">Consul能做什么?</h3>
-
 <p>简单来说，consul是一个分布式的服务管理平台，应用可以利用consul来进行分布式服务的服务注册、服务发现、配置管理、分布式事务协调等功能。借助于raft共识算法，可以轻松搭建出一个高可用的分布式集群，各节点所存储的数据通过raft算法可以保证最终一致性，而不需要依赖于任何的外部数据库。（这点非常重要，要知道搭建一个高可用的mysql数据库本身成本就非常高，nacos的数据存储目前只支持mysql，现在貌似也有规划转分布式算法）。通过上面的介绍，相信你也看出来了，consul做的事情本质上和zookeeper、etcd这些分布式服务组件都差不多，只是zookeeper用的一致性算法是zab（基于paxos），向来以难以理解著称，而etcd也是raft算法，相对容易理解很多，但是不带ui管理界面，易用性方面consul会好一点</p>
-
 <h3 id="集群搭建">集群搭建</h3>
-
 <h4 id="下载安装">下载安装</h4>
-
 <p>consul安装非常简单，直接在官网下载对应操作系统编译好的二进制文件就行，网址为<a href="https://www.consul.io/downloads.html">https://www.consul.io/downloads.html</a>。整个压缩包就一个二进制文件consul，拷贝至系统的<code>/usr/bin</code>就ok了。执行consul，看到如下输出，说明安装成功：</p>
-
-<pre><code class="language-bash">[consul@localhost ~]$ consul
-Usage: consul [--version] [--help] &lt;command&gt; [&lt;args&gt;]
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>consul@localhost ~<span style="color:#f92672">]</span>$ consul
+Usage: consul <span style="color:#f92672">[</span>--version<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--help<span style="color:#f92672">]</span> &lt;command&gt; <span style="color:#f92672">[</span>&lt;args&gt;<span style="color:#f92672">]</span>
 
 Available commands are:
-    acl            Interact with Consul's ACLs
-    agent          Runs a Consul agent
-    catalog        Interact with the catalog
-    config         Interact with Consul's Centralized Configurations
+    acl            Interact with Consul<span style="color:#e6db74">&#39;s ACLs
+</span><span style="color:#e6db74">    agent          Runs a Consul agent
+</span><span style="color:#e6db74">    catalog        Interact with the catalog
+</span><span style="color:#e6db74">    config         Interact with Consul&#39;</span>s Centralized Configurations
     connect        Interact with Consul Connect
-    debug          Records a debugging archive for operators
+    debug          Records a debugging archive <span style="color:#66d9ef">for</span> operators
     event          Fire a new event
     exec           Executes a command on Consul nodes
-    force-leave    Forces a member of the cluster to enter the &quot;left&quot; state
-    info           Provides debugging information for operators.
+    force-leave    Forces a member of the cluster to enter the <span style="color:#e6db74">&#34;left&#34;</span> state
+    info           Provides debugging information <span style="color:#66d9ef">for</span> operators.
     intention      Interact with Connect service intentions
     join           Tell Consul agent to join cluster
     keygen         Generates a new encryption key
@@ -292,19 +240,16 @@ Available commands are:
     maint          Controls node or service maintenance mode
     members        Lists the members of a Consul cluster
     monitor        Stream logs from a Consul agent
-    operator       Provides cluster-level tools for Consul operators
+    operator       Provides cluster-level tools <span style="color:#66d9ef">for</span> Consul operators
     reload         Triggers the agent to reload configuration files
     rtt            Estimates network round trip time between nodes
     services       Interact with services
     snapshot       Saves, restores and inspects snapshots of Consul server state
-    tls            Builtin helpers for creating CAs and certificates
+    tls            Builtin helpers <span style="color:#66d9ef">for</span> creating CAs and certificates
     validate       Validate config files/directories
     version        Prints the Consul version
-    watch          Watch for changes in Consul
-</code></pre>
-
-<h5 id="consul参数说明">consul参数说明</h5>
-
+    watch          Watch <span style="color:#66d9ef">for</span> changes in Consul
+</code></pre></div><h5 id="consul参数说明">consul参数说明</h5>
 <ul>
 <li>agent：是consul的核心指令，它运行agent来维护成员的重要信息、运行检查、服务宣布、查询处理等等。</li>
 <li>event：提供了一种机制，用来fire自定义的用户事件，这些事件对consul来说是不透明的，但它们可以用来构建自动部署、重启服务或者其他行动的脚本。</li>
@@ -320,67 +265,64 @@ leave指令触发一个优雅的离开动作并关闭agent，节点离开后不�
 <li>version：打印consul的版本</li>
 <li>watch：提供了一个机制，用来监视实际数据视图的改变(节点列表、成员服务、KV)，如果没有指定进程，当前值会被dump出来。</li>
 </ul>
-
 <h5 id="agent参数说明">agent参数说明</h5>
-
 <p>核心对象的agent，我们来看一下它的启动参数</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>consul@localhost ~<span style="color:#f92672">]</span>$ consul agent --help
+Usage: consul agent <span style="color:#f92672">[</span>options<span style="color:#f92672">]</span>
 
-<pre><code class="language-bash">[consul@localhost ~]$ consul agent --help
-Usage: consul agent [options]
-
-  Starts the Consul agent and runs until an interrupt is received. The
+  Starts the Consul agent and runs <span style="color:#66d9ef">until</span> an interrupt is received. The
   agent represents a single node in a cluster.
 
 HTTP API Options
 
-  -datacenter=&lt;value&gt;
+  -datacenter<span style="color:#f92672">=</span>&lt;value&gt;
      Datacenter of the agent.
 
 Command Options
 
-  -advertise=&lt;value&gt;
+  -advertise<span style="color:#f92672">=</span>&lt;value&gt;
      Sets the advertise address to use.
 
-  -advertise-wan=&lt;value&gt;
+  -advertise-wan<span style="color:#f92672">=</span>&lt;value&gt;
      Sets address to advertise on WAN instead of -advertise address.
 
-  -allow-write-http-from=&lt;value&gt;
+  -allow-write-http-from<span style="color:#f92672">=</span>&lt;value&gt;
      Only allow write endpoint calls from given network. CIDR format,
      can be specified multiple times.
 
-  -alt-domain=&lt;value&gt;
-     Alternate domain to use for DNS interface.
+  -alt-domain<span style="color:#f92672">=</span>&lt;value&gt;
+     Alternate domain to use <span style="color:#66d9ef">for</span> DNS interface.
 
-  -bind=&lt;value&gt;
-     Sets the bind address for cluster communication.
+  -bind<span style="color:#f92672">=</span>&lt;value&gt;
+     Sets the bind address <span style="color:#66d9ef">for</span> cluster communication.
 
   -bootstrap
      Sets server to bootstrap mode.
 
-  -bootstrap-expect=&lt;value&gt;
+  -bootstrap-expect<span style="color:#f92672">=</span>&lt;value&gt;
      Sets server to expect bootstrap mode.
 
-  -check_output_max_size=&lt;value&gt;
-     Sets the maximum output size for checks on this agent
+  -check_output_max_size<span style="color:#f92672">=</span>&lt;value&gt;
+     Sets the maximum output size <span style="color:#66d9ef">for</span> checks on this agent
 
-  -client=&lt;value&gt;
-     Sets the address to bind for client access. This includes RPC, DNS,
-     HTTP, HTTPS and gRPC (if configured).
+  -client<span style="color:#f92672">=</span>&lt;value&gt;
+     Sets the address to bind <span style="color:#66d9ef">for</span> client access. This includes RPC, DNS,
+     HTTP, HTTPS and gRPC <span style="color:#f92672">(</span><span style="color:#66d9ef">if</span> configured<span style="color:#f92672">)</span>.
 
-  -config-dir=&lt;value&gt;
+  -config-dir<span style="color:#f92672">=</span>&lt;value&gt;
      Path to a directory to read configuration files from. This
-     will read every file ending in '.json' as configuration in this
+     will read every file ending in <span style="color:#e6db74">&#39;.json&#39;</span> as configuration in this
      directory in alphabetical order. Can be specified multiple times.
 
-  -config-file=&lt;value&gt;
+  -config-file<span style="color:#f92672">=</span>&lt;value&gt;
      Path to a file in JSON or HCL format with a matching file
      extension. Can be specified multiple times.
 
-  -config-format=&lt;value&gt;
+  -config-format<span style="color:#f92672">=</span>&lt;value&gt;
      Config files are in this format irrespective of their extension.
-     Must be 'hcl' or 'json'
+     Must be <span style="color:#e6db74">&#39;hcl&#39;</span> or <span style="color:#e6db74">&#39;json&#39;</span>
 
-  -data-dir=&lt;value&gt;
+  -data-dir<span style="color:#f92672">=</span>&lt;value&gt;
      Path to a data directory to store agent state.
 
   -dev
@@ -394,11 +336,11 @@ Command Options
   -disable-keyring-file
      Disables the backing up of the keyring to a file.
 
-  -dns-port=&lt;value&gt;
+  -dns-port<span style="color:#f92672">=</span>&lt;value&gt;
      DNS port to use.
 
-  -domain=&lt;value&gt;
-     Domain to use for DNS interface.
+  -domain<span style="color:#f92672">=</span>&lt;value&gt;
+     Domain to use <span style="color:#66d9ef">for</span> DNS interface.
 
   -enable-local-script-checks
      Enables health check scripts from configuration file.
@@ -406,116 +348,116 @@ Command Options
   -enable-script-checks
      Enables health check scripts.
 
-  -encrypt=&lt;value&gt;
+  -encrypt<span style="color:#f92672">=</span>&lt;value&gt;
      Provides the gossip encryption key.
 
-  -grpc-port=&lt;value&gt;
-     Sets the gRPC API port to listen on (currently needed for Envoy xDS
-     only).
+  -grpc-port<span style="color:#f92672">=</span>&lt;value&gt;
+     Sets the gRPC API port to listen on <span style="color:#f92672">(</span>currently needed <span style="color:#66d9ef">for</span> Envoy xDS
+     only<span style="color:#f92672">)</span>.
 
-  -hcl=&lt;value&gt;
+  -hcl<span style="color:#f92672">=</span>&lt;value&gt;
      hcl config fragment. Can be specified multiple times.
 
-  -http-port=&lt;value&gt;
+  -http-port<span style="color:#f92672">=</span>&lt;value&gt;
      Sets the HTTP API port to listen on.
 
-  -join=&lt;value&gt;
+  -join<span style="color:#f92672">=</span>&lt;value&gt;
      Address of an agent to join at start time. Can be specified
      multiple times.
 
-  -join-wan=&lt;value&gt;
+  -join-wan<span style="color:#f92672">=</span>&lt;value&gt;
      Address of an agent to join -wan at start time. Can be specified
      multiple times.
 
-  -log-file=&lt;value&gt;
+  -log-file<span style="color:#f92672">=</span>&lt;value&gt;
      Path to the file the logs get written to
 
-  -log-level=&lt;value&gt;
+  -log-level<span style="color:#f92672">=</span>&lt;value&gt;
      Log level of the agent.
 
-  -log-rotate-bytes=&lt;value&gt;
+  -log-rotate-bytes<span style="color:#f92672">=</span>&lt;value&gt;
      Maximum number of bytes that should be written to a log file
 
-  -log-rotate-duration=&lt;value&gt;
+  -log-rotate-duration<span style="color:#f92672">=</span>&lt;value&gt;
      Time after which log rotation needs to be performed
 
-  -log-rotate-max-files=&lt;value&gt;
+  -log-rotate-max-files<span style="color:#f92672">=</span>&lt;value&gt;
      Maximum number of log file archives to keep
 
-  -node=&lt;value&gt;
+  -node<span style="color:#f92672">=</span>&lt;value&gt;
      Name of this node. Must be unique in the cluster.
 
-  -node-id=&lt;value&gt;
-     A unique ID for this node across space and time. Defaults to a
+  -node-id<span style="color:#f92672">=</span>&lt;value&gt;
+     A unique ID <span style="color:#66d9ef">for</span> this node across space and time. Defaults to a
      randomly-generated ID that persists in the data-dir.
 
-  -node-meta=&lt;key:value&gt;
-     An arbitrary metadata key/value pair for this node, of the format
-     `key:value`. Can be specified multiple times.
+  -node-meta<span style="color:#f92672">=</span>&lt;key:value&gt;
+     An arbitrary metadata key/value pair <span style="color:#66d9ef">for</span> this node, of the format
+     <span style="color:#e6db74">`</span>key:value<span style="color:#e6db74">`</span>. Can be specified multiple times.
 
   -non-voting-server
-     (Enterprise-only) This flag is used to make the server not
+     <span style="color:#f92672">(</span>Enterprise-only<span style="color:#f92672">)</span> This flag is used to make the server not
      participate in the Raft quorum, and have it only receive the data
      replication stream. This can be used to add read scalability to
      a cluster in cases where a high volume of reads to servers are
      needed.
 
-  -pid-file=&lt;value&gt;
+  -pid-file<span style="color:#f92672">=</span>&lt;value&gt;
      Path to file to store agent PID.
 
-  -protocol=&lt;value&gt;
+  -protocol<span style="color:#f92672">=</span>&lt;value&gt;
      Sets the protocol version. Defaults to latest.
 
-  -raft-protocol=&lt;value&gt;
+  -raft-protocol<span style="color:#f92672">=</span>&lt;value&gt;
      Sets the Raft protocol version. Defaults to latest.
 
-  -recursor=&lt;value&gt;
+  -recursor<span style="color:#f92672">=</span>&lt;value&gt;
      Address of an upstream DNS server. Can be specified multiple times.
 
   -rejoin
      Ignores a previous leave and attempts to rejoin the cluster.
 
-  -retry-interval=&lt;value&gt;
+  -retry-interval<span style="color:#f92672">=</span>&lt;value&gt;
      Time to wait between join attempts.
 
-  -retry-interval-wan=&lt;value&gt;
+  -retry-interval-wan<span style="color:#f92672">=</span>&lt;value&gt;
      Time to wait between join -wan attempts.
 
-  -retry-join=&lt;value&gt;
+  -retry-join<span style="color:#f92672">=</span>&lt;value&gt;
      Address of an agent to join at start time with retries enabled. Can
      be specified multiple times.
 
-  -retry-join-wan=&lt;value&gt;
+  -retry-join-wan<span style="color:#f92672">=</span>&lt;value&gt;
      Address of an agent to join -wan at start time with retries
      enabled. Can be specified multiple times.
 
-  -retry-max=&lt;value&gt;
+  -retry-max<span style="color:#f92672">=</span>&lt;value&gt;
      Maximum number of join attempts. Defaults to 0, which will retry
      indefinitely.
 
-  -retry-max-wan=&lt;value&gt;
+  -retry-max-wan<span style="color:#f92672">=</span>&lt;value&gt;
      Maximum number of join -wan attempts. Defaults to 0, which will
      retry indefinitely.
 
-  -segment=&lt;value&gt;
-     (Enterprise-only) Sets the network segment to join.
+  -segment<span style="color:#f92672">=</span>&lt;value&gt;
+     <span style="color:#f92672">(</span>Enterprise-only<span style="color:#f92672">)</span> Sets the network segment to join.
 
-  -serf-lan-bind=&lt;value&gt;
+  -serf-lan-bind<span style="color:#f92672">=</span>&lt;value&gt;
      Address to bind Serf LAN listeners to.
 
-  -serf-lan-port=&lt;value&gt;
+  -serf-lan-port<span style="color:#f92672">=</span>&lt;value&gt;
      Sets the Serf LAN port to listen on.
 
-  -serf-wan-bind=&lt;value&gt;
+  -serf-wan-bind<span style="color:#f92672">=</span>&lt;value&gt;
      Address to bind Serf WAN listeners to.
 
-  -serf-wan-port=&lt;value&gt;
+  -serf-wan-port<span style="color:#f92672">=</span>&lt;value&gt;
      Sets the Serf WAN port to listen on.
 
   -server
      Switches agent to server mode.
 
-  -server-port=&lt;value&gt;
+  -server-port<span style="color:#f92672">=</span>&lt;value&gt;
      Sets the server port to listen on.
 
   -syslog
@@ -524,14 +466,12 @@ Command Options
   -ui
      Enables the built-in static web UI server.
 
-  -ui-content-path=&lt;value&gt;
+  -ui-content-path<span style="color:#f92672">=</span>&lt;value&gt;
      Sets the external UI path to a string. Defaults to: /ui/
 
-  -ui-dir=&lt;value&gt;
+  -ui-dir<span style="color:#f92672">=</span>&lt;value&gt;
      Path to directory containing the web UI resources.
-</code></pre>
-
-<ul>
+</code></pre></div><ul>
 <li>-advertise：通知展现地址用来改变我们给集群中的其他节点展现的地址，一般情况下-bind地址就是展现地址</li>
 <li>-bootstrap：用来控制一个server是否在bootstrap模式，在一个datacenter中只能有一个server处于bootstrap模式，当一个server处于bootstrap模式时，可以自己选举为raft leader。</li>
 <li>-bootstrap-expect：在一个datacenter中期望提供的server节点数目，当该值提供的时候，consul一直等到达到指定sever数目的时候才会引导整个集群，该标记不能和bootstrap公用。</li>
@@ -555,117 +495,92 @@ Command Options
 <li>-ui-dir:提供存放web ui资源的路径，该目录必须是可读的。</li>
 <li>-pid-file:提供一个路径来存放pid文件，可以使用该文件进行SIGINT/SIGHUP(关闭/更新)agent。</li>
 </ul>
-
 <h4 id="启动节点">启动节点</h4>
-
 <p>了解了参数之后，我们就可以来启动集群了。这次我们规划了三个节点（一般建议为奇数节点），启动命令如下：</p>
-
-<pre><code class="language-bash">// 22.196.248.71
-consul agent -server -ui -bootstrap -data-dir=/data/consul -node=agent-1 -client=0.0.0.0 -bind=22.196.248.71 -datacenter=dc1
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">// 22.196.248.71
+consul agent -server -ui -bootstrap -data-dir<span style="color:#f92672">=</span>/data/consul -node<span style="color:#f92672">=</span>agent-1 -client<span style="color:#f92672">=</span>0.0.0.0 -bind<span style="color:#f92672">=</span>22.196.248.71 -datacenter<span style="color:#f92672">=</span>dc1
 
 // 22.196.248.73
-consul agent -server -ui -data-dir=/data/consul -node=agent-2 -client=0.0.0.0 -bind=22.196.248.73 -datacenter=dc1 -join 22.196.248.71
+consul agent -server -ui -data-dir<span style="color:#f92672">=</span>/data/consul -node<span style="color:#f92672">=</span>agent-2 -client<span style="color:#f92672">=</span>0.0.0.0 -bind<span style="color:#f92672">=</span>22.196.248.73 -datacenter<span style="color:#f92672">=</span>dc1 -join 22.196.248.71
 
 // 22.196.248.74
-consul agent -server -ui -data-dir=/data/consul -node=agent-3 -client=0.0.0.0 -bind=22.196.248.74 -datacenter=dc1 -join 22.196.248.71
-</code></pre>
-
-<p>解释一下上面的指令，简单来说，就是指定当前主机客户端侦听地址为<code>-client=0.0.0.0</code>（这个参数指定了客户端允许接入的地址，0.0.0.0为任意地址可以接入，默认为127.0.0.1，即只有本机能接入），绑定了当前主机的IP地址（-bind，多网卡的话必须要设置，让consul知道使用哪个ip作为节点的ip），指定了一个数据中心的名称（-datacenter=dc1），后两台服务器在启动的时候加入第一台代理服务器（-join 22.196.248.71），同时指定了启用每台服务器的内置 WebUI 服务器组件（-ui），当三台服务器都正确运行起来以后，Consul 集群将自动选举 leader，自动进行集群事务，无需干预。
-&gt; 这里需要注意一点，理论上consul节点起来之后可以通过raft算法自动选举leader出来，但是我这边没有成功，日志提示选举失败，需要通过设置-bootstrap参数先启动某个节点，这个节点会自动把自己设置为leader，后面启动的节点就可以正常加入了。具体原因未知，有高手知道的请指点一下</p>
-
-<p>此时访问任意一台服务器的<a href="http://ip:8500，都可以看到ui界面">http://ip:8500，都可以看到ui界面</a>
-<img src="https://upload-images.jianshu.io/upload_images/14871146-6d97de0329dc014c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png" />
+consul agent -server -ui -data-dir<span style="color:#f92672">=</span>/data/consul -node<span style="color:#f92672">=</span>agent-3 -client<span style="color:#f92672">=</span>0.0.0.0 -bind<span style="color:#f92672">=</span>22.196.248.74 -datacenter<span style="color:#f92672">=</span>dc1 -join 22.196.248.71
+</code></pre></div><p>解释一下上面的指令，简单来说，就是指定当前主机客户端侦听地址为<code>-client=0.0.0.0</code>（这个参数指定了客户端允许接入的地址，0.0.0.0为任意地址可以接入，默认为127.0.0.1，即只有本机能接入），绑定了当前主机的IP地址（-bind，多网卡的话必须要设置，让consul知道使用哪个ip作为节点的ip），指定了一个数据中心的名称（-datacenter=dc1），后两台服务器在启动的时候加入第一台代理服务器（-join 22.196.248.71），同时指定了启用每台服务器的内置 WebUI 服务器组件（-ui），当三台服务器都正确运行起来以后，Consul 集群将自动选举 leader，自动进行集群事务，无需干预。</p>
+<blockquote>
+<p>这里需要注意一点，理论上consul节点起来之后可以通过raft算法自动选举leader出来，但是我这边没有成功，日志提示选举失败，需要通过设置-bootstrap参数先启动某个节点，这个节点会自动把自己设置为leader，后面启动的节点就可以正常加入了。具体原因未知，有高手知道的请指点一下</p>
+</blockquote>
+<p>此时访问任意一台服务器的http://ip:8500，都可以看到ui界面
+<img src="https://upload-images.jianshu.io/upload_images/14871146-6d97de0329dc014c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png">
 看到这个界面说明三个节点都正常启动了，我们在key/value插入一些数据，可以看到在三个节点都能正确查询到，集群bootstrap成功。</p>
-
 <h3 id="spring-cloud-集成">Spring Cloud 集成</h3>
-
 <h4 id="配置中心">配置中心</h4>
-
 <p>这边我们看看如何与spring cloud集成，使用consul作为应用的配置中心。为简单起见我们使用zuul网关作为示例，只使用了配置中心功能，没用注册中心功能
 在zuul的pom文件中添加如下依赖：</p>
-
-<pre><code class="language-xml">&lt;dependencies&gt;
-  &lt;dependency&gt;
-  &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
-  &lt;artifactId&gt;spring-cloud-starter-consul-config&lt;/artifactId&gt;
-  &lt;/dependency&gt;
-&lt;/dependencies&gt;
-</code></pre>
-
-<p>修改配置文件（注意要使用bootstrap.yml进行配置，不要用application.yml，否则配置不会起作用）</p>
-
-<pre><code class="language-yml">spring:
-  application:
-    name: bocsh-gateway
-  cloud:
-    consul:
-      host: 22.196.248.71
-      port: 8500
-      config:
-        enabled: true
-        format: yaml
-        #data-key表示consul上面的KEY值(或者说文件的名字) ,默认是data
-        #prefix设置配置值的基本文件夹，默认为config
-        #defaultContext设置所有应用程序使用的文件夹名称，默认为spring的应用名称
-        #profileSeparator设置用于使用配置文件在属性源中分隔配置文件名称的分隔符的值,默认为逗号
-server:
-  port: 30080
-</code></pre>
-
-<p>注意<code>data-key</code>,<code>prefix</code>,<code>defaultContext</code>,<code>profileSeparator</code>这几个配置都是可选项，定义了我们的配置文件在consul中存储的目录结构，spring boot 在启动时会在这个路径下获取配置文件信息，如果都是使用默认值得话，在consul中存储的数据结构如下（默认读取的是default配置）：
-<img src="https://upload-images.jianshu.io/upload_images/14871146-a5ce8d1a0a69d055.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png" />
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;dependencies&gt;</span>
+  <span style="color:#f92672">&lt;dependency&gt;</span>
+  <span style="color:#f92672">&lt;groupId&gt;</span>org.springframework.cloud<span style="color:#f92672">&lt;/groupId&gt;</span>
+  <span style="color:#f92672">&lt;artifactId&gt;</span>spring-cloud-starter-consul-config<span style="color:#f92672">&lt;/artifactId&gt;</span>
+  <span style="color:#f92672">&lt;/dependency&gt;</span>
+<span style="color:#f92672">&lt;/dependencies&gt;</span>
+</code></pre></div><p>修改配置文件（注意要使用bootstrap.yml进行配置，不要用application.yml，否则配置不会起作用）</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#66d9ef">spring</span>:
+  <span style="color:#66d9ef">application</span>:
+    <span style="color:#66d9ef">name</span>: bocsh-gateway
+  <span style="color:#66d9ef">cloud</span>:
+    <span style="color:#66d9ef">consul</span>:
+      <span style="color:#66d9ef">host</span>: <span style="color:#ae81ff">22.196.248.71</span>
+      <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">8500</span>
+      <span style="color:#66d9ef">config</span>:
+        <span style="color:#66d9ef">enabled</span>: <span style="color:#66d9ef">true</span>
+        <span style="color:#66d9ef">format</span>: yaml
+        <span style="color:#75715e">#data-key表示consul上面的KEY值(或者说文件的名字) ,默认是data</span>
+        <span style="color:#75715e">#prefix设置配置值的基本文件夹，默认为config</span>
+        <span style="color:#75715e">#defaultContext设置所有应用程序使用的文件夹名称，默认为spring的应用名称</span>
+        <span style="color:#75715e">#profileSeparator设置用于使用配置文件在属性源中分隔配置文件名称的分隔符的值,默认为逗号</span>
+<span style="color:#66d9ef">server</span>:
+  <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">30080</span>
+</code></pre></div><p>注意<code>data-key</code>,<code>prefix</code>,<code>defaultContext</code>,<code>profileSeparator</code>这几个配置都是可选项，定义了我们的配置文件在consul中存储的目录结构，spring boot 在启动时会在这个路径下获取配置文件信息，如果都是使用默认值得话，在consul中存储的数据结构如下（默认读取的是default配置）：
+<img src="https://upload-images.jianshu.io/upload_images/14871146-a5ce8d1a0a69d055.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png">
 key为<code>config/bocsh-gateway/data</code></p>
-
 <h4 id="动态配置更新">动态配置更新</h4>
-
 <p>首先，spring cloud consul组件是有动态更新配置能力的，官方称之为Config Watch。原理是consul客户端定时向consul服务端发起一个http请求，以检测服务端的配置是否有更新（类似于在actuator端点执行/refresh操作，但consul是自动的，不需要专门触发），相关配置如下：</p>
-
-<pre><code class="language-yaml">spring:
-  cloud:
-    consul:
-      config:
-        watch: 
-          enable: #default true
-          wait-time: #default 55
-          delay: #default 1000
-</code></pre>
-
-<p>可以看到配置更新能力默认是开启的，不想动态更新的话可以通过设置<code>spring.cloud.consul.config.watch.enabled=false</code>关闭Config Watch功能。</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">spring</span>:
+  <span style="color:#66d9ef">cloud</span>:
+    <span style="color:#66d9ef">consul</span>:
+      <span style="color:#66d9ef">config</span>:
+        <span style="color:#66d9ef">watch</span>: 
+          <span style="color:#66d9ef">enable</span>: <span style="color:#75715e">#default true</span>
+          <span style="color:#66d9ef">wait-time</span>: <span style="color:#75715e">#default 55</span>
+          <span style="color:#66d9ef">delay</span>: <span style="color:#75715e">#default 1000</span>
+</code></pre></div><p>可以看到配置更新能力默认是开启的，不想动态更新的话可以通过设置<code>spring.cloud.consul.config.watch.enabled=false</code>关闭Config Watch功能。</p>
 <p>有了上面的知识，我们就可以来配置动态路由了，首先在启动主类下加入如下配置：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@EnableZuulProxy</span>
+<span style="color:#a6e22e">@SpringBootApplication</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BaseApplication</span> <span style="color:#f92672">{</span>
 
-<pre><code class="language-java">@EnableZuulProxy
-@SpringBootApplication
-public class BaseApplication {
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
 
-    public static void main(String[] args) {
+        SpringApplication<span style="color:#f92672">.</span><span style="color:#a6e22e">run</span><span style="color:#f92672">(</span>BaseApplication<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">,</span> args<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
 
-        SpringApplication.run(BaseApplication.class, args);
-    }
+    <span style="color:#a6e22e">@RefreshScope</span>
+    <span style="color:#a6e22e">@ConfigurationProperties</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;zuul&#34;</span><span style="color:#f92672">)</span>
+    <span style="color:#66d9ef">public</span> ZuulProperties <span style="color:#a6e22e">zuulProperties</span><span style="color:#f92672">(){</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> ZuulProperties<span style="color:#f92672">();</span>
+    <span style="color:#f92672">}</span>
 
-    @RefreshScope
-    @ConfigurationProperties(&quot;zuul&quot;)
-    public ZuulProperties zuulProperties(){
-        return new ZuulProperties();
-    }
-
-}
-</code></pre>
-
-<p>在配置文件中打开actuator的routes端点，使我们可以观察routes变化的情况</p>
-
-<pre><code class="language-yaml">management:
-  endpoints:
-    web:
-      exposure:
-        include: routes
-</code></pre>
-
-<p>修改consul中的key/value值，通过访问<code>http://ip:port/actuator/routes</code>可以看到zuul目前的最新路由表，配置实时更新，实现了动态配置功能。
-&gt; 这里需要注意一点，如果你改的是zuul路由表中的<code>path</code>部分，则原有的路由信息不会消息，会新增一条你修改后的路由信息，修改<code>url</code>部分则可以实时生效。</p>
-
+<span style="color:#f92672">}</span>
+</code></pre></div><p>在配置文件中打开actuator的routes端点，使我们可以观察routes变化的情况</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">management</span>:
+  <span style="color:#66d9ef">endpoints</span>:
+    <span style="color:#66d9ef">web</span>:
+      <span style="color:#66d9ef">exposure</span>:
+        <span style="color:#66d9ef">include</span>: routes
+</code></pre></div><p>修改consul中的key/value值，通过访问<code>http://ip:port/actuator/routes</code>可以看到zuul目前的最新路由表，配置实时更新，实现了动态配置功能。</p>
+<blockquote>
+<p>这里需要注意一点，如果你改的是zuul路由表中的<code>path</code>部分，则原有的路由信息不会消息，会新增一条你修改后的路由信息，修改<code>url</code>部分则可以实时生效。</p>
+</blockquote>
 <h3 id="参考资料">参考资料</h3>
-
 <p>1.<a href="https://www.cnblogs.com/linjiqin/p/9718223.html">https://www.cnblogs.com/linjiqin/p/9718223.html</a>
 2.<a href="https://blog.csdn.net/it_lihongmin/article/details/91357445">https://blog.csdn.net/it_lihongmin/article/details/91357445</a>
 3.<a href="https://consul.io">https://consul.io</a>
@@ -678,12 +593,12 @@ public class BaseApplication {
               <ul class="pager">
                   
                   <li class="previous">
-                      <a href="/post/cloud-native-api-gateway-part-2/" data-toggle="tooltip" data-placement="top" title="构建云原生微服务网关系列-篇二：Zuul">&larr; Previous Post</a>
+                      <a href="/post/use-kubernetes-to-build-microservices/" data-toggle="tooltip" data-placement="top" title="使用spring boot&#43;kubernetes构建完整微服务平台">&larr; Previous Post</a>
                   </li>
                   
                   
                   <li class="next">
-                      <a href="/post/use-kubernetes-to-build-microservices/" data-toggle="tooltip" data-placement="top" title="使用spring boot&#43;kubernetes构建完整微服务平台">Next Post &rarr;</a>
+                      <a href="/post/cloud-native-api-gateway-part-2/" data-toggle="tooltip" data-placement="top" title="构建云原生微服务网关系列-篇二：Zuul">Next Post &rarr;</a>
                   </li>
                   
               </ul>
@@ -724,76 +639,28 @@ public class BaseApplication {
                      
                     
                         
-                            <a href="/tags/api-gateway" title="Api Gateway">
-                                Api Gateway
+                            <a href="/tags/api-gateway" title="api-gateway">
+                                api-gateway
                             </a>
                         
                     
                         
                     
                         
-                            <a href="/tags/cloud-native" title="Cloud Native">
-                                Cloud Native
+                            <a href="/tags/cloud-native" title="cloud-native">
+                                cloud-native
                             </a>
                         
                     
                         
-                            <a href="/tags/devops" title="DevOps">
-                                DevOps
+                            <a href="/tags/devops" title="devops">
+                                devops
                             </a>
                         
                     
                         
-                            <a href="/tags/docker" title="Docker">
-                                Docker
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/istio" title="Istio">
-                                Istio
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/kubernetes" title="Kubernetes">
-                                Kubernetes
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/microservice" title="Microservice">
-                                Microservice
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/restful" title="RESTful">
-                                RESTful
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/servicemesh" title="ServiceMesh">
-                                ServiceMesh
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/spring-cloud" title="Spring Cloud">
-                                Spring Cloud
+                            <a href="/tags/docker" title="docker">
+                                docker
                             </a>
                         
                     
@@ -805,12 +672,60 @@ public class BaseApplication {
                     
                         
                     
+                        
+                            <a href="/tags/istio" title="istio">
+                                istio
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="kubernetes">
+                                kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="microservice">
+                                microservice
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/restful" title="restful">
+                                restful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/servicemesh" title="servicemesh">
+                                servicemesh
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="spring-cloud">
+                                spring-cloud
+                            </a>
                         
                     
                         
                             <a href="/tags/vue" title="vue">
                                 vue
                             </a>
+                        
+                    
                         
                     
                         

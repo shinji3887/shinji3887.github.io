@@ -9,14 +9,14 @@
     <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <meta name="description" content="eureka高可用集群搭建">
+    <meta name="description" content="Istio 将控制平面整合为单一二进制文件 istiod，本文从架构层面审视 Istio 项目组进行此变化的原因及取舍">
     
     <meta name="keyword"  content="暴走的初号机, shinji3887, 暴走的初号机的网络日志, 暴走的初号机的博客, shinji3887 Blog, 博客, 个人网站, 互联网, Web, 云原生, PaaS, Istio, Kubernetes, 微服务, Microservice">
     <link rel="shortcut icon" href="/img/favicon.ico">
 
-    <title>搭建eureka高可用集群-同步率400%</title>
+    <title>介绍 istiod：简化控制平面-同步率400%</title>
 
-    <link rel="canonical" href="/post/create-eureka-ha-cluster/">
+    <link rel="canonical" href="/post/introducing-istiod/">
 
     <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/iDisqus.min.css"/>
 	
@@ -121,7 +121,7 @@
 
 <style type="text/css">
     header.intro-header{
-        background-image: url('https://lupeier.cn-sh2.ufileos.com/architecture-athens-building-164336.jpg')
+        background-image: url('https://lupeier.cn-sh2.ufileos.com/man-in-black-jacket-and-orange-helmet-sitting-on-chair-3186949.jpg')
     }
 </style>
 <header class="intro-header" >
@@ -131,14 +131,18 @@
                 <div class="post-heading">
                     <div class="tags">
                        
-                       <a class="tag" href="/tags/spring-cloud" title="Spring Cloud">
-                           Spring Cloud
+                       <a class="tag" href="/tags/istio" title="Istio">
+                           Istio
+                        </a>
+                        
+                       <a class="tag" href="/tags/servicemesh" title="ServiceMesh">
+                           ServiceMesh
                         </a>
                         
                     </div>
-                    <h1>搭建eureka高可用集群</h1>
+                    <h1>介绍 istiod：简化控制平面</h1>
                     <h2 class="subheading"></h2>
-                    <span  class="meta">Posted by L&#39; on Friday, March 8, 2019
+                    <span  class="meta">Posted by Craig Box (Google) on Saturday, March 21, 2020
                         
                     </span>
 					<br>
@@ -165,61 +169,81 @@
                         <header>
                         <h2>TOC</h2>
                         </header>
-                        <nav id="TableOfContents"></nav>
+                        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#istio-控制平面的历史">Istio 控制平面的历史</a></li>
+    <li><a href="#复杂性的代价">复杂性的代价</a></li>
+    <li><a href="#合并的收益引入-istiod">合并的收益：引入 istiod</a></li>
+    <li><a href="#专家说明">专家说明</a></li>
+    <li><a href="#进阶">进阶</a></li>
+  </ul>
+</nav>
         		
         		<blockquote>
-<p>eureka高可用集群搭建</p>
+<p>编者按：Istio 项目终于在 1.5 版本中迎来了架构大改，砍掉了之前备受争议的 Mixer 组件（以<a href="/post/redefining-extensibility-in-proxies/">Wasm方案</a>取代之），同时将控制平面的各组件整合为了单一二进制文件 istiod，在大规模生产落地的道路上迈出了坚实的一步。本文翻译自 Istio 官方博客，作者为来自谷歌的 Istio 项目架构师，文中详细描述了 Istio 控制平面从微服务到回归单体的整个历程以及架构师的权衡取舍（tradeoff）。Istio 项目再次证明了“没有银弹”，微服务架构不能包治百病，适合自己的才是最好的。文中对于实施微服务带来的优势和劣势都做了详细深入的分析，配合 Istio 项目这个现实案例，堪称教科书级别，其整个发展演变过程值得每一个从事微服务架构方面工作的架构师进行学习。</p>
 </blockquote>
-<p>通常来说，高可用集群需要3个节点，通过各个节点之间进行复制和互相注册来保障注册中心的高可用。任何一个注册中心节点挂掉对集群都不会有影响，甚至全部的eureka节点挂掉，客户端之间的调用也不受影响（客户端的ribbon会缓存服务注册列表，当然此时新的服务就没法注册了），集群架构图如下
-<img src="https://upload-images.jianshu.io/upload_images/14871146-4de9ba7fd9f2ba01.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="eureka-cluster.png"></p>
-<p>废话不多说，直接上配置文件</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">spring</span>:
-    <span style="color:#66d9ef">application</span>:
-        <span style="color:#66d9ef">name</span>: eureka-server
-<span style="color:#66d9ef">server</span>:
-    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">10001</span>
-<span style="color:#66d9ef">eureka</span>:
-    <span style="color:#66d9ef">client</span>:
-        <span style="color:#66d9ef">register-with-eureka</span>: <span style="color:#66d9ef">true</span>
-        <span style="color:#66d9ef">fetch-registry</span>: <span style="color:#66d9ef">true</span>
-    <span style="color:#66d9ef">server</span>:
-        <span style="color:#66d9ef">enable-self-preservation</span>: <span style="color:#66d9ef">false</span>
----
-<span style="color:#66d9ef">spring</span>:
-  <span style="color:#66d9ef">profiles</span>: peer1_test
-<span style="color:#66d9ef">eureka</span>:
-  <span style="color:#66d9ef">instance</span>:
-    <span style="color:#66d9ef">hostname</span>: dce304-master-vm1
-  <span style="color:#66d9ef">client</span>:
-    <span style="color:#66d9ef">serviceUrl</span>:
-      <span style="color:#66d9ef">defaultZone</span>: http://dce304-master-vm2:<span style="color:#ae81ff">10001</span>/eureka/,http://dce304-master-vm3:<span style="color:#ae81ff">10001</span>/eureka/
----
-<span style="color:#66d9ef">spring</span>:
-  <span style="color:#66d9ef">profiles</span>: peer2_test
-<span style="color:#66d9ef">eureka</span>:
-  <span style="color:#66d9ef">instance</span>:
-    <span style="color:#66d9ef">hostname</span>: dce304-master-vm2
-  <span style="color:#66d9ef">client</span>:
-    <span style="color:#66d9ef">serviceUrl</span>:
-      <span style="color:#66d9ef">defaultZone</span>: http://dce304-master-vm1:<span style="color:#ae81ff">10001</span>/eureka/,http://dce304-master-vm3:<span style="color:#ae81ff">10001</span>/eureka/
----
-<span style="color:#66d9ef">spring</span>:
-  <span style="color:#66d9ef">profiles</span>: peer3_test
-<span style="color:#66d9ef">eureka</span>:
-  <span style="color:#66d9ef">instance</span>:
-    <span style="color:#66d9ef">hostname</span>: dce304-master-vm3
-  <span style="color:#66d9ef">client</span>:
-    <span style="color:#66d9ef">serviceUrl</span>:
-      <span style="color:#66d9ef">defaultZone</span>: http://dce304-master-vm1:<span style="color:#ae81ff">10001</span>/eureka/,http://dce304-master-vm2:<span style="color:#ae81ff">10001</span>/eureka/
-</code></pre></div><p>这边有两点需要注意</p>
+<p>当把服务映射到交付它们的不同团队时，或者当独立部署的价值和独立扩展的价值大于编排成本时，微服务是一个很好的模式。我们定期与在现实世界中运行 Istio 的客户和团队进行交谈，他们告诉我们，对于 Istio 控制平面而言，情况并非如此。因此，在 Istio 1.5 中，我们更改了 Istio 的打包方式，将控制平面功能合并为一个称为 <strong>istiod</strong> 的二进制文件。</p>
+<h2 id="istio-控制平面的历史">Istio 控制平面的历史</h2>
+<p>Istio 实现了一种模式，该模式已在 Google 和 IBM 使用多年，后来被称为“服务网格”。通过将客户端和服务端进程与代理服务器配对，它们可以充当应用程序感知的 <em>数据平面</em> ，而不仅仅是在主机间传输数据包或通过网络传输脉冲信号。</p>
+<p>这种模式可以帮助世界通过 <em>微服务</em> 达成共识：通过轻量级协议连接细粒度、松散耦合的服务。通用的跨平台和跨语言标准（例如 HTTP 和 gRPC ）取代了专有传输，而所需库的广泛存在，使得不同的团队能够以最适合的语言编写整个体系架构的不同部分。此外，每个服务可以根据需要独立扩展。对这样的网络实施安全性、可观察性和流量控制的愿景推动了 Istio 的普及。</p>
+<p>Istio 的 <em>控制平面</em> 本身就是一种现代的云原生应用程序。因此，它从一开始就作为一组微服务而构建。诸如服务发现（Pilot），配置（Galley），证书生成（Citadel）和可扩展性（Mixer）等各个 Istio 组件都被编写并部署为单独的微服务。这些组件需要安全地进行通信并易于观察，这为 Istio 提供了“吃自己的狗粮”的机会（或“喝自己的香槟”，更法语化的比喻！）。</p>
+<h2 id="复杂性的代价">复杂性的代价</h2>
+<p>优秀的团队会回顾他们的选择，并借助事后回顾重新审视当时的选择。通常，当团队接受微服务及其固有的复杂性时，他们会在其他方面寻求改进以证明其取舍的正确性。让我们看一下此视角下的 Istio 控制平面。</p>
 <ul>
-<li><code>register-with-eureka</code>和<code>fetch-registry</code>两个参数要设置为<code>true</code>，这样eureka会自注册，否则的话其他eureka发现不了这个节点（当然也可以不设置这两个参数，默认值就是true）</li>
-<li><code>eureka.instance.hostname</code>设置的主机名和其他两个节点中的<code>defaultZone</code>当中的主机名要保持一致，否则<code>available-replicas</code>中也不会出现可用副本信息</li>
+<li>
+<p><strong>微服务使您能够使用不同的语言编写。</strong> 数据平面（ Envoy 代理）是用 C++ 编写的，并且此边界受益于 xDS API 的清晰隔离设计。但是，所有 Istio 控制平面组件都是用 Go 编写的。我们能够为适当的工作选择适当的语言：高性能的 C++ 用于代理，而在考虑易于访问和快速开发的其他所有场景都会使用 Go。</p>
+</li>
+<li>
+<p><strong>微服务使您能够允许不同的团队分别管理服务。</strong> 在绝大多数 Istio 安装过程中，所有组件都是由单个团队或个人安装和操作的。在 Istio 中完成的组件与构建它的开发团队的边界保持一致。如果 Istio 组件是由编写它们的人作为托管服务交付的，那么这是有道理的，但事实并非如此！虽然这使得组件开发团队的工作变得更简单，但对数量级更多的普通用户的可用性产生了巨大影响。</p>
+</li>
+<li>
+<p><strong>微服务使您能够解耦版本，并在不同时间发布不同的组件。</strong> 控制平面的所有组件从始至终均在同一版本中发布。我们从未测试或支持运行（例如）Citadel 和 Pilot 的不同版本。</p>
+</li>
+<li>
+<p><strong>微服务使您能够独立扩展组件。</strong> 在 Istio 1.5 中，控制平面成本由一个单一特性主导：为对数据平面进行编程的 Envoy xDS API 提供服务。每个其他功能都有边际成本，这意味着在可单独伸缩的微服务中拥有这些功能的价值很小。</p>
+</li>
+<li>
+<p><strong>微服务使您能够维护安全边界。</strong> 将应用程序分为不同的微服务的另一个很好的理由是，它们是否具有不同的安全角色。诸如 sidecar 注入器，Envoy 引导程序，Citadel 和 Pilot 之类的多个 Istio 微服务拥有几乎等同的更改代理配置的权限。因此，利用其中的任何服务都将造成几乎同等的损害。部署 Istio 时，默认情况下，所有组件都安装在同一 Kubernetes 命名空间中，从而提供了有限的安全隔离。</p>
+</li>
 </ul>
-<p>完成配置后，分别启动三个节点，启动时指定不同的profile参数
-<code>java -jar eureka-server-0.0.1-SNAPSHOT.jar --spring.profiles.active=peer3_test &gt;log.txt &amp;</code>
-启动完成后打开控制台，看到available-replicas中显示有两个节点，集群搭建完成
-<img src="https://upload-images.jianshu.io/upload_images/14871146-f9cd9270acb209ea.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="eureka.png"></p>
+<h2 id="合并的收益引入-istiod">合并的收益：引入 istiod</h2>
+<p>在确定微服务的许多常见好处并不适用于 Istio 控制平面之后，我们决定将它们统一为一个二进制文件：<strong>istiod</strong>（ &lsquo;d&rsquo; 代表 <a href="https://en.wikipedia.org/wiki/Daemon_%28computing%29">daemon</a>)。</p>
+<p>让我们看一下新打包方式的好处：</p>
+<ul>
+<li>
+<p><strong>安装变得更加容易。</strong> 所需的 Kubernetes 部署和相关配置更少，因此 Istio 的配置选项和参数集大大减少了。在最简单的情况下，<strong><em>您可以通过启动单个 Pod 来启用包含所有功能的 Istio 控制平面。</em></strong></p>
+</li>
+<li>
+<p><strong>配置变得更加容易。</strong> Istio 目前拥有的许多配置选项都是编排控制平面组件的方法，因此不再需要。您也不再需要更改群集范围内的 <code>PodSecurityPolicy</code> 来部署Istio。</p>
+</li>
+<li>
+<p><strong>使用虚拟机变得更加容易。</strong> 要将工作负载添加到网格中，现在只需要安装一个代理和已生成的证书即可。该代理仅连接单个后台服务。</p>
+</li>
+<li>
+<p><strong>维护变得更加容易。</strong> 安装、升级和删除 Istio 不再需要复杂的版本依赖关系和启动顺序。例如：要升级控制平面，您只需要在现有控制平面边上启动一个新的 istiod 版本，对其进行金丝雀部署，然后将所有流量移至该平面即可。</p>
+</li>
+<li>
+<p><strong>伸缩变得更加容易。</strong> 现在只有一个需要伸缩的组件。</p>
+</li>
+<li>
+<p><strong>调试变得更加容易。</strong> 更少的组件意味着更少的跨组件环境调试。</p>
+</li>
+<li>
+<p><strong>启动时间减少。</strong> 在以预定义的顺序启动时，组件不再需要彼此等待。</p>
+</li>
+<li>
+<p><strong>资源使用率下降，响应能力上升。</strong> 组件之间的通信将得到保证，并且不受 gRPC 报文大小限制。缓存可以被安全的共享，从而减少了资源占用。</p>
+</li>
+</ul>
+<p>istiod 将先前由 Pilot，Galley，Citadel 和 sidecar 注入器执行的功能统一为一个二进制文件。</p>
+<p>单独的组件 istio-agent 通过将配置和密钥安全地传递给 Envoy 代理，来帮助每个 sidecar 连接到网格。严格来说，尽管该代理仍然是控制平面的一部分，但它是按 per-pod（每 pod ） 运行的。 通过将以前作为 DaemonSet 运行的 per-node（每节点） 功能移动到 per-pod（每 pod ） 代理中，我们进一步简化了操作。</p>
+<h2 id="专家说明">专家说明</h2>
+<p>在某些情况下，您可能仍然想要独立运行 Istio 组件或替换某些组件。</p>
+<p>一些用户可能想在网格外部使用证书颁发机构（CA），我们有<a href="https://istio.io/docs/tasks/security/plugin-ca-cert/">如何执行此操作的文档</a>。如果您使用其他工具进行证书设置，则可以使用它代替内置CA。</p>
+<h2 id="进阶">进阶</h2>
+<p>本质上，istiod 只是打包和优化方面的改变。它与单独的组件基于相同的代码和 API 契约构建，并且仍由我们全面的测试套件覆盖。这使我们有信心将其设置为 Istio 1.5 中的默认设置。该服务现在称为 <code>istiod</code> - 在升级过程完成时，您会看到一个用于现有代理的 <code>istio-pilot</code>。</p>
+<p>虽然迁移到 istiod 似乎是一个巨大的变化，并且对于 <em>管理</em> 和 <em>维护</em> 网格的人员来说是一个巨大的改进，但它不会让 <em>使用</em> Istio 的日常生活变得有何不同。istiod 不会更改用于配置网格的任何 API ，因此您现有的进程将保持不变。</p>
+<p>这是否意味着微服务对于所有工作负载和架构设计都是错误的？当然不是。它们是工具带上的工具，当它们映射到您的组织现实中时，会发挥最佳的作用。恰恰相反，此变更（引入 istiod ）表明了 Istio 项目不断根据用户反馈进行更改的意愿，并持续关注最终用户的简化操作。微服务的大小必须合适，我们相信我们已经为 Istio 找到了合适的大小。</p>
 
         
                 
@@ -228,13 +252,9 @@
               <ul class="pager">
                   
                   <li class="previous">
-                      <a href="/post/after-kubernetest-genereation/" data-toggle="tooltip" data-placement="top" title="解读2017之容器篇：后Kubernetes时代 ">&larr; Previous Post</a>
+                      <a href="/post/webassembly-in-envoy/" data-toggle="tooltip" data-placement="top" title="WebAssembly in Envoy">&larr; Previous Post</a>
                   </li>
                   
-                  
-                  <li class="next">
-                      <a href="/post/use-helm-install-elastic-search/" data-toggle="tooltip" data-placement="top" title="使用helm charts安装elasticsearch集群">Next Post &rarr;</a>
-                  </li>
                   
               </ul>
   
@@ -453,7 +473,7 @@
 		    
                 </ul>
 		<p class="copyright text-muted">
-                    Copyright &copy; L&#39;s Blog , 2019
+                    Copyright &copy; L&#39;s Blog , 2020
                     <br>
                     <br>
                     <a href="http://icp.chinaz.com/info?q=lupeier.com" target="_blank">备案号：沪ICP备19022667号-1</a>                    

@@ -69,11 +69,11 @@
                     </li>
                     
                     <li>
-                        <a href="categories/tech">Tech</a>
+                        <a href="categories/tech">tech</a>
                     </li>
                     
                     <li>
-                        <a href="categories/tips">Tips</a>
+                        <a href="categories/tips">tips</a>
                     </li>
                     
                     <li>
@@ -170,368 +170,334 @@
                         <h2>TOC</h2>
                         </header>
                         <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#核心配置类">核心配置类</a></li>
-<li><a href="#axios相关配置">axios相关配置</a></li>
-<li><a href="#验证码处理">验证码处理</a>
-<ul>
-<li><a href="#webauthenticationdetails">WebAuthenticationDetails</a></li>
-<li><a href="#authenticationdetailssource">AuthenticationDetailsSource</a></li>
-<li><a href="#authenticationprovider">AuthenticationProvider</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#核心配置类">核心配置类</a></li>
+        <li><a href="#axios相关配置">axios相关配置</a></li>
+        <li><a href="#验证码处理">验证码处理</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
         		
-        		
-
-<blockquote>
+        		<blockquote>
 <p>在前后端分离的状态下，传统的spring security认证模式也需要做一点改造，以适应ajax的前端访问模式</p>
 </blockquote>
-
 <p>现在前后端分离的开发模式已经成为主流，好处不多说了，说说碰到的问题和坑。首先要解决的肯定是跨域问题，这个问题之前已经有讨论，请移步<a href="https://www.jianshu.com/p/8f5e7b547dfc">这里查看</a>。另外一个问题是传统的spring security安全机制是基于页面跳转的，使用302重定向（认证成功跳转至之前访问的页面，认证失败或未认证跳转至系统设置的默认登陆页面）。传统应用这么弄没问题，但现在vue一般都是基于axios进行ajax访问，ajax请求是没法直接处理302跳转的（浏览器会直接处理跳转请求，ajax的callback拿到的是跳转后的返回页面，在spring security中就是登陆首页，不符合需求）。幸好spring security所有的流程都是可以自定义的，我们可以扩展一下各个环节的流程。spring boot版本为2.1.4.RELEASE，对应的spring security版本为5.1.5.RELEASE</p>
-
 <h3 id="核心配置类">核心配置类</h3>
-
 <p><code>WebSecurityConfig</code>类配置如下</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">import</span> java.io.IOException<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.io.PrintWriter<span style="color:#f92672">;</span>
 
-<pre><code class="language-java">import java.io.IOException;
-import java.io.PrintWriter;
+<span style="color:#f92672">import</span> javax.servlet.ServletException<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> javax.servlet.http.HttpServletRequest<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> javax.servlet.http.HttpServletResponse<span style="color:#f92672">;</span>
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+<span style="color:#f92672">import</span> org.apache.commons.logging.Log<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.apache.commons.logging.LogFactory<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.beans.factory.annotation.Autowired<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.context.annotation.Configuration<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.http.HttpStatus<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.authentication.AuthenticationDetailsSource<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.authentication.AuthenticationProvider<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.config.annotation.web.builders.HttpSecurity<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.config.annotation.web.configuration.EnableWebSecurity<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.core.Authentication<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.core.AuthenticationException<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.core.context.SecurityContextHolder<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.web.AuthenticationEntryPoint<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.web.authentication.WebAuthenticationDetails<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler<span style="color:#f92672">;</span>
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationDetailsSource;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
-import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
+<span style="color:#f92672">import</span> com.bocsh.mer.security.MyUserDetailsService<span style="color:#f92672">;</span>
 
-import com.bocsh.mer.security.MyUserDetailsService;
-
-@Configuration
-@EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+<span style="color:#a6e22e">@Configuration</span>
+<span style="color:#a6e22e">@EnableWebSecurity</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">WebSecurityConfig</span> <span style="color:#66d9ef">extends</span> WebSecurityConfigurerAdapter <span style="color:#f92672">{</span>
 	
-	@Autowired
-	MyUserDetailsService myDetailService;
+	<span style="color:#a6e22e">@Autowired</span>
+	MyUserDetailsService myDetailService<span style="color:#f92672">;</span>
 	
-	@Autowired
-    private AuthenticationDetailsSource&lt;HttpServletRequest, WebAuthenticationDetails&gt; authenticationDetailsSource;
+	<span style="color:#a6e22e">@Autowired</span>
+    <span style="color:#66d9ef">private</span> AuthenticationDetailsSource<span style="color:#f92672">&lt;</span>HttpServletRequest<span style="color:#f92672">,</span> WebAuthenticationDetails<span style="color:#f92672">&gt;</span> authenticationDetailsSource<span style="color:#f92672">;</span>
 	
-	protected Log log = LogFactory.getLog(this.getClass());
+	<span style="color:#66d9ef">protected</span> Log log <span style="color:#f92672">=</span> LogFactory<span style="color:#f92672">.</span><span style="color:#a6e22e">getLog</span><span style="color:#f92672">(</span><span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">());</span>
 	
-	@Autowired
-    private AuthenticationProvider authenticationProvider; 
+	<span style="color:#a6e22e">@Autowired</span>
+    <span style="color:#66d9ef">private</span> AuthenticationProvider authenticationProvider<span style="color:#f92672">;</span> 
 
-	@Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	<span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">configure</span><span style="color:#f92672">(</span>AuthenticationManagerBuilder auth<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception <span style="color:#f92672">{</span>
 		
-        auth.authenticationProvider(authenticationProvider);
-    }
+        auth<span style="color:#f92672">.</span><span style="color:#a6e22e">authenticationProvider</span><span style="color:#f92672">(</span>authenticationProvider<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
 	
-	//定义登陆成功返回信息
-	private class AjaxAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-	    @Override
-	    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+	<span style="color:#75715e">//定义登陆成功返回信息
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">private</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AjaxAuthSuccessHandler</span> <span style="color:#66d9ef">extends</span> SimpleUrlAuthenticationSuccessHandler <span style="color:#f92672">{</span>
+	    <span style="color:#a6e22e">@Override</span>
+	    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onAuthenticationSuccess</span><span style="color:#f92672">(</span>HttpServletRequest request<span style="color:#f92672">,</span> HttpServletResponse response<span style="color:#f92672">,</span> Authentication authentication<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException<span style="color:#f92672">,</span> ServletException <span style="color:#f92672">{</span>
 	    	
-	    	//User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	    	log.info(&quot;商户[&quot; + SecurityContextHolder.getContext().getAuthentication().getPrincipal() +&quot;]登陆成功！&quot;);
-	    	//登陆成功后移除session中验证码信息
-	    	request.getSession().removeAttribute(&quot;codeValue&quot;);
-	    	request.getSession().removeAttribute(&quot;codeTime&quot;);
+	    	<span style="color:#75715e">//User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+</span><span style="color:#75715e"></span>	    	log<span style="color:#f92672">.</span><span style="color:#a6e22e">info</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;商户[&#34;</span> <span style="color:#f92672">+</span> SecurityContextHolder<span style="color:#f92672">.</span><span style="color:#a6e22e">getContext</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getAuthentication</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getPrincipal</span><span style="color:#f92672">()</span> <span style="color:#f92672">+</span><span style="color:#e6db74">&#34;]登陆成功！&#34;</span><span style="color:#f92672">);</span>
+	    	<span style="color:#75715e">//登陆成功后移除session中验证码信息
+</span><span style="color:#75715e"></span>	    	request<span style="color:#f92672">.</span><span style="color:#a6e22e">getSession</span><span style="color:#f92672">().</span><span style="color:#a6e22e">removeAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;codeValue&#34;</span><span style="color:#f92672">);</span>
+	    	request<span style="color:#f92672">.</span><span style="color:#a6e22e">getSession</span><span style="color:#f92672">().</span><span style="color:#a6e22e">removeAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;codeTime&#34;</span><span style="color:#f92672">);</span>
 	    	
-	    	response.setContentType(&quot;application/json;charset=utf-8&quot;);
-            PrintWriter out = response.getWriter();
-            out.write(&quot;{\&quot;status\&quot;:\&quot;ok\&quot;,\&quot;msg\&quot;:\&quot;登录成功\&quot;}&quot;);
-            out.flush();
-            out.close();
-	    }
-	}
+	    	response<span style="color:#f92672">.</span><span style="color:#a6e22e">setContentType</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;application/json;charset=utf-8&#34;</span><span style="color:#f92672">);</span>
+            PrintWriter out <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span><span style="color:#a6e22e">getWriter</span><span style="color:#f92672">();</span>
+            out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;{\&#34;status\&#34;:\&#34;ok\&#34;,\&#34;msg\&#34;:\&#34;登录成功\&#34;}&#34;</span><span style="color:#f92672">);</span>
+            out<span style="color:#f92672">.</span><span style="color:#a6e22e">flush</span><span style="color:#f92672">();</span>
+            out<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+	    <span style="color:#f92672">}</span>
+	<span style="color:#f92672">}</span>
 	
-	//定义登陆失败返回信息
-	private class AjaxAuthFailHandler extends SimpleUrlAuthenticationFailureHandler {
-	    @Override
-	    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-	    	//登陆失败后移除session中验证码信息
-	    	request.getSession().removeAttribute(&quot;codeValue&quot;);
-	    	request.getSession().removeAttribute(&quot;codeTime&quot;);
+	<span style="color:#75715e">//定义登陆失败返回信息
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">private</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AjaxAuthFailHandler</span> <span style="color:#66d9ef">extends</span> SimpleUrlAuthenticationFailureHandler <span style="color:#f92672">{</span>
+	    <span style="color:#a6e22e">@Override</span>
+	    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onAuthenticationFailure</span><span style="color:#f92672">(</span>HttpServletRequest request<span style="color:#f92672">,</span> HttpServletResponse response<span style="color:#f92672">,</span> AuthenticationException exception<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException<span style="color:#f92672">,</span> ServletException <span style="color:#f92672">{</span>
+	    	<span style="color:#75715e">//登陆失败后移除session中验证码信息
+</span><span style="color:#75715e"></span>	    	request<span style="color:#f92672">.</span><span style="color:#a6e22e">getSession</span><span style="color:#f92672">().</span><span style="color:#a6e22e">removeAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;codeValue&#34;</span><span style="color:#f92672">);</span>
+	    	request<span style="color:#f92672">.</span><span style="color:#a6e22e">getSession</span><span style="color:#f92672">().</span><span style="color:#a6e22e">removeAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;codeTime&#34;</span><span style="color:#f92672">);</span>
 	    	
-	    	response.setContentType(&quot;application/json;charset=utf-8&quot;);
-	    	response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            PrintWriter out = response.getWriter();
-            out.write(&quot;{\&quot;status\&quot;:\&quot;error\&quot;,\&quot;msg\&quot;:\&quot;请检查用户名、密码或验证码是否正确\&quot;}&quot;);
-            out.flush();
-            out.close();
-	    }
-	}
+	    	response<span style="color:#f92672">.</span><span style="color:#a6e22e">setContentType</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;application/json;charset=utf-8&#34;</span><span style="color:#f92672">);</span>
+	    	response<span style="color:#f92672">.</span><span style="color:#a6e22e">setStatus</span><span style="color:#f92672">(</span>HttpStatus<span style="color:#f92672">.</span><span style="color:#a6e22e">UNAUTHORIZED</span><span style="color:#f92672">.</span><span style="color:#a6e22e">value</span><span style="color:#f92672">());</span>
+            PrintWriter out <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span><span style="color:#a6e22e">getWriter</span><span style="color:#f92672">();</span>
+            out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;{\&#34;status\&#34;:\&#34;error\&#34;,\&#34;msg\&#34;:\&#34;请检查用户名、密码或验证码是否正确\&#34;}&#34;</span><span style="color:#f92672">);</span>
+            out<span style="color:#f92672">.</span><span style="color:#a6e22e">flush</span><span style="color:#f92672">();</span>
+            out<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+	    <span style="color:#f92672">}</span>
+	<span style="color:#f92672">}</span>
 	
-	//定义异常返回信息
-	public class UnauthorizedEntryPoint implements AuthenticationEntryPoint {
-	    @Override
-	    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-	    	response.sendError(HttpStatus.UNAUTHORIZED.value(),authException.getMessage());
-        }
+	<span style="color:#75715e">//定义异常返回信息
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UnauthorizedEntryPoint</span> <span style="color:#66d9ef">implements</span> AuthenticationEntryPoint <span style="color:#f92672">{</span>
+	    <span style="color:#a6e22e">@Override</span>
+	    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">commence</span><span style="color:#f92672">(</span>HttpServletRequest request<span style="color:#f92672">,</span> HttpServletResponse response<span style="color:#f92672">,</span> AuthenticationException authException<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException<span style="color:#f92672">,</span> ServletException <span style="color:#f92672">{</span>
+	    	response<span style="color:#f92672">.</span><span style="color:#a6e22e">sendError</span><span style="color:#f92672">(</span>HttpStatus<span style="color:#f92672">.</span><span style="color:#a6e22e">UNAUTHORIZED</span><span style="color:#f92672">.</span><span style="color:#a6e22e">value</span><span style="color:#f92672">(),</span>authException<span style="color:#f92672">.</span><span style="color:#a6e22e">getMessage</span><span style="color:#f92672">());</span>
+        <span style="color:#f92672">}</span>
 
-	}
+	<span style="color:#f92672">}</span>
 	
-	//定义登出成功返回信息
-	private class AjaxLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler  {
+	<span style="color:#75715e">//定义登出成功返回信息
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">private</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AjaxLogoutSuccessHandler</span> <span style="color:#66d9ef">extends</span> SimpleUrlLogoutSuccessHandler  <span style="color:#f92672">{</span>
 
-		public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
-				Authentication authentication) throws IOException, ServletException {
-			response.setContentType(&quot;application/json;charset=utf-8&quot;);
-            PrintWriter out = response.getWriter();
-            out.write(&quot;{\&quot;status\&quot;:\&quot;ok\&quot;,\&quot;msg\&quot;:\&quot;登出成功\&quot;}&quot;);
-            out.flush();
-            out.close();
-		}
-	}
+		<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onLogoutSuccess</span><span style="color:#f92672">(</span>HttpServletRequest request<span style="color:#f92672">,</span> HttpServletResponse response<span style="color:#f92672">,</span>
+				Authentication authentication<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> IOException<span style="color:#f92672">,</span> ServletException <span style="color:#f92672">{</span>
+			response<span style="color:#f92672">.</span><span style="color:#a6e22e">setContentType</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;application/json;charset=utf-8&#34;</span><span style="color:#f92672">);</span>
+            PrintWriter out <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span><span style="color:#a6e22e">getWriter</span><span style="color:#f92672">();</span>
+            out<span style="color:#f92672">.</span><span style="color:#a6e22e">write</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;{\&#34;status\&#34;:\&#34;ok\&#34;,\&#34;msg\&#34;:\&#34;登出成功\&#34;}&#34;</span><span style="color:#f92672">);</span>
+            out<span style="color:#f92672">.</span><span style="color:#a6e22e">flush</span><span style="color:#f92672">();</span>
+            out<span style="color:#f92672">.</span><span style="color:#a6e22e">close</span><span style="color:#f92672">();</span>
+		<span style="color:#f92672">}</span>
+	<span style="color:#f92672">}</span>
 	
-	@Override
-    protected void configure(HttpSecurity http) throws Exception {
+	<span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">configure</span><span style="color:#f92672">(</span>HttpSecurity http<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception <span style="color:#f92672">{</span>
 		http
-		.exceptionHandling().authenticationEntryPoint(new UnauthorizedEntryPoint())
-		.and()
-		.csrf().disable()
-		.authorizeRequests()                   
-            .antMatchers(&quot;/users/login_page&quot;,&quot;/users/captcha&quot;).permitAll()
-            .anyRequest().authenticated()
-            .and().formLogin().loginPage(&quot;/users/login_page&quot;)
-                              .successHandler(new AjaxAuthSuccessHandler())
-                              .failureHandler(new AjaxAuthFailHandler())
-                              .loginProcessingUrl(&quot;/login&quot;)
-                              .authenticationDetailsSource(authenticationDetailsSource)
-            .and()
-            .logout().logoutSuccessHandler(new AjaxLogoutSuccessHandler())
-            .logoutUrl(&quot;/logout&quot;);
-    }
-}
-</code></pre>
-
-<p>这里分别说明：<code>configure</code>方法配置整体的认证规则，即除了<code>/users/login_page</code>和<code>/users/captcha</code>这两个方式之外全部需要认证，同时在<code>formLogin</code>方法中设置了两个自定义的handler分别处理认证成功、认证失败的情况，这里我们设置直接返回json字符串，content-type设置为<code>application/json;charset=utf-8</code>，这样在认证完毕之后就不用自动302跳转了，而是交由axios框架来进行处理。</p>
-
+		<span style="color:#f92672">.</span><span style="color:#a6e22e">exceptionHandling</span><span style="color:#f92672">().</span><span style="color:#a6e22e">authenticationEntryPoint</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> UnauthorizedEntryPoint<span style="color:#f92672">())</span>
+		<span style="color:#f92672">.</span><span style="color:#a6e22e">and</span><span style="color:#f92672">()</span>
+		<span style="color:#f92672">.</span><span style="color:#a6e22e">csrf</span><span style="color:#f92672">().</span><span style="color:#a6e22e">disable</span><span style="color:#f92672">()</span>
+		<span style="color:#f92672">.</span><span style="color:#a6e22e">authorizeRequests</span><span style="color:#f92672">()</span>                   
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">antMatchers</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/users/login_page&#34;</span><span style="color:#f92672">,</span><span style="color:#e6db74">&#34;/users/captcha&#34;</span><span style="color:#f92672">).</span><span style="color:#a6e22e">permitAll</span><span style="color:#f92672">()</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">anyRequest</span><span style="color:#f92672">().</span><span style="color:#a6e22e">authenticated</span><span style="color:#f92672">()</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">and</span><span style="color:#f92672">().</span><span style="color:#a6e22e">formLogin</span><span style="color:#f92672">().</span><span style="color:#a6e22e">loginPage</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/users/login_page&#34;</span><span style="color:#f92672">)</span>
+                              <span style="color:#f92672">.</span><span style="color:#a6e22e">successHandler</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> AjaxAuthSuccessHandler<span style="color:#f92672">())</span>
+                              <span style="color:#f92672">.</span><span style="color:#a6e22e">failureHandler</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> AjaxAuthFailHandler<span style="color:#f92672">())</span>
+                              <span style="color:#f92672">.</span><span style="color:#a6e22e">loginProcessingUrl</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/login&#34;</span><span style="color:#f92672">)</span>
+                              <span style="color:#f92672">.</span><span style="color:#a6e22e">authenticationDetailsSource</span><span style="color:#f92672">(</span>authenticationDetailsSource<span style="color:#f92672">)</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">and</span><span style="color:#f92672">()</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">logout</span><span style="color:#f92672">().</span><span style="color:#a6e22e">logoutSuccessHandler</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> AjaxLogoutSuccessHandler<span style="color:#f92672">())</span>
+            <span style="color:#f92672">.</span><span style="color:#a6e22e">logoutUrl</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/logout&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>这里分别说明：<code>configure</code>方法配置整体的认证规则，即除了<code>/users/login_page</code>和<code>/users/captcha</code>这两个方式之外全部需要认证，同时在<code>formLogin</code>方法中设置了两个自定义的handler分别处理认证成功、认证失败的情况，这里我们设置直接返回json字符串，content-type设置为<code>application/json;charset=utf-8</code>，这样在认证完毕之后就不用自动302跳转了，而是交由axios框架来进行处理。</p>
 <p><code>UnauthorizedEntryPoint</code>定义了异常处理的逻辑，同理我们也是直接返回ajax信息而不做跳转。</p>
-
 <h3 id="axios相关配置">axios相关配置</h3>
-
-<pre><code class="language-js">instance.interceptors.response.use(res =&gt; {
-      let { data } = res
-      this.destroy(url)
-      if (this.shade) {
-        Spin.hide()
-        Modal.success({
-          title: '操作成功'
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#a6e22e">instance</span>.<span style="color:#a6e22e">interceptors</span>.<span style="color:#a6e22e">response</span>.<span style="color:#a6e22e">use</span>(<span style="color:#a6e22e">res</span> =&gt; {
+      <span style="color:#66d9ef">let</span> { <span style="color:#a6e22e">data</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">res</span>
+      <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">destroy</span>(<span style="color:#a6e22e">url</span>)
+      <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">shade</span>) {
+        <span style="color:#a6e22e">Spin</span>.<span style="color:#a6e22e">hide</span>()
+        <span style="color:#a6e22e">Modal</span>.<span style="color:#a6e22e">success</span>({
+          <span style="color:#a6e22e">title</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;操作成功&#39;</span>
         })
       }
-      console.log(res)
-      return data
-    }, error =&gt; {
-      console.log(error)
-      var code = error.response.status
-      if (code === 401) {
-        Cookies.remove(TOKEN_KEY)
-        window.location.href = '/login'
-        Message.error('未登录，或登录失效，请登录')
+      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">res</span>)
+      <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">data</span>
+    }, <span style="color:#a6e22e">error</span> =&gt; {
+      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">error</span>)
+      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">code</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">error</span>.<span style="color:#a6e22e">response</span>.<span style="color:#a6e22e">status</span>
+      <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">code</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">401</span>) {
+        <span style="color:#a6e22e">Cookies</span>.<span style="color:#a6e22e">remove</span>(<span style="color:#a6e22e">TOKEN_KEY</span>)
+        window.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">href</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/login&#39;</span>
+        <span style="color:#a6e22e">Message</span>.<span style="color:#a6e22e">error</span>(<span style="color:#e6db74">&#39;未登录，或登录失效，请登录&#39;</span>)
       }
-</code></pre>
-
-<p>这里面我们定义了一个响应拦截器，在error情况下，判断若返回码为401（就是我们在spring security中自定义的handler的错误状态码），则自动跳转至登陆页面。这样实现了在会话失效的情况下，点击前端任意需要访问后端api的按钮，均会触发跳转登录首页的效果，符合我们的预期。实际情况中一般前端框架都会自己带一套基于cookies的认证机制，这里我们把cookies的失效时间可以设置的长一点（一般可以设为一天），以保障还是以后端会话的失效时间为准。</p>
-
+</code></pre></div><p>这里面我们定义了一个响应拦截器，在error情况下，判断若返回码为401（就是我们在spring security中自定义的handler的错误状态码），则自动跳转至登陆页面。这样实现了在会话失效的情况下，点击前端任意需要访问后端api的按钮，均会触发跳转登录首页的效果，符合我们的预期。实际情况中一般前端框架都会自己带一套基于cookies的认证机制，这里我们把cookies的失效时间可以设置的长一点（一般可以设为一天），以保障还是以后端会话的失效时间为准。</p>
 <h3 id="验证码处理">验证码处理</h3>
-
 <p>一般我们在处理用户登录，为安全考虑需要加入图形验证码。这里需要注意的一点是<strong>验证码也必须作为login这个action的处理参数传入</strong>，否则的话这个验证码只是做了前端页面验证，实际在处理login事件的时候是没有验证码的，这样就没有意义了。而spring security框架默认只能帮助我们处理用户名+密码的这样验证方式，这样就需要对认证方式进行扩展。</p>
-
 <h4 id="webauthenticationdetails">WebAuthenticationDetails</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">import</span> javax.servlet.http.HttpServletRequest<span style="color:#f92672">;</span>
 
-<pre><code class="language-java">import javax.servlet.http.HttpServletRequest;
+<span style="color:#f92672">import</span> org.springframework.security.web.authentication.WebAuthenticationDetails<span style="color:#f92672">;</span>
 
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
-
-public class MyWebAuthenticationDetails extends WebAuthenticationDetails {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 6975601077710753878L;
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyWebAuthenticationDetails</span> <span style="color:#66d9ef">extends</span> WebAuthenticationDetails <span style="color:#f92672">{</span>
+    <span style="color:#75715e">/**
+</span><span style="color:#75715e">     * 
+</span><span style="color:#75715e">     */</span>
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">long</span> serialVersionUID <span style="color:#f92672">=</span> 6975601077710753878L<span style="color:#f92672">;</span>
     
-    private String username;
+    <span style="color:#66d9ef">private</span> String username<span style="color:#f92672">;</span>
     
-    private String password;
+    <span style="color:#66d9ef">private</span> String password<span style="color:#f92672">;</span>
     
-    private String validcode;
+    <span style="color:#66d9ef">private</span> String validcode<span style="color:#f92672">;</span>
     
-    private String sessionCodeValue;
+    <span style="color:#66d9ef">private</span> String sessionCodeValue<span style="color:#f92672">;</span>
     
-    private long sessionCodeTime;
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">long</span> sessionCodeTime<span style="color:#f92672">;</span>
     
-    public String getSessionCodeValue() {
-		return sessionCodeValue;
-	}
+    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getSessionCodeValue</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">return</span> sessionCodeValue<span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
 
-	public void setSessionCodeValue(String sessionCodeValue) {
-		this.sessionCodeValue = sessionCodeValue;
-	}
+	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setSessionCodeValue</span><span style="color:#f92672">(</span>String sessionCodeValue<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">sessionCodeValue</span> <span style="color:#f92672">=</span> sessionCodeValue<span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
 
-    public long getSessionCodeTime() {
-		return sessionCodeTime;
-	}
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">long</span> <span style="color:#a6e22e">getSessionCodeTime</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">return</span> sessionCodeTime<span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
 
-	public void setSessionCodeTime(long sessionCodeTime) {
-		this.sessionCodeTime = sessionCodeTime;
-	}
+	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setSessionCodeTime</span><span style="color:#f92672">(</span><span style="color:#66d9ef">long</span> sessionCodeTime<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">sessionCodeTime</span> <span style="color:#f92672">=</span> sessionCodeTime<span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
 
-	public String getUsername() {
-		return username;
-	}
+	<span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getUsername</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">return</span> username<span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setUsername</span><span style="color:#f92672">(</span>String username<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> username<span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
 
-	public String getPassword() {
-		return password;
-	}
+	<span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getPassword</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">return</span> password<span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setPassword</span><span style="color:#f92672">(</span>String password<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">password</span> <span style="color:#f92672">=</span> password<span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
 
-	public String getValidcode() {
-		return validcode;
-	}
+	<span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getValidcode</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">return</span> validcode<span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
 
-	public void setValidcode(String validcode) {
-		this.validcode = validcode;
-	}
+	<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setValidcode</span><span style="color:#f92672">(</span>String validcode<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">validcode</span> <span style="color:#f92672">=</span> validcode<span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
 
-	public MyWebAuthenticationDetails(HttpServletRequest request) {
-        super(request);
-        username = request.getParameter(&quot;username&quot;);
-        password = request.getParameter(&quot;password&quot;);
-        validcode = request.getParameter(&quot;validateCode&quot;);
-        sessionCodeValue = (String)request.getSession().getAttribute(&quot;codeValue&quot;);
-        sessionCodeTime = (Long)request.getSession().getAttribute(&quot;codeTime&quot;);
-    }
-}
-</code></pre>
-
-<p>这边前三个参数是从页面的login请求中传过来的，后面两个参数是在页面上请求生成图片验证码的时候我们设置到session里面去，以便于后续的验证</p>
-
+	<span style="color:#66d9ef">public</span> <span style="color:#a6e22e">MyWebAuthenticationDetails</span><span style="color:#f92672">(</span>HttpServletRequest request<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">super</span><span style="color:#f92672">(</span>request<span style="color:#f92672">);</span>
+        username <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span><span style="color:#a6e22e">getParameter</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;username&#34;</span><span style="color:#f92672">);</span>
+        password <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span><span style="color:#a6e22e">getParameter</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;password&#34;</span><span style="color:#f92672">);</span>
+        validcode <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span><span style="color:#a6e22e">getParameter</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;validateCode&#34;</span><span style="color:#f92672">);</span>
+        sessionCodeValue <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>String<span style="color:#f92672">)</span>request<span style="color:#f92672">.</span><span style="color:#a6e22e">getSession</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;codeValue&#34;</span><span style="color:#f92672">);</span>
+        sessionCodeTime <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>Long<span style="color:#f92672">)</span>request<span style="color:#f92672">.</span><span style="color:#a6e22e">getSession</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getAttribute</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;codeTime&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>这边前三个参数是从页面的login请求中传过来的，后面两个参数是在页面上请求生成图片验证码的时候我们设置到session里面去，以便于后续的验证</p>
 <h4 id="authenticationdetailssource">AuthenticationDetailsSource</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">import</span> javax.servlet.http.HttpServletRequest<span style="color:#f92672">;</span>
 
-<pre><code class="language-java">import javax.servlet.http.HttpServletRequest;
+<span style="color:#f92672">import</span> org.springframework.security.authentication.AuthenticationDetailsSource<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.web.authentication.WebAuthenticationDetails<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.stereotype.Component<span style="color:#f92672">;</span>
 
-import org.springframework.security.authentication.AuthenticationDetailsSource;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
-import org.springframework.stereotype.Component;
+<span style="color:#a6e22e">@Component</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyAuthenticationDetailsSource</span> <span style="color:#66d9ef">implements</span> AuthenticationDetailsSource<span style="color:#f92672">&lt;</span>HttpServletRequest<span style="color:#f92672">,</span> WebAuthenticationDetails<span style="color:#f92672">&gt;</span> <span style="color:#f92672">{</span>
 
-@Component
-public class MyAuthenticationDetailsSource implements AuthenticationDetailsSource&lt;HttpServletRequest, WebAuthenticationDetails&gt; {
-
-    @Override
-    public WebAuthenticationDetails buildDetails(HttpServletRequest context) {
-        return new MyWebAuthenticationDetails(context);
-    }
-}
-</code></pre>
-
-<p>这个类实现了一个自定义的接口，返回我们刚才定义的<code>MyWebAuthenticationDetails</code>资源</p>
-
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> WebAuthenticationDetails <span style="color:#a6e22e">buildDetails</span><span style="color:#f92672">(</span>HttpServletRequest context<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> MyWebAuthenticationDetails<span style="color:#f92672">(</span>context<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>这个类实现了一个自定义的接口，返回我们刚才定义的<code>MyWebAuthenticationDetails</code>资源</p>
 <h4 id="authenticationprovider">AuthenticationProvider</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">import</span> java.util.ArrayList<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.Collection<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> java.util.Date<span style="color:#f92672">;</span>
 
-<pre><code class="language-java">import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+<span style="color:#f92672">import</span> org.apache.commons.logging.Log<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.apache.commons.logging.LogFactory<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.beans.factory.annotation.Autowired<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.authentication.AuthenticationProvider<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.authentication.BadCredentialsException<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.authentication.UsernamePasswordAuthenticationToken<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.core.Authentication<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.core.AuthenticationException<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.core.GrantedAuthority<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.security.core.authority.SimpleGrantedAuthority<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> org.springframework.stereotype.Component<span style="color:#f92672">;</span>
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Component;
+<span style="color:#f92672">import</span> com.bocsh.mer.service.MerchantService<span style="color:#f92672">;</span>
 
-import com.bocsh.mer.service.MerchantService;
-
-@Component
-public class MyAuthenticationProvider implements AuthenticationProvider {
+<span style="color:#a6e22e">@Component</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyAuthenticationProvider</span> <span style="color:#66d9ef">implements</span> AuthenticationProvider <span style="color:#f92672">{</span>
     
-	protected Log log = LogFactory.getLog(this.getClass());
+	<span style="color:#66d9ef">protected</span> Log log <span style="color:#f92672">=</span> LogFactory<span style="color:#f92672">.</span><span style="color:#a6e22e">getLog</span><span style="color:#f92672">(</span><span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">());</span>
 	
-	@Autowired
-	MerchantService ms;
+	<span style="color:#a6e22e">@Autowired</span>
+	MerchantService ms<span style="color:#f92672">;</span>
 	
-    @Override
-    public Authentication authenticate(Authentication authentication) 
-            throws AuthenticationException {
-    	log.info(&quot;now start custom authenticate process!&quot;);
-        MyWebAuthenticationDetails details = (MyWebAuthenticationDetails) authentication.getDetails();  
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> Authentication <span style="color:#a6e22e">authenticate</span><span style="color:#f92672">(</span>Authentication authentication<span style="color:#f92672">)</span> 
+            <span style="color:#66d9ef">throws</span> AuthenticationException <span style="color:#f92672">{</span>
+    	log<span style="color:#f92672">.</span><span style="color:#a6e22e">info</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;now start custom authenticate process!&#34;</span><span style="color:#f92672">);</span>
+        MyWebAuthenticationDetails details <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>MyWebAuthenticationDetails<span style="color:#f92672">)</span> authentication<span style="color:#f92672">.</span><span style="color:#a6e22e">getDetails</span><span style="color:#f92672">();</span>  
         
-        //校验码判断
-        if(!details.getValidcode().equals(details.getSessionCodeValue())) {
-        	log.info(&quot;validate code error&quot;);
-        	throw new BadCredentialsException(&quot;authenticate fail！&quot;);
-        }
+        <span style="color:#75715e">//校验码判断
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span><span style="color:#f92672">(!</span>details<span style="color:#f92672">.</span><span style="color:#a6e22e">getValidcode</span><span style="color:#f92672">().</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>details<span style="color:#f92672">.</span><span style="color:#a6e22e">getSessionCodeValue</span><span style="color:#f92672">()))</span> <span style="color:#f92672">{</span>
+        	log<span style="color:#f92672">.</span><span style="color:#a6e22e">info</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;validate code error&#34;</span><span style="color:#f92672">);</span>
+        	<span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> BadCredentialsException<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;authenticate fail！&#34;</span><span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
 
-        //校验码有效期
-        if((new Date()).getTime() - details.getSessionCodeTime() &gt; 60000) {
-        	log.info(&quot;validate code expired!&quot;);
-        	throw new BadCredentialsException(&quot;authenticate fail！&quot;);
-        }
+        <span style="color:#75715e">//校验码有效期
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span><span style="color:#f92672">((</span><span style="color:#66d9ef">new</span> Date<span style="color:#f92672">()).</span><span style="color:#a6e22e">getTime</span><span style="color:#f92672">()</span> <span style="color:#f92672">-</span> details<span style="color:#f92672">.</span><span style="color:#a6e22e">getSessionCodeTime</span><span style="color:#f92672">()</span> <span style="color:#f92672">&gt;</span> 60000<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        	log<span style="color:#f92672">.</span><span style="color:#a6e22e">info</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;validate code expired!&#34;</span><span style="color:#f92672">);</span>
+        	<span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> BadCredentialsException<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;authenticate fail！&#34;</span><span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
         
-        //验密
-        String inpass=&quot;&quot;;
-		try {
-			inpass = ms.getPass(details.getUsername());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        if(!inpass.equals(details.getPassword())) {
-        	log.info(&quot;password error&quot;);
-        	throw new BadCredentialsException(&quot;authenticate fail！&quot;);
-        }
+        <span style="color:#75715e">//验密
+</span><span style="color:#75715e"></span>        String inpass<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">;</span>
+		<span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
+			inpass <span style="color:#f92672">=</span> ms<span style="color:#f92672">.</span><span style="color:#a6e22e">getPass</span><span style="color:#f92672">(</span>details<span style="color:#f92672">.</span><span style="color:#a6e22e">getUsername</span><span style="color:#f92672">());</span>
+		<span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>Exception e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+			<span style="color:#75715e">// TODO Auto-generated catch block
+</span><span style="color:#75715e"></span>			e<span style="color:#f92672">.</span><span style="color:#a6e22e">printStackTrace</span><span style="color:#f92672">();</span>
+		<span style="color:#f92672">}</span>
+        <span style="color:#66d9ef">if</span><span style="color:#f92672">(!</span>inpass<span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>details<span style="color:#f92672">.</span><span style="color:#a6e22e">getPassword</span><span style="color:#f92672">()))</span> <span style="color:#f92672">{</span>
+        	log<span style="color:#f92672">.</span><span style="color:#a6e22e">info</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;password error&#34;</span><span style="color:#f92672">);</span>
+        	<span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> BadCredentialsException<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;authenticate fail！&#34;</span><span style="color:#f92672">);</span>
+        <span style="color:#f92672">}</span>
         	
         
-        Collection&lt;GrantedAuthority&gt; auths=new ArrayList&lt;GrantedAuthority&gt;(); 
-        auths.add(new SimpleGrantedAuthority(&quot;ROLE_ADMIN&quot;));
-        return new UsernamePasswordAuthenticationToken(details.getUsername(),details.getPassword(),auths);
+        Collection<span style="color:#f92672">&lt;</span>GrantedAuthority<span style="color:#f92672">&gt;</span> auths<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>GrantedAuthority<span style="color:#f92672">&gt;();</span> 
+        auths<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> SimpleGrantedAuthority<span style="color:#f92672">(</span><span style="color:#e6db74">&#34;ROLE_ADMIN&#34;</span><span style="color:#f92672">));</span>
+        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> UsernamePasswordAuthenticationToken<span style="color:#f92672">(</span>details<span style="color:#f92672">.</span><span style="color:#a6e22e">getUsername</span><span style="color:#f92672">(),</span>details<span style="color:#f92672">.</span><span style="color:#a6e22e">getPassword</span><span style="color:#f92672">(),</span>auths<span style="color:#f92672">);</span>
    
-    }
+    <span style="color:#f92672">}</span>
 
-    @Override
-    public boolean supports(Class&lt;?&gt; authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
-    }
+    <span style="color:#a6e22e">@Override</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">supports</span><span style="color:#f92672">(</span>Class<span style="color:#f92672">&lt;?&gt;</span> authentication<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> authentication<span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>UsernamePasswordAuthenticationToken<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
 
-}
-</code></pre>
-
-<p>这里自定义了一个<code>AuthenticationProvider</code>来处理实际的认证业务逻辑，在这里可以方便的根据我们需要来进行自定义，我这边分别做了验证码校验、效期校验和验密，大家可以根据需要定制。认证成功就返回一个<code>UsernamePasswordAuthenticationToken</code>对象并配置好合适的权限（权限基于标准的RBAC模型，我这里为了讲解方便设置为ROLE_ADMIN，这里不展开讲了）。如果认证失败，只需要抛出一个异常（AuthenticationException的子类），这样spring security会自动找到失败页面进行返回，对应我们上面定义的<code>AjaxAuthFailHandler</code>这个类。</p>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>这里自定义了一个<code>AuthenticationProvider </code>来处理实际的认证业务逻辑，在这里可以方便的根据我们需要来进行自定义，我这边分别做了验证码校验、效期校验和验密，大家可以根据需要定制。认证成功就返回一个<code>UsernamePasswordAuthenticationToken</code>对象并配置好合适的权限（权限基于标准的RBAC模型，我这里为了讲解方便设置为ROLE_ADMIN，这里不展开讲了）。如果认证失败，只需要抛出一个异常（AuthenticationException的子类），这样spring security会自动找到失败页面进行返回，对应我们上面定义的<code>AjaxAuthFailHandler</code>这个类。</p>
 
         
                 
@@ -540,12 +506,12 @@ public class MyAuthenticationProvider implements AuthenticationProvider {
               <ul class="pager">
                   
                   <li class="previous">
-                      <a href="/post/get-images-from-gcr-io/" data-toggle="tooltip" data-placement="top" title="通过阿里云快速获取gcr.io上的镜像文件">&larr; Previous Post</a>
+                      <a href="/post/vue-cli3.0-proxytable/" data-toggle="tooltip" data-placement="top" title="vue-cli3.0使用proxytable解决跨域问题">&larr; Previous Post</a>
                   </li>
                   
                   
                   <li class="next">
-                      <a href="/post/vue-cli3.0-proxytable/" data-toggle="tooltip" data-placement="top" title="vue-cli3.0使用proxytable解决跨域问题">Next Post &rarr;</a>
+                      <a href="/post/get-images-from-gcr-io/" data-toggle="tooltip" data-placement="top" title="通过阿里云快速获取gcr.io上的镜像文件">Next Post &rarr;</a>
                   </li>
                   
               </ul>
@@ -586,76 +552,28 @@ public class MyAuthenticationProvider implements AuthenticationProvider {
                      
                     
                         
-                            <a href="/tags/api-gateway" title="Api Gateway">
-                                Api Gateway
+                            <a href="/tags/api-gateway" title="api-gateway">
+                                api-gateway
                             </a>
                         
                     
                         
                     
                         
-                            <a href="/tags/cloud-native" title="Cloud Native">
-                                Cloud Native
+                            <a href="/tags/cloud-native" title="cloud-native">
+                                cloud-native
                             </a>
                         
                     
                         
-                            <a href="/tags/devops" title="DevOps">
-                                DevOps
+                            <a href="/tags/devops" title="devops">
+                                devops
                             </a>
                         
                     
                         
-                            <a href="/tags/docker" title="Docker">
-                                Docker
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/istio" title="Istio">
-                                Istio
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/kubernetes" title="Kubernetes">
-                                Kubernetes
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/microservice" title="Microservice">
-                                Microservice
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/restful" title="RESTful">
-                                RESTful
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/servicemesh" title="ServiceMesh">
-                                ServiceMesh
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/spring-cloud" title="Spring Cloud">
-                                Spring Cloud
+                            <a href="/tags/docker" title="docker">
+                                docker
                             </a>
                         
                     
@@ -667,12 +585,60 @@ public class MyAuthenticationProvider implements AuthenticationProvider {
                     
                         
                     
+                        
+                            <a href="/tags/istio" title="istio">
+                                istio
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="kubernetes">
+                                kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="microservice">
+                                microservice
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/restful" title="restful">
+                                restful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/servicemesh" title="servicemesh">
+                                servicemesh
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="spring-cloud">
+                                spring-cloud
+                            </a>
                         
                     
                         
                             <a href="/tags/vue" title="vue">
                                 vue
                             </a>
+                        
+                    
                         
                     
                         

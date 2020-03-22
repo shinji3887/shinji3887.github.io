@@ -69,11 +69,11 @@
                     </li>
                     
                     <li>
-                        <a href="categories/tech">Tech</a>
+                        <a href="categories/tech">tech</a>
                     </li>
                     
                     <li>
-                        <a href="categories/tips">Tips</a>
+                        <a href="categories/tips">tips</a>
                     </li>
                     
                     <li>
@@ -166,94 +166,59 @@
                         <h2>TOC</h2>
                         </header>
                         <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#准备工作">准备工作</a></li>
-<li><a href="#趟坑之旅">趟坑之旅</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#准备工作">准备工作</a></li>
+        <li><a href="#趟坑之旅">趟坑之旅</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
         		
-        		
-
-<blockquote>
+        		<blockquote>
 <p>Finchley正式RELEASE版本发布也有段时间了，如果想体验spring boot2.0的魅力以及spring 5.0的新功能，自然是要把Spring Cloud升级至F版。升级过程小结如下</p>
 </blockquote>
-
 <h3 id="准备工作">准备工作</h3>
-
 <p>升级步骤非常简单，修改一下pom依赖项即可，maven会自动下载所有的对应依赖（注意jdk必须为1.8以上版本），这也是我喜欢spring boot的原因，清爽不紧绷~
 原来的配置为</p>
-
-<pre><code class="language-xml">&lt;version.spring-boot&gt;1.5.14.RELEASE&lt;/version.spring-boot&gt;
-&lt;version.spring-cloud&gt;Edgware.SR3&lt;/version.spring-cloud&gt;
-</code></pre>
-
-<p>直接修改为F版的依赖配置（此处按照官方文档的配置，第一个坑）</p>
-
-<pre><code class="language-xml">&lt;version.spring-boot&gt;2.0.1.RELEASE&lt;/version.spring-boot&gt;
-&lt;version.spring-cloud&gt;Finchley.SR2&lt;/version.spring-cloud&gt;
-</code></pre>
-
-<h3 id="趟坑之旅">趟坑之旅</h3>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;version.spring-boot&gt;</span>1.5.14.RELEASE<span style="color:#f92672">&lt;/version.spring-boot&gt;</span>
+<span style="color:#f92672">&lt;version.spring-cloud&gt;</span>Edgware.SR3<span style="color:#f92672">&lt;/version.spring-cloud&gt;</span>
+</code></pre></div><p>直接修改为F版的依赖配置（此处按照官方文档的配置，第一个坑）</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;version.spring-boot&gt;</span>2.0.1.RELEASE<span style="color:#f92672">&lt;/version.spring-boot&gt;</span>
+<span style="color:#f92672">&lt;version.spring-cloud&gt;</span>Finchley.SR2<span style="color:#f92672">&lt;/version.spring-cloud&gt;</span>
+</code></pre></div><h3 id="趟坑之旅">趟坑之旅</h3>
 <p>下载完更新依赖之后，发现有一个地方报错，找不到eureka-client组件，原配置为</p>
-
-<pre><code class="language-xml">&lt;dependency&gt;
-   &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
-   &lt;artifactId&gt;spring-cloud-starter-eureka&lt;/artifactId&gt;
-&lt;/dependency&gt;
-</code></pre>
-
-<p>F版中spring cloud对这个组件的命名规范做了调整，增加了公司名，个人感觉是为了以后接入更多的注册中心做准备，比如 <code>spring-cloud-alibaba-nacos</code>这类的，修改配置如下：</p>
-
-<pre><code class="language-xml">&lt;dependency&gt;
-    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
-    &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-client&lt;/artifactId&gt;
-&lt;/dependency&gt;
-</code></pre>
-
-<p>依赖项解决，启动服务，发现起不来-_-#,系统报错有循环依赖</p>
-
-<pre><code class="language-bash">***************************
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;dependency&gt;</span>
+   <span style="color:#f92672">&lt;groupId&gt;</span>org.springframework.cloud<span style="color:#f92672">&lt;/groupId&gt;</span>
+   <span style="color:#f92672">&lt;artifactId&gt;</span>spring-cloud-starter-eureka<span style="color:#f92672">&lt;/artifactId&gt;</span>
+<span style="color:#f92672">&lt;/dependency&gt;</span>
+</code></pre></div><p>F版中spring cloud对这个组件的命名规范做了调整，增加了公司名，个人感觉是为了以后接入更多的注册中心做准备，比如 <code>spring-cloud-alibaba-nacos</code>这类的，修改配置如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;dependency&gt;</span>
+    <span style="color:#f92672">&lt;groupId&gt;</span>org.springframework.cloud<span style="color:#f92672">&lt;/groupId&gt;</span>
+    <span style="color:#f92672">&lt;artifactId&gt;</span>spring-cloud-starter-netflix-eureka-client<span style="color:#f92672">&lt;/artifactId&gt;</span>
+<span style="color:#f92672">&lt;/dependency&gt;</span>
+</code></pre></div><p>依赖项解决，启动服务，发现起不来-_-#,系统报错有循环依赖</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">***************************
 APPLICATION FAILED TO START
 ***************************
 Description:
 The dependencies of some of the beans in the application context form a cycle:
-    servletEndpointRegistrar defined in class path resource [org/springframework/boot/actuate/autoconfigure/endpoint/web/ServletEndpointManagementContextConfiguration.class]
+    servletEndpointRegistrar defined in class path resource <span style="color:#f92672">[</span>org/springframework/boot/actuate/autoconfigure/endpoint/web/ServletEndpointManagementContextConfiguration.class<span style="color:#f92672">]</span>
     ↓
-    healthEndpoint defined in class path resource [org/springframework/boot/actuate/autoconfigure/health/HealthEndpointConfiguration.class]
+    healthEndpoint defined in class path resource <span style="color:#f92672">[</span>org/springframework/boot/actuate/autoconfigure/health/HealthEndpointConfiguration.class<span style="color:#f92672">]</span>
     ↓
-</code></pre>
-
-<p>在百度一顿谷歌之后，发现是 <code>actuate</code>组件的健康检测和我自己注入的数据库连接池产生了循环依赖。因为spring boot2的默认数据库连接池改成了 <code>Hikari</code>，官方文档显示这是spring boot2的一个早期bug&hellip;(要不怎么叫趟坑之旅呢)，把spring boot依赖升级到最新的<code>2.0.6.RELEASE</code>,应用可以正常启动了
+</code></pre></div><p>在百度一顿谷歌之后，发现是 <code>actuate</code>组件的健康检测和我自己注入的数据库连接池产生了循环依赖。因为spring boot2的默认数据库连接池改成了 <code>Hikari</code>，官方文档显示这是spring boot2的一个早期bug&hellip;(要不怎么叫趟坑之旅呢)，把spring boot依赖升级到最新的<code>2.0.6.RELEASE</code>,应用可以正常启动了
 启动完成后，发现eureka注册中心里面注册的服务显示不了正确的ip地址了，一顿查之后发现是配置又改了&hellip;,原来是</p>
-
-<pre><code class="language-bash">${spring.cloud.client.ipAddress}
-</code></pre>
-
-<p>现在要改成</p>
-
-<pre><code class="language-bash">${spring.cloud.client.ip-address}
-</code></pre>
-
-<p>之后又发现项目里面有很多报错，因为我项目里用到jpa的语法做数据库查询（正常项目里应该都会用到），没错，spring boot2的jpa语法又改了&hellip;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#e6db74">${</span>spring.cloud.client.ipAddress<span style="color:#e6db74">}</span>
+</code></pre></div><p>现在要改成</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#e6db74">${</span>spring.cloud.client.ip-address<span style="color:#e6db74">}</span>
+</code></pre></div><p>之后又发现项目里面有很多报错，因为我项目里用到jpa的语法做数据库查询（正常项目里应该都会用到），没错，spring boot2的jpa语法又改了&hellip;
 原来的写法</p>
-
-<pre><code class="language-java">Service service = serviceRepository.findOne(id);
-</code></pre>
-
-<p>需要改成</p>
-
-<pre><code class="language-java">Service service = serviceRepository.findById(id).get();
-</code></pre>
-
-<p>同理还有 <code>exists</code>和 <code>delete</code>方法都要改成 <code>existsById</code>和 <code>deleteById</code>，所幸项目本身还在起步阶段，要改的地方不多，改完之后项目终于不报错了，启动完验证接口测试成功。</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Service service <span style="color:#f92672">=</span> serviceRepository<span style="color:#f92672">.</span><span style="color:#a6e22e">findOne</span><span style="color:#f92672">(</span>id<span style="color:#f92672">);</span>
+</code></pre></div><p>需要改成</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Service service <span style="color:#f92672">=</span> serviceRepository<span style="color:#f92672">.</span><span style="color:#a6e22e">findById</span><span style="color:#f92672">(</span>id<span style="color:#f92672">).</span><span style="color:#a6e22e">get</span><span style="color:#f92672">();</span>
+</code></pre></div><p>同理还有 <code>exists</code>和 <code>delete</code>方法都要改成 <code>existsById</code>和 <code>deleteById</code>，所幸项目本身还在起步阶段，要改的地方不多，改完之后项目终于不报错了，启动完验证接口测试成功。</p>
 <p>总结一下：前几步都是配置问题，耐心修改完即可，最后一步因为涉及到代码的修改，需要慎重评估，如果有项目中已经在大量使用原spring boot1.5的jpa，建议慎重考虑（当然还有一种方法可以单独降级jpa的版本至1.x版本，但不确定是否会和spring boot2有兼容性问题）。另外实测spring boot2的应用去连老版本的eureka和config server都没有问题，应该是对应服务的restful接口并没有修改，所以基础组件也可以不升级。针对 <code>SpringCloudGateway2.0</code> 以及 <code>spring boot2</code>的新特性，待后续分享。</p>
 
         
@@ -263,12 +228,12 @@ The dependencies of some of the beans in the application context form a cycle:
               <ul class="pager">
                   
                   <li class="previous">
-                      <a href="/post/spring-cloud-config-kubernetes-configmap/" data-toggle="tooltip" data-placement="top" title="基于Spring Cloud Config和Kubernetes ConfigMap进行微服务集群的配置管理">&larr; Previous Post</a>
+                      <a href="/about/" data-toggle="tooltip" data-placement="top" title="关于我">&larr; Previous Post</a>
                   </li>
                   
                   
                   <li class="next">
-                      <a href="/about/" data-toggle="tooltip" data-placement="top" title="关于我">Next Post &rarr;</a>
+                      <a href="/post/spring-cloud-config-kubernetes-configmap/" data-toggle="tooltip" data-placement="top" title="基于Spring Cloud Config和Kubernetes ConfigMap进行微服务集群的配置管理">Next Post &rarr;</a>
                   </li>
                   
               </ul>
@@ -309,76 +274,28 @@ The dependencies of some of the beans in the application context form a cycle:
                      
                     
                         
-                            <a href="/tags/api-gateway" title="Api Gateway">
-                                Api Gateway
+                            <a href="/tags/api-gateway" title="api-gateway">
+                                api-gateway
                             </a>
                         
                     
                         
                     
                         
-                            <a href="/tags/cloud-native" title="Cloud Native">
-                                Cloud Native
+                            <a href="/tags/cloud-native" title="cloud-native">
+                                cloud-native
                             </a>
                         
                     
                         
-                            <a href="/tags/devops" title="DevOps">
-                                DevOps
+                            <a href="/tags/devops" title="devops">
+                                devops
                             </a>
                         
                     
                         
-                            <a href="/tags/docker" title="Docker">
-                                Docker
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/istio" title="Istio">
-                                Istio
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/kubernetes" title="Kubernetes">
-                                Kubernetes
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/microservice" title="Microservice">
-                                Microservice
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/restful" title="RESTful">
-                                RESTful
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/servicemesh" title="ServiceMesh">
-                                ServiceMesh
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/spring-cloud" title="Spring Cloud">
-                                Spring Cloud
+                            <a href="/tags/docker" title="docker">
+                                docker
                             </a>
                         
                     
@@ -390,12 +307,60 @@ The dependencies of some of the beans in the application context form a cycle:
                     
                         
                     
+                        
+                            <a href="/tags/istio" title="istio">
+                                istio
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="kubernetes">
+                                kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="microservice">
+                                microservice
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/restful" title="restful">
+                                restful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/servicemesh" title="servicemesh">
+                                servicemesh
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="spring-cloud">
+                                spring-cloud
+                            </a>
                         
                     
                         
                             <a href="/tags/vue" title="vue">
                                 vue
                             </a>
+                        
+                    
                         
                     
                         

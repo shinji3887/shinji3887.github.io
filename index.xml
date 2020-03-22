@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>L&#39;s Blog</title>
@@ -6,10 +6,19 @@
     <description>Recent content on L&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 08 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 01 Nov 2018 22:42:06 +0800</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>介绍 istiod：简化控制平面</title>
+      <link>/post/introducing-istiod/</link>
+      <pubDate>Sat, 21 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/introducing-istiod/</guid>
+      <description>编者按：Istio 项目终于在 1.5 版本中迎来了架构大改，砍掉了之前备受争议的 Mixer 组件（以Wasm方案取代之），同时将控制平面的各组件整合为了单一二</description>
+    </item>
     
     <item>
       <title>WebAssembly in Envoy</title>
@@ -296,7 +305,7 @@
       <pubDate>Thu, 01 Nov 2018 22:42:06 +0800</pubDate>
       
       <guid>/about/</guid>
-      <description>欢迎光临我的个人博客，一个从事了10多年金融领域应用开发的老兵。专业领域为J2EE方向，见证了从单体应用到SOA、ESB再到微服务的技术架构</description>
+      <description>Interests 微服务/Micro Service 服务网格/Service Mesh 无服务器架构/Serverless 容器化/Container 敏捷/DevOps</description>
     </item>
     
   </channel>

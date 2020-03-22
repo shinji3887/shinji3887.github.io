@@ -69,11 +69,11 @@
                     </li>
                     
                     <li>
-                        <a href="categories/tech">Tech</a>
+                        <a href="categories/tech">tech</a>
                     </li>
                     
                     <li>
-                        <a href="categories/tips">Tips</a>
+                        <a href="categories/tips">tips</a>
                     </li>
                     
                     <li>
@@ -166,122 +166,79 @@
                         <h2>TOC</h2>
                         </header>
                         <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#什么是cka考试">什么是CKA考试？</a></li>
-<li><a href="#cka证书的含金量如何">CKA证书的含金量如何？</a></li>
-<li><a href="#考试难度">考试难度</a></li>
-<li><a href="#考试报名">考试报名</a></li>
-<li><a href="#考前复习">考前复习</a></li>
-<li><a href="#真题解析">真题解析</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#什么是cka考试">什么是CKA考试？</a></li>
+        <li><a href="#cka证书的含金量如何">CKA证书的含金量如何？</a></li>
+        <li><a href="#考试难度">考试难度</a></li>
+        <li><a href="#考试报名">考试报名</a></li>
+        <li><a href="#考前复习">考前复习</a></li>
+        <li><a href="#真题解析">真题解析</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
         		
-        		
-
-<blockquote>
+        		<blockquote>
 <p>CKA考试相关说明及经验总结</p>
 </blockquote>
-
 <h3 id="什么是cka考试">什么是CKA考试？</h3>
-
 <p>CKA全称是Certified Kubernetes Administrator，即Kubernetes认证管理员，由CNCF官方组织考试并颁发证书，应该来说还是比较权威的,还有一个是CKAD考试，对于报考人员的要求更高，主要是基于kubernetes做开发的（比如operator之类），这边我们主要说说CKA考试。
-<img src="https://lupeier.cn-sh2.ufileos.com/cka.png" alt="cka.png" /></p>
-
+<img src="https://lupeier.cn-sh2.ufileos.com/cka.png" alt="cka.png"></p>
 <h3 id="cka证书的含金量如何">CKA证书的含金量如何？</h3>
-
 <p>前两年K8没现在这么火，加上考试费不便宜，考试又很麻烦（需要连国外服务器），这个证书拿的人不多，这两年K8大火，有越来越多的各种xx云和培训机构都在做这个培训，应该说拿证书的难度是大大降低了（培训费很贵）。当然一张证书无法体现一个人的全部能力（其实所有的各种认证证书都是一样的问题），但是有CKA至少说明了你对kubernetes的各种组件、原理、常规操作、简单排障是没有问题了，我觉得是相当于一个入门砖吧，对于工作不久并且有志于从事云原生相关工作的人，还是有积极意义的。而对于企业来说，如果想招聘K8集群管理员，那看这个证书无疑是最方便的，省去了很多能力考察的精力。</p>
-
 <h3 id="考试难度">考试难度</h3>
-
 <p>考试整体难度不算很高，全部是实操类题目，共24题，没有选择题、判断题，考察的是你对于k8的实际应用和操作能力，并不会涉及非常深的底层原理、架构设计思想等。但是题目涉及的范围比较广，相对时间会比较紧张，所以要通过这个考试需要你对于k8的整体功能有一个非常全面的认识。</p>
-
 <h3 id="考试报名">考试报名</h3>
-
 <p>有个好消息是，今年linux基金会的开源软件大学终于落地中国，这样中国的考生就可以方便的在线下考点考试了，从而避免啃爹的网络问题和各种报名、考试环境、摄像头的准备，考官也是中国人，交流非常方便。个人建议如果不是住特别偏远的交通不便，参加线下考试是最佳选择。考试费用是2165元。</p>
-
 <p>线下考点列表：<a href="https://training.linuxfoundation.cn/faq#13">https://training.linuxfoundation.cn/faq#13</a></p>
-
 <p>报名网址：<a href="https://training.linuxfoundation.cn/certificate/details/1">https://training.linuxfoundation.cn/certificate/details/1</a></p>
-
 <p>考纲及考试小贴士：<a href="https://training.linuxfoundation.cn/faq#15">https://training.linuxfoundation.cn/faq#15</a></p>
-
 <p>注意考纲是全英文的，一般以最新的release的k8版本为基础，不过核心的组件和功能最近的版本中变化不大。</p>
-
 <h3 id="考前复习">考前复习</h3>
-
 <p>现在有各种培训机构和云计算公司会针对CKA有专门的培训课程，价格很贵（考试+培训一般都要1万出头），时间其实也就2到3天左右。个人认为除非是你对于k8毫无概念，或者是公司报销费用，否则没有必要去参加这些培训，根据官方考纲复习+看官方文档足够你通过考试了，复习的时候搭建一个简单的k8集群供进行实操，minikube，docker自带的k8，或者像katacoda这样的线上kubernetes playground都是很好的选择。考试的时候是可以查看kubernetes的官方文档网站的，所以对于很多命令、操作不需要死记硬背，只需要知道大致的位置就可以。</p>
-
 <p>目前的考试政策，如果你报名考试没通过（考到75分通过），还会有一次retake的机会，还是比较人性化的，所以我相信只要认真复习通过的问题不会很大。证书有效期为2年，续不续看你们公司的实际需求（CNCF也要赚钱啊），我觉得除非K8架构发生了非常大的改动，或者公司对于资格认定这块有要求，否则也没必要特意去续，能考出来已经证明了你的能力了。</p>
-
 <h3 id="真题解析">真题解析</h3>
-
 <p>这里要感谢简书作者桶装酱油王，下面的题目主要出自他考试过后的整理，原文在这里<a href="https://www.jianshu.com/p/135c1d618a79">https://www.jianshu.com/p/135c1d618a79</a></p>
-
 <p>1.列出环境内所有的pv 并以 name字段排序（使用kubectl自带排序功能）</p>
-
-<pre><code class="language-bash">kubectl get pv --sort-by=.metadata.name
-</code></pre>
-
-<p>考点：kubectl命令熟悉程度</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl get pv --sort-by<span style="color:#f92672">=</span>.metadata.name
+</code></pre></div><p>考点：kubectl命令熟悉程度</p>
 <p>2.列出指定pod的日志中状态为Error的行，并记录在指定的文件上</p>
-
-<pre><code class="language-bash">kubectl logs &lt;podname&gt; | grep bash &gt; /opt/KUCC000xxx/KUCC000xxx.txt
-</code></pre>
-
-<p>考点：Monitor, Log, and Debug</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl logs &lt;podname&gt; | grep bash &gt; /opt/KUCC000xxx/KUCC000xxx.txt
+</code></pre></div><p>考点：Monitor, Log, and Debug</p>
 <p>3.列出k8s可用的节点，不包含不可调度的 和 NoReachable的节点，并把数字写入到文件里</p>
-
-<pre><code class="language-bash">#笨方法，人工数
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#笨方法，人工数</span>
 kubectl get nodes
 
-#CheatSheet方法，应该还能优化JSONPATH
-JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}' \
- &amp;&amp; kubectl get nodes -o jsonpath=&quot;$JSONPATH&quot; | grep &quot;Ready=True&quot;
-</code></pre>
-
-<p>考点：kubectl命令熟悉程度(cheatsheet非常重要，最好能熟练掌握)</p>
-
+<span style="color:#75715e">#CheatSheet方法，应该还能优化JSONPATH</span>
+JSONPATH<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}&#39;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span> <span style="color:#f92672">&amp;&amp;</span> kubectl get nodes -o jsonpath<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span>$JSONPATH<span style="color:#e6db74">&#34;</span> | grep <span style="color:#e6db74">&#34;Ready=True&#34;</span>
+</code></pre></div><p>考点：kubectl命令熟悉程度(cheatsheet非常重要，最好能熟练掌握)</p>
 <p>参考：<a href="https://kubernetes.io/docs/reference/kubectl/cheatsheet/">kubectl cheatsheet</a></p>
-
 <p>4.创建一个pod名称为nginx，并将其调度到节点为 disk=stat上</p>
-
-<pre><code class="language-bash">#我的操作,实际上从文档复制更快
-kubectl run nginx --image=nginx --restart=Never --dry-run &gt; 4.yaml
-#增加对应参数
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#我的操作,实际上从文档复制更快</span>
+kubectl run nginx --image<span style="color:#f92672">=</span>nginx --restart<span style="color:#f92672">=</span>Never --dry-run &gt; 4.yaml
+<span style="color:#75715e">#增加对应参数</span>
 vi 4.yaml
 kubectl apply -f 4.yaml
-</code></pre>
-
-<pre><code class="language-yaml">apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx
-  labels:
-    env: test
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    imagePullPolicy: IfNotPresent
-  nodeSelector:
-    disktype: ssd
-</code></pre>
-
-<p>考点：pod的调度。</p>
-
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: Pod
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: nginx
+  <span style="color:#66d9ef">labels</span>:
+    <span style="color:#66d9ef">env</span>: test
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">containers</span>:
+  - <span style="color:#66d9ef">name</span>: nginx
+    <span style="color:#66d9ef">image</span>: nginx
+    <span style="color:#66d9ef">imagePullPolicy</span>: IfNotPresent
+  <span style="color:#66d9ef">nodeSelector</span>:
+    <span style="color:#66d9ef">disktype</span>: ssd
+</code></pre></div><p>考点：pod的调度。</p>
 <p>参考：<a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/">assign-pod-node</a></p>
-
 <p>5.提供一个pod的yaml，要求添加Init Container，Init Container的作用是创建一个空文件，pod的Containers判断文件是否存在，不存在则退出</p>
-
-<pre><code class="language-bash">apiVersion: v1
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">apiVersion: v1
 kind: Pod
 metadata:
   name: nginx
@@ -289,30 +246,20 @@ spec:
   containers:
   - name: apline
     image: nginx
-    command: ['sh', '-c', 'if [ ! -e &quot;/opt/myfile&quot; ];then exit; fi;']
-###增加init Container####
+    command: <span style="color:#f92672">[</span><span style="color:#e6db74">&#39;sh&#39;</span>, <span style="color:#e6db74">&#39;-c&#39;</span>, <span style="color:#e6db74">&#39;if [ ! -e &#34;/opt/myfile&#34; ];then exit; fi;&#39;</span><span style="color:#f92672">]</span>
+<span style="color:#75715e">###增加init Container####</span>
 initContainers:
  - name: init
     image: busybox
-    command: ['sh', '-c', 'touch /目录/work;']
-</code></pre>
-
-<p>考点：init Container。一开始审题不仔细，以为要用到livenessProbes</p>
-
+    command: <span style="color:#f92672">[</span><span style="color:#e6db74">&#39;sh&#39;</span>, <span style="color:#e6db74">&#39;-c&#39;</span>, <span style="color:#e6db74">&#39;touch /目录/work;&#39;</span><span style="color:#f92672">]</span>
+</code></pre></div><p>考点：init Container。一开始审题不仔细，以为要用到livenessProbes</p>
 <p>参考：<a href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/">init-containers</a></p>
-
 <p>6.指定在命名空间内创建一个pod名称为test，内含四个指定的镜像nginx、redis、memcached、busybox</p>
-
-<pre><code class="language-bash">kubectl run test --image=nginx --image=redis --image=memcached --image=buxybox --restart=Never -n &lt;namespace&gt;
-</code></pre>
-
-<p>考点：kubectl命令熟悉程度、多个容器的pod的创建</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl run test --image<span style="color:#f92672">=</span>nginx --image<span style="color:#f92672">=</span>redis --image<span style="color:#f92672">=</span>memcached --image<span style="color:#f92672">=</span>buxybox --restart<span style="color:#f92672">=</span>Never -n &lt;namespace&gt;
+</code></pre></div><p>考点：kubectl命令熟悉程度、多个容器的pod的创建</p>
 <p>参考：<a href="https://kubernetes.io/docs/reference/kubectl/cheatsheet/">kubectl cheatsheet</a></p>
-
 <p>7.创建一个pod名称为test，镜像为nginx，Volume名称cache-volume为挂在在/data目录下，且Volume是non-Persistent的</p>
-
-<pre><code class="language-bash">apiVersion: v1
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">apiVersion: v1
 kind: Pod
 metadata:
   name: test
@@ -325,34 +272,24 @@ spec:
       name: cache-volume
   volumes:
   - name: cache-volume
-    emptyDir: {}
-</code></pre>
-
-<p>考点：Volume、emptdir</p>
-
+    emptyDir: <span style="color:#f92672">{}</span>
+</code></pre></div><p>考点：Volume、emptdir</p>
 <p>参考：<a href="https://kubernetes.io/docs/concepts/storage/volumes/#emptydir">Volumes</a></p>
-
 <p>8.列出Service名为test下的pod 并找出使用CPU使用率最高的一个，将pod名称写入文件中</p>
-
-<pre><code class="language-bash">#使用-o wide 获取service test的SELECTOR
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#使用-o wide 获取service test的SELECTOR</span>
 kubectl get svc test -o wide
-##获取结果我就随便造了
-NAME              TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE       SELECTOR
-test   ClusterIP   None         &lt;none&gt;        3306/TCP   50d       app=wordpress,tier=mysql
+<span style="color:#75715e">##获取结果我就随便造了</span>
+NAME              TYPE        CLUSTER-IP   EXTERNAL-IP   PORT<span style="color:#f92672">(</span>S<span style="color:#f92672">)</span>    AGE       SELECTOR
+test   ClusterIP   None         &lt;none&gt;        3306/TCP   50d       app<span style="color:#f92672">=</span>wordpress,tier<span style="color:#f92672">=</span>mysql
 
-#获取对应SELECTOR的pod使用率，找到最大那个写入文件中
-kubectl top pod -l 'app=wordpress,tier=mysql'
-</code></pre>
-
-<p>考点：获取service selector，kubectl top监控pod资源</p>
-
+<span style="color:#75715e">#获取对应SELECTOR的pod使用率，找到最大那个写入文件中</span>
+kubectl top pod -l <span style="color:#e6db74">&#39;app=wordpress,tier=mysql&#39;</span>
+</code></pre></div><p>考点：获取service selector，kubectl top监控pod资源</p>
 <p>参考：<a href="https://kubernetes.io/docs/tasks/debug-application-cluster/resource-usage-monitoring/">Tools for Monitoring Resources</a></p>
-
 <p>9.创建一个Pod名称为nginx-app，镜像为nginx，并根据pod创建名为nginx-app的Service，type为NodePort</p>
-
-<pre><code class="language-bash">kubectl run nginx-app --image=nginx --restart=Never --port=80
-kubectl create svc nodeport nginx-app --tcp=80:80 --dry-run -o yaml &gt; 9.yaml
-#修改yaml，保证selector name=nginx-app
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl run nginx-app --image<span style="color:#f92672">=</span>nginx --restart<span style="color:#f92672">=</span>Never --port<span style="color:#f92672">=</span><span style="color:#ae81ff">80</span>
+kubectl create svc nodeport nginx-app --tcp<span style="color:#f92672">=</span>80:80 --dry-run -o yaml &gt; 9.yaml
+<span style="color:#75715e">#修改yaml，保证selector name=nginx-app</span>
 vi 9.yaml
 apiVersion: v1
 kind: Service
@@ -364,32 +301,25 @@ metadata:
 spec:
   ports:
   - name: 80-80
-    port: 80
+    port: <span style="color:#ae81ff">80</span>
     protocol: TCP
-    targetPort: 80
+    targetPort: <span style="color:#ae81ff">80</span>
   selector:
-#注意要和pod对应  
+<span style="color:#75715e">#注意要和pod对应</span>  
     name: nginx-app
   type: NodePort
-</code></pre>
-
-<p>考点：Service</p>
-
+</code></pre></div><p>考点：Service</p>
 <p>参考：<a href="https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types">publishing-services-service-types</a></p>
-
 <p>10.创建一个nginx的Workload，保证其在每个节点上运行，注意不要覆盖节点原有的Tolerations</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">这道题直接复制文档的yaml太长了，由于damonSet的格式和Deployment格式差不多，我用旁门左道的方法 先创建Deploy，再修改，这样速度会快一点
 
-<pre><code class="language-bash">这道题直接复制文档的yaml太长了，由于damonSet的格式和Deployment格式差不多，我用旁门左道的方法 先创建Deploy，再修改，这样速度会快一点
-
-#先创建一个deployment的yaml模板
-kubectl run nginx --image=nginx --dry-run -o yaml &gt; 10.yaml
-#将yaml改成DaemonSet
+<span style="color:#75715e">#先创建一个deployment的yaml模板</span>
+kubectl run nginx --image<span style="color:#f92672">=</span>nginx --dry-run -o yaml &gt; 10.yaml
+<span style="color:#75715e">#将yaml改成DaemonSet</span>
 vi 10.yaml
-</code></pre>
-
-<pre><code class="language-bash">#修改apiVersion和kind
-#apiVersion: extensions/v1beta1
-#kind: Deployment
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#修改apiVersion和kind</span>
+<span style="color:#75715e">#apiVersion: extensions/v1beta1</span>
+<span style="color:#75715e">#kind: Deployment</span>
 apiVersion:apps/v1
 kind: DaemonSet
 metadata:
@@ -398,12 +328,12 @@ metadata:
     run: nginx
   name: nginx
 spec:
-#去掉replicas
-# replicas: 1
+<span style="color:#75715e">#去掉replicas</span>
+<span style="color:#75715e"># replicas: 1</span>
   selector:
     matchLabels:
       run: nginx
-  strategy: {}
+  strategy: <span style="color:#f92672">{}</span>
   template:
     metadata:
       creationTimestamp: null
@@ -413,205 +343,142 @@ spec:
       containers:
       - image: nginx
         name: nginx
-        resources: {}
-status: {}
-</code></pre>
-
-<p>考点：DaemonSet</p>
-
+        resources: <span style="color:#f92672">{}</span>
+status: <span style="color:#f92672">{}</span>
+</code></pre></div><p>考点：DaemonSet</p>
 <p>参考：<a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/">DaemonSet</a></p>
-
 <p>11.将deployment为nginx-app的副本数从1变成4。</p>
-
-<pre><code class="language-bash">#方法1
-kubectl scale  --replicas=4 deployment nginx-app
-#方法2，使用edit命令将replicas改成4
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#方法1</span>
+kubectl scale  --replicas<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span> deployment nginx-app
+<span style="color:#75715e">#方法2，使用edit命令将replicas改成4</span>
 kubectl edit deploy nginx-app
-</code></pre>
-
-<p>考点：deployment的Scaling，搜索Scaling</p>
-
+</code></pre></div><p>考点：deployment的Scaling，搜索Scaling</p>
 <p>参考：<a href="https://kubernetes.io/docs/tasks/run-application/run-stateless-application-deployment/#scaling-the-application-by-increasing-the-replica-count">Scaling the application by increasing the replica count</a></p>
-
 <p>12.创建nginx-app的deployment ，使用镜像为nginx:1.11.0-alpine ,修改镜像为1.11.3-alpine，并记录升级，再使用回滚，将镜像回滚至nginx:1.11.0-alpine</p>
-
-<pre><code class="language-bash">kubectl run nginx-app --image=nginx:1.11.0-alpine
-kubectl set image deployment nginx-app --image=nginx:1.11.3-alpine
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl run nginx-app --image<span style="color:#f92672">=</span>nginx:1.11.0-alpine
+kubectl set image deployment nginx-app --image<span style="color:#f92672">=</span>nginx:1.11.3-alpine
 kubectl rollout undo deployment nginx-app
 kubectl rollout status -w deployment nginx-app
-</code></pre>
-
-<p>考点：资源的更新</p>
-
+</code></pre></div><p>考点：资源的更新</p>
 <p>参考：<a href="https://kubernetes.io/docs/reference/kubectl/cheatsheet/#updating-resources">Kubectl Cheat Sheet:Updating Resources</a></p>
-
 <p>13.根据已有的一个nginx的pod、创建名为nginx的svc、并使用nslookup查找出service dns记录，pod的dns记录并分别写入到指定的文件中</p>
-
-<pre><code class="language-bash">#创建一个服务
-kubectl create svc nodeport nginx --tcp=80:80
-#创建一个指定版本的busybox，用于执行nslookup
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#创建一个服务</span>
+kubectl create svc nodeport nginx --tcp<span style="color:#f92672">=</span>80:80
+<span style="color:#75715e">#创建一个指定版本的busybox，用于执行nslookup</span>
 kubectl create -f https://k8s.io/examples/admin/dns/busybox.yaml
-#将svc的dns记录写入文件中
+<span style="color:#75715e">#将svc的dns记录写入文件中</span>
 kubectl exec -ti busybox -- nslookup nginx &gt; 指定文件
-#获取pod的ip地址
+<span style="color:#75715e">#获取pod的ip地址</span>
 kubectl get pod nginx -o yaml
-#将获取的pod ip地址使用nslookup查找dns记录
+<span style="color:#75715e">#将获取的pod ip地址使用nslookup查找dns记录</span>
 kubectl exec -ti busybox -- nslookup &lt;Pod ip&gt;
-</code></pre>
-
-<p>考点：网络相关，DNS解析</p>
-
+</code></pre></div><p>考点：网络相关，DNS解析</p>
 <p>参考：<a href="https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/">Debugging DNS Resolution</a></p>
-
 <p>14.创建Secret 名为mysecret，内含有password字段，值为bob，然后 在pod1里 使用ENV进行调用，Pod2里使用Volume挂载在/data 下</p>
-
-<pre><code class="language-bash">#将密码值使用base64加密,记录在Notepad里
-echo -n 'bob' | base64
-</code></pre>
-
-<p>secret.yaml</p>
-
-<pre><code class="language-yaml">apiVersion: v1
-kind: Secret
-metadata:
-  name: mysecret
-type: Opaque
-data:
-  password: Ym9i
-</code></pre>
-
-<p>pod1.yaml</p>
-
-<pre><code class="language-yaml">apiVersion: v1
-kind: Pod
-metadata:
-  name: pod1
-spec:
-  containers:
-  - name: mypod
-    image: nginx
-    volumeMounts:
-    - name: mysecret
-      mountPath: &quot;/data&quot;
-      readOnly: true
-  volumes:
-  - name: mysecret
-    secret:
-      secretName: mysecret
-</code></pre>
-
-<p>pod2.yaml</p>
-
-<pre><code class="language-yaml">apiVersion: v1
-kind: Pod
-metadata:
-  name: pod2
-spec:
-  containers:
-  - name: mycontainer
-    image: redis
-    env:
-      - name: SECRET_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: mysecret
-            key: password
-</code></pre>
-
-<p>考点: Secret</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#将密码值使用base64加密,记录在Notepad里</span>
+echo -n <span style="color:#e6db74">&#39;bob&#39;</span> | base64
+</code></pre></div><p>secret.yaml</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: Secret
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: mysecret
+<span style="color:#66d9ef">type</span>: Opaque
+<span style="color:#66d9ef">data</span>:
+  <span style="color:#66d9ef">password</span>: Ym9i
+</code></pre></div><p>pod1.yaml</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: Pod
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: pod1
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">containers</span>:
+  - <span style="color:#66d9ef">name</span>: mypod
+    <span style="color:#66d9ef">image</span>: nginx
+    <span style="color:#66d9ef">volumeMounts</span>:
+    - <span style="color:#66d9ef">name</span>: mysecret
+      <span style="color:#66d9ef">mountPath</span>: <span style="color:#e6db74">&#34;/data&#34;</span>
+      <span style="color:#66d9ef">readOnly</span>: <span style="color:#66d9ef">true</span>
+  <span style="color:#66d9ef">volumes</span>:
+  - <span style="color:#66d9ef">name</span>: mysecret
+    <span style="color:#66d9ef">secret</span>:
+      <span style="color:#66d9ef">secretName</span>: mysecret
+</code></pre></div><p>pod2.yaml</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: Pod
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: pod2
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">containers</span>:
+  - <span style="color:#66d9ef">name</span>: mycontainer
+    <span style="color:#66d9ef">image</span>: redis
+    <span style="color:#66d9ef">env</span>:
+      - <span style="color:#66d9ef">name</span>: SECRET_PASSWORD
+        <span style="color:#66d9ef">valueFrom</span>:
+          <span style="color:#66d9ef">secretKeyRef</span>:
+            <span style="color:#66d9ef">name</span>: mysecret
+            <span style="color:#66d9ef">key</span>: password
+</code></pre></div><p>考点: Secret</p>
 <p>参考：<a href="https://kubernetes.io/docs/concepts/configuration/secret/">Secret</a></p>
-
 <p>15.使node1节点不可调度，并重新分配该节点上的pod</p>
-
-<pre><code class="language-bash">#直接drain会出错，需要添加--ignore-daemonsets --delete-local-data参数
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#直接drain会出错，需要添加--ignore-daemonsets --delete-local-data参数</span>
 kubectl drain node node1  --ignore-daemonsets --delete-local-data
-</code></pre>
-
-<p>考点：节点调度、维护</p>
-
+</code></pre></div><p>考点：节点调度、维护</p>
 <p>参考：<a href="https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/">Safely Drain a Node while Respecting Application SLOs</a></p>
-
 <p>16.使用etcd 备份功能备份etcd（提供enpoints，ca、cert、key）</p>
-
-<pre><code class="language-bash">ETCDCTL_API=3 etcdctl --endpoints https://127.0.0.1:2379 \
---cacert=ca.pem --cert=cert.pem --key=key.pem \
-snapshot save snapshotdb
-</code></pre>
-
-<p>考点：etcd的集群的备份与恢复</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ETCDCTL_API<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> etcdctl --endpoints https://127.0.0.1:2379 <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>--cacert<span style="color:#f92672">=</span>ca.pem --cert<span style="color:#f92672">=</span>cert.pem --key<span style="color:#f92672">=</span>key.pem <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>snapshot save snapshotdb
+</code></pre></div><p>考点：etcd的集群的备份与恢复</p>
 <p>参考：<a href="https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#backing-up-an-etcd-cluster">backing up an etcd cluster</a></p>
-
 <p>17.给出一个失联节点的集群，排查节点故障，要保证改动是永久的。</p>
-
-<pre><code class="language-bash">#查看集群状态
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#查看集群状态</span>
 kubectl get nodes
-#查看故障节点信息
+<span style="color:#75715e">#查看故障节点信息</span>
 kubectl describe node node1
 
-#Message显示kubelet无法访问（记不清了）
-#进入故障节点
+<span style="color:#75715e">#Message显示kubelet无法访问（记不清了）</span>
+<span style="color:#75715e">#进入故障节点</span>
 ssh node1
 
-#查看节点中的kubelet进程
+<span style="color:#75715e">#查看节点中的kubelet进程</span>
 ps -aux | grep kubelete
-#没找到kubelet进程，查看kubelet服务状态
+<span style="color:#75715e">#没找到kubelet进程，查看kubelet服务状态</span>
 systemctl status kubelet.service 
-#kubelet服务没启动，启动服务并观察
+<span style="color:#75715e">#kubelet服务没启动，启动服务并观察</span>
 systemctl start kubelet.service 
-#启动正常，enable服务
+<span style="color:#75715e">#启动正常，enable服务</span>
 systemctl enable kubelet.service 
 
-#回到考试节点并查看状态
+<span style="color:#75715e">#回到考试节点并查看状态</span>
 exit
 
-kubectl get nodes #正常
-</code></pre>
-
-<p>考点：故障排查</p>
-
+kubectl get nodes <span style="color:#75715e">#正常</span>
+</code></pre></div><p>考点：故障排查</p>
 <p>参考：<a href="https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/">Troubleshoot Clusters</a></p>
-
 <p>18.给出一个集群，排查出集群的故障</p>
-
 <p>这道题没空做完。kubectl get node显示connection refuse，估计是apiserver的故障。</p>
-
 <p>考点：故障排查</p>
-
 <p>参考：<a href="https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/">Troubleshoot Clusters</a></p>
-
 <p>19.给出一个节点，完善kubelet配置文件，要求使用systemd配置kubelet</p>
-
 <p>这道题没空做完，</p>
-
 <p>考点我知道，doc没找到··在哪 逃~ε=ε=ε=┏(゜ロ゜;)┛</p>
-
 <p>20.给出一个集群，将节点node1添加到集群中，并使用TLS bootstrapping</p>
-
 <p>这道题没空做完，花费时间比较长，可惜了。</p>
-
 <p>考点：TLS Bootstrapping</p>
-
 <p>参考：<a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/">TLS Bootstrapping</a></p>
-
 <p>21.创建一个pv，类型是hostPath，位于/data中，大小1G，模式ReadOnlyMany</p>
-
-<pre><code class="language-yaml">apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv
-spec:
-  capacity:
-    storage: 1Gi  
-  accessModes:
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
+<span style="color:#66d9ef">kind</span>: PersistentVolume
+<span style="color:#66d9ef">metadata</span>:
+  <span style="color:#66d9ef">name</span>: pv
+<span style="color:#66d9ef">spec</span>:
+  <span style="color:#66d9ef">capacity</span>:
+    <span style="color:#66d9ef">storage</span>: 1Gi  
+  <span style="color:#66d9ef">accessModes</span>:
     - ReadOnlyMany
-  hostPath:
-    path: /data
-</code></pre>
-
-<p>考点：创建PV</p>
-
+  <span style="color:#66d9ef">hostPath</span>:
+    <span style="color:#66d9ef">path</span>: /data
+</code></pre></div><p>考点：创建PV</p>
 <p>参考：<a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/">persistent volumes</a></p>
 
         
@@ -621,12 +488,12 @@ spec:
               <ul class="pager">
                   
                   <li class="previous">
-                      <a href="/post/redefining-extensibility-in-proxies/" data-toggle="tooltip" data-placement="top" title="重新定义代理的扩展性：WebAssembly在Envoy与Istio中的应用">&larr; Previous Post</a>
+                      <a href="/post/cloud-native-api-gateway-part-2/" data-toggle="tooltip" data-placement="top" title="构建云原生微服务网关系列-篇二：Zuul">&larr; Previous Post</a>
                   </li>
                   
                   
                   <li class="next">
-                      <a href="/post/cloud-native-api-gateway-part-2/" data-toggle="tooltip" data-placement="top" title="构建云原生微服务网关系列-篇二：Zuul">Next Post &rarr;</a>
+                      <a href="/post/redefining-extensibility-in-proxies/" data-toggle="tooltip" data-placement="top" title="重新定义代理的扩展性：WebAssembly在Envoy与Istio中的应用">Next Post &rarr;</a>
                   </li>
                   
               </ul>
@@ -667,76 +534,28 @@ spec:
                      
                     
                         
-                            <a href="/tags/api-gateway" title="Api Gateway">
-                                Api Gateway
+                            <a href="/tags/api-gateway" title="api-gateway">
+                                api-gateway
                             </a>
                         
                     
                         
                     
                         
-                            <a href="/tags/cloud-native" title="Cloud Native">
-                                Cloud Native
+                            <a href="/tags/cloud-native" title="cloud-native">
+                                cloud-native
                             </a>
                         
                     
                         
-                            <a href="/tags/devops" title="DevOps">
-                                DevOps
+                            <a href="/tags/devops" title="devops">
+                                devops
                             </a>
                         
                     
                         
-                            <a href="/tags/docker" title="Docker">
-                                Docker
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/istio" title="Istio">
-                                Istio
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/kubernetes" title="Kubernetes">
-                                Kubernetes
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/microservice" title="Microservice">
-                                Microservice
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/restful" title="RESTful">
-                                RESTful
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/servicemesh" title="ServiceMesh">
-                                ServiceMesh
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/spring-cloud" title="Spring Cloud">
-                                Spring Cloud
+                            <a href="/tags/docker" title="docker">
+                                docker
                             </a>
                         
                     
@@ -748,12 +567,60 @@ spec:
                     
                         
                     
+                        
+                            <a href="/tags/istio" title="istio">
+                                istio
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="kubernetes">
+                                kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="microservice">
+                                microservice
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/restful" title="restful">
+                                restful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/servicemesh" title="servicemesh">
+                                servicemesh
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="spring-cloud">
+                                spring-cloud
+                            </a>
                         
                     
                         
                             <a href="/tags/vue" title="vue">
                                 vue
                             </a>
+                        
+                    
                         
                     
                         

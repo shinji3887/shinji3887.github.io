@@ -69,11 +69,11 @@
                     </li>
                     
                     <li>
-                        <a href="categories/tech">Tech</a>
+                        <a href="categories/tech">tech</a>
                     </li>
                     
                     <li>
-                        <a href="categories/tips">Tips</a>
+                        <a href="categories/tips">tips</a>
                     </li>
                     
                     <li>
@@ -166,78 +166,59 @@
                         <h2>TOC</h2>
                         </header>
                         <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#跨域问题简述">跨域问题简述</a></li>
-<li><a href="#解决方案">解决方案</a></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#跨域问题简述">跨域问题简述</a></li>
+        <li><a href="#解决方案">解决方案</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
         		
-        		
-
-<blockquote>
+        		<blockquote>
 <p>现代的web开发一般都是前后端分离，前后端使用rest api进行交互，分离使得前后端服务器一般都不在一起，这导致了跨域问题，本文说明在vue-cli中解决这一问题</p>
 </blockquote>
-
 <h3 id="跨域问题简述">跨域问题简述</h3>
-
 <p>如果浏览器有类似下面的报错信息，则说明碰到跨域问题了</p>
-
-<pre><code class="language-bash">localhost/:1 Failed to load http://www.abc.cn/test/testToken.php: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'http://localhost:8080' is therefore not allowed access. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
-</code></pre>
-
-<p>在没有设置<code>Access-Control-Allow-Origin</code>这个标签的情况下，浏览器默认是不允许跨域发送请求的，这里面涉及到安全问题，XSS、CSRF等攻击手段都是恶意脚本的跨站访问，所以一般在服务端没有特殊说明的情况下，浏览器都是禁用CORS的。</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">localhost/:1 Failed to load http://www.abc.cn/test/testToken.php: Response to preflight request doesn<span style="color:#e6db74">&#39;t pass access control check: No &#39;</span>Access-Control-Allow-Origin<span style="color:#e6db74">&#39; header is present on the requested resource. Origin &#39;</span>http://localhost:8080<span style="color:#e6db74">&#39; is therefore not allowed access. If an opaque response serves your needs, set the request&#39;</span>s mode to <span style="color:#e6db74">&#39;no-cors&#39;</span> to fetch the resource with CORS disabled.
+</code></pre></div><p>在没有设置<code>Access-Control-Allow-Origin</code>这个标签的情况下，浏览器默认是不允许跨域发送请求的，这里面涉及到安全问题，XSS、CSRF等攻击手段都是恶意脚本的跨站访问，所以一般在服务端没有特殊说明的情况下，浏览器都是禁用CORS的。</p>
 <p>浏览器如何判断是否是跨域访问呢？这里面就要讲到<code>同源策略</code>。同源策略（Same origin policy）是一种约定，它是浏览器最核心也最基本的安全功能，如果缺少了同源策略，则基于互联网的web访问安全会受到巨大威胁。可以说Web是构建在同源策略基础之上的，浏览器只是针对同源策略的一种实现。</p>
-
 <p>简单的来说：<strong>协议、IP、端口三者都相同，则为同源</strong>。不是同源的脚本不能操作其他源下面的对象。
-<img src="https://upload-images.jianshu.io/upload_images/14871146-70d0f99e722432dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="cors.png" /></p>
-
+<img src="https://upload-images.jianshu.io/upload_images/14871146-70d0f99e722432dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="cors.png"></p>
 <h3 id="解决方案">解决方案</h3>
-
 <p><code>同源策略</code>保障了互联网的安全访问，但是却对于前后端分离的应用带来了挑战。幸运的是，现在的解决方案也很多，比如<code>script标签</code>、<code>jsonp</code>、<code>后端设置cors</code>等等。之前我是用的方式即是服务端设置cors，返回标头内携带<code>access-control-allow-origin: *</code>标签，可解决跨域问题。配置如下（使用spring boot开发的后端服务）</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Configuration</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CorsConfig</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> CorsConfiguration <span style="color:#a6e22e">buildConfig</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        CorsConfiguration corsConfiguration <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> CorsConfiguration<span style="color:#f92672">();</span>
+        corsConfiguration<span style="color:#f92672">.</span><span style="color:#a6e22e">addAllowedOrigin</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;*&#34;</span><span style="color:#f92672">);</span> <span style="color:#75715e">// 1
+</span><span style="color:#75715e"></span>        corsConfiguration<span style="color:#f92672">.</span><span style="color:#a6e22e">addAllowedHeader</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;*&#34;</span><span style="color:#f92672">);</span> <span style="color:#75715e">// 2
+</span><span style="color:#75715e"></span>        corsConfiguration<span style="color:#f92672">.</span><span style="color:#a6e22e">addAllowedMethod</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;*&#34;</span><span style="color:#f92672">);</span> <span style="color:#75715e">// 3
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> corsConfiguration<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
 
-<pre><code class="language-java">@Configuration
-public class CorsConfig {
-    private CorsConfiguration buildConfig() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin(&quot;*&quot;); // 1
-        corsConfiguration.addAllowedHeader(&quot;*&quot;); // 2
-        corsConfiguration.addAllowedMethod(&quot;*&quot;); // 3
-        return corsConfiguration;
-    }
-
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration(&quot;/**&quot;, buildConfig()); // 4
-        return new CorsFilter(source);
-    }
-}
-</code></pre>
-
-<p>但这种方式一方面使得后端服务产生安全问题，另外如果碰到需要使用cookie的场景（比如会话保持），仍然还是失效的（cookie严格限制无法进行跨域访问）。所以比较推荐的做法还是在前端设置proxy代理，来解决跨域问题。这边使用的是vue-cli3.0，配置和之前略有不同,在根目录的<code>vue.config.js</code>下加入如下配置:</p>
-
-<pre><code class="language-js">devServer: {
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:33000/api',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          '^/api': ''
+    <span style="color:#a6e22e">@Bean</span>
+    <span style="color:#66d9ef">public</span> CorsFilter <span style="color:#a6e22e">corsFilter</span><span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+        UrlBasedCorsConfigurationSource source <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> UrlBasedCorsConfigurationSource<span style="color:#f92672">();</span>
+        source<span style="color:#f92672">.</span><span style="color:#a6e22e">registerCorsConfiguration</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;/**&#34;</span><span style="color:#f92672">,</span> buildConfig<span style="color:#f92672">());</span> <span style="color:#75715e">// 4
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> CorsFilter<span style="color:#f92672">(</span>source<span style="color:#f92672">);</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>但这种方式一方面使得后端服务产生安全问题，另外如果碰到需要使用cookie的场景（比如会话保持），仍然还是失效的（cookie严格限制无法进行跨域访问）。所以比较推荐的做法还是在前端设置proxy代理，来解决跨域问题。这边使用的是vue-cli3.0，配置和之前略有不同,在根目录的<code>vue.config.js</code>下加入如下配置:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#a6e22e">devServer</span><span style="color:#f92672">:</span> {
+    <span style="color:#a6e22e">proxy</span><span style="color:#f92672">:</span> {
+      <span style="color:#e6db74">&#39;/api&#39;</span><span style="color:#f92672">:</span> {
+        <span style="color:#a6e22e">target</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;http://127.0.0.1:33000/api&#39;</span>,
+        <span style="color:#a6e22e">changeOrigin</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+        <span style="color:#a6e22e">ws</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,
+        <span style="color:#a6e22e">pathRewrite</span><span style="color:#f92672">:</span> {
+          <span style="color:#e6db74">&#39;^/api&#39;</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>
         }
       }
     }
   }
-</code></pre>
-
-<p>如此在前端所有发往<code>/api</code>的请求都会转发至后端服务<code>http://127.0.0.1:33000/api</code>,问题解决。注意这边配置的是开发环境,供调试使用,生产环境可使用nginx或haproxy的代理功能进行转发.</p>
+</code></pre></div><p>如此在前端所有发往<code>/api</code>的请求都会转发至后端服务<code>http://127.0.0.1:33000/api</code>,问题解决。注意这边配置的是开发环境,供调试使用,生产环境可使用nginx或haproxy的代理功能进行转发.</p>
 
         
                 
@@ -246,12 +227,12 @@ public class CorsConfig {
               <ul class="pager">
                   
                   <li class="previous">
-                      <a href="/post/vue-spring-security-login/" data-toggle="tooltip" data-placement="top" title="使用vue集成spring security进行安全登陆">&larr; Previous Post</a>
+                      <a href="/post/use-helm-install-elastic-search/" data-toggle="tooltip" data-placement="top" title="使用helm charts安装elasticsearch集群">&larr; Previous Post</a>
                   </li>
                   
                   
                   <li class="next">
-                      <a href="/post/use-helm-install-elastic-search/" data-toggle="tooltip" data-placement="top" title="使用helm charts安装elasticsearch集群">Next Post &rarr;</a>
+                      <a href="/post/vue-spring-security-login/" data-toggle="tooltip" data-placement="top" title="使用vue集成spring security进行安全登陆">Next Post &rarr;</a>
                   </li>
                   
               </ul>
@@ -292,76 +273,28 @@ public class CorsConfig {
                      
                     
                         
-                            <a href="/tags/api-gateway" title="Api Gateway">
-                                Api Gateway
+                            <a href="/tags/api-gateway" title="api-gateway">
+                                api-gateway
                             </a>
                         
                     
                         
                     
                         
-                            <a href="/tags/cloud-native" title="Cloud Native">
-                                Cloud Native
+                            <a href="/tags/cloud-native" title="cloud-native">
+                                cloud-native
                             </a>
                         
                     
                         
-                            <a href="/tags/devops" title="DevOps">
-                                DevOps
+                            <a href="/tags/devops" title="devops">
+                                devops
                             </a>
                         
                     
                         
-                            <a href="/tags/docker" title="Docker">
-                                Docker
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/istio" title="Istio">
-                                Istio
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/kubernetes" title="Kubernetes">
-                                Kubernetes
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/microservice" title="Microservice">
-                                Microservice
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/restful" title="RESTful">
-                                RESTful
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/servicemesh" title="ServiceMesh">
-                                ServiceMesh
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/spring-cloud" title="Spring Cloud">
-                                Spring Cloud
+                            <a href="/tags/docker" title="docker">
+                                docker
                             </a>
                         
                     
@@ -373,12 +306,60 @@ public class CorsConfig {
                     
                         
                     
+                        
+                            <a href="/tags/istio" title="istio">
+                                istio
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="kubernetes">
+                                kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="microservice">
+                                microservice
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/restful" title="restful">
+                                restful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/servicemesh" title="servicemesh">
+                                servicemesh
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="spring-cloud">
+                                spring-cloud
+                            </a>
                         
                     
                         
                             <a href="/tags/vue" title="vue">
                                 vue
                             </a>
+                        
+                    
                         
                     
                         

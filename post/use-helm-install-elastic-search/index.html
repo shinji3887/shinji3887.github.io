@@ -69,11 +69,11 @@
                     </li>
                     
                     <li>
-                        <a href="categories/tech">Tech</a>
+                        <a href="categories/tech">tech</a>
                     </li>
                     
                     <li>
-                        <a href="categories/tips">Tips</a>
+                        <a href="categories/tips">tips</a>
                     </li>
                     
                     <li>
@@ -170,169 +170,102 @@
                         <h2>TOC</h2>
                         </header>
                         <nav id="TableOfContents">
-<ul>
-<li>
-<ul>
-<li>
-<ul>
-<li><a href="#安装helm">安装helm</a>
-<ul>
-<li><a href="#方式一-使用官方脚本一键安装">方式一：使用官方脚本一键安装</a></li>
-<li><a href="#方式二-手动下载安装-这里安装目前最新的2-13-1版本">方式二：手动下载安装(这里安装目前最新的2.13.1版本)</a></li>
-<li><a href="#安装tiller">安装Tiller</a></li>
-<li><a href="#tiller授权">Tiller授权</a></li>
-<li><a href="#更换仓库">更换仓库</a></li>
-</ul></li>
-<li><a href="#搭建es集群">搭建ES集群</a>
-<ul>
-<li><a href="#kibana安装">kibana安装</a></li>
-</ul></li>
-</ul></li>
-</ul></li>
-</ul>
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#安装helm">安装helm</a></li>
+        <li><a href="#搭建es集群">搭建ES集群</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav>
         		
-        		
-
-<blockquote>
+        		<blockquote>
 <p>helm是kubernetes的包管理器，可以管理k8s的各种资源，并利用charts描述文件做非常复杂的编排功能，可以说是各种有状态发行软件的安装利器。现在各大厂商都出了自身产品的helm安装包，本文尝试使用helm进行es集群的搭建</p>
 </blockquote>
-
 <p>前提条件：一个可用的kuberenetes集群（1.10以上版本）</p>
-
 <h3 id="安装helm">安装helm</h3>
-
-<h4 id="方式一-使用官方脚本一键安装">方式一：使用官方脚本一键安装</h4>
-
-<pre><code class="language-bash">curl https://raw.githubusercontent.com/helm/helm/master/scripts/get &gt; get_helm.sh
-$ chmod 700 get_helm.sh
+<h4 id="方式一使用官方脚本一键安装">方式一：使用官方脚本一键安装</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">curl https://raw.githubusercontent.com/helm/helm/master/scripts/get &gt; get_helm.sh
+$ chmod <span style="color:#ae81ff">700</span> get_helm.sh
 $ ./get_helm.sh
-</code></pre>
-
-<h4 id="方式二-手动下载安装-这里安装目前最新的2-13-1版本">方式二：手动下载安装(这里安装目前最新的2.13.1版本)</h4>
-
-<pre><code class="language-bash">#从官网下载最新版本的二进制安装包到本地：https://github.com/kubernetes/helm/releases
-# 解压压缩包
+</code></pre></div><h4 id="方式二手动下载安装这里安装目前最新的2131版本">方式二：手动下载安装(这里安装目前最新的2.13.1版本)</h4>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#从官网下载最新版本的二进制安装包到本地：https://github.com/kubernetes/helm/releases</span>
+<span style="color:#75715e"># 解压压缩包</span>
 tar -zxvf helm-2.13.1.tar.gz 
-# 把 helm 指令放到bin目录下
+<span style="color:#75715e"># 把 helm 指令放到bin目录下</span>
 mv helm-2.13.1/helm /usr/local/bin/helm
-helm help # 验证
-</code></pre>
-
-<h4 id="安装tiller">安装Tiller</h4>
-
+helm help <span style="color:#75715e"># 验证</span>
+</code></pre></div><h4 id="安装tiller">安装Tiller</h4>
 <p>注意：先在 K8S 集群上每个节点安装 socat 软件(yum install -y socat )，不然会报错，如果当初使用的kubeadm安装的k8s，socat是自动安装好的</p>
-
 <p>Tiller 是以 Deployment 方式部署在 Kubernetes 集群中的，只需使用以下指令便可简单的完成安装。</p>
-
-<pre><code class="language-bash">$ helm init
-</code></pre>
-
-<p>由于 Helm 默认会去 storage.googleapis.com 拉取镜像，很可能访问不了。可以直接去阿里云下载镜像，并打tag，镜像地址为<code>registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:v2.13.1</code></p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ helm init
+</code></pre></div><p>由于 Helm 默认会去 storage.googleapis.com 拉取镜像，很可能访问不了。可以直接去阿里云下载镜像，并打tag，镜像地址为<code>registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:v2.13.1</code></p>
 <h4 id="tiller授权">Tiller授权</h4>
-
 <p>k8s1.6版本以后默认使用RBAC授权模式，需要添加账号及角色才能使tiller正常访问api-server
 创建 Kubernetes 的服务帐号(tiller)和绑定角色(这里赋予cluster-admin角色)</p>
-
-<pre><code class="language-bash">$ kubectl create serviceaccount --namespace kube-system tiller
-$ kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-</code></pre>
-
-<p>为 Tiller 这个deploy设置刚才创建的帐号</p>
-
-<pre><code class="language-bash"># 使用 kubectl patch 更新 API 对象
-$ kubectl patch deploy --namespace kube-system tiller-deploy -p '{&quot;spec&quot;:{&quot;template&quot;:{&quot;spec&quot;:{&quot;serviceAccount&quot;:&quot;tiller&quot;}}}}'
-deployment.extensions &quot;tiller-deploy&quot; patched
-</code></pre>
-
-<p>验证tiller是否安装成功</p>
-
-<pre><code class="language-bash">[root@MiWiFi-R1CM-srv _state]# kubectl get po -n kube-system|grep tiller
-tiller-deploy-7cb87ddf7d-274ph            1/1     Running   1          2d1h
-[root@MiWiFi-R1CM-srv _state]# helm version
-Client: &amp;version.Version{SemVer:&quot;v2.13.1&quot;, GitCommit:&quot;618447cbf203d147601b4b9bd7f8c37a5d39fbb4&quot;, GitTreeState:&quot;clean&quot;}
-Server: &amp;version.Version{SemVer:&quot;v2.13.1&quot;, GitCommit:&quot;618447cbf203d147601b4b9bd7f8c37a5d39fbb4&quot;, GitTreeState:&quot;clean&quot;}
-</code></pre>
-
-<h4 id="更换仓库">更换仓库</h4>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ kubectl create serviceaccount --namespace kube-system tiller
+$ kubectl create clusterrolebinding tiller-cluster-rule --clusterrole<span style="color:#f92672">=</span>cluster-admin --serviceaccount<span style="color:#f92672">=</span>kube-system:tiller
+</code></pre></div><p>为 Tiller 这个deploy设置刚才创建的帐号</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># 使用 kubectl patch 更新 API 对象</span>
+$ kubectl patch deploy --namespace kube-system tiller-deploy -p <span style="color:#e6db74">&#39;{&#34;spec&#34;:{&#34;template&#34;:{&#34;spec&#34;:{&#34;serviceAccount&#34;:&#34;tiller&#34;}}}}&#39;</span>
+deployment.extensions <span style="color:#e6db74">&#34;tiller-deploy&#34;</span> patched
+</code></pre></div><p>验证tiller是否安装成功</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>root@MiWiFi-R1CM-srv _state<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po -n kube-system|grep tiller</span>
+tiller-deploy-7cb87ddf7d-274ph            1/1     Running   <span style="color:#ae81ff">1</span>          2d1h
+<span style="color:#f92672">[</span>root@MiWiFi-R1CM-srv _state<span style="color:#f92672">]</span><span style="color:#75715e"># helm version</span>
+Client: &amp;version.Version<span style="color:#f92672">{</span>SemVer:<span style="color:#e6db74">&#34;v2.13.1&#34;</span>, GitCommit:<span style="color:#e6db74">&#34;618447cbf203d147601b4b9bd7f8c37a5d39fbb4&#34;</span>, GitTreeState:<span style="color:#e6db74">&#34;clean&#34;</span><span style="color:#f92672">}</span>
+Server: &amp;version.Version<span style="color:#f92672">{</span>SemVer:<span style="color:#e6db74">&#34;v2.13.1&#34;</span>, GitCommit:<span style="color:#e6db74">&#34;618447cbf203d147601b4b9bd7f8c37a5d39fbb4&#34;</span>, GitTreeState:<span style="color:#e6db74">&#34;clean&#34;</span><span style="color:#f92672">}</span>
+</code></pre></div><h4 id="更换仓库">更换仓库</h4>
 <p>默认的charts仓库在googleapi网站上，速度比较慢，这里我们更换为阿里云的charts仓库</p>
-
-<pre><code class="language-bash"># 先移除原先的仓库
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># 先移除原先的仓库</span>
 helm repo remove stable
-# 添加新的仓库地址
+<span style="color:#75715e"># 添加新的仓库地址</span>
 helm repo add stable https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts
-# 更新仓库
+<span style="color:#75715e"># 更新仓库</span>
 helm repo update
-</code></pre>
-
-<p>执行<code>helm search</code>看一下目前可用的charts，现在还不多，但很多大名鼎鼎的中间件，比如<code>rabbit mq</code>、<code>mysql</code>、<code>redis</code>、<code>mangodb</code>等等都针对helm charts出了高可用版本，要知道这些中间件的集群搭建可是非常麻烦的，使用helm可以非常方便的一键搭建集群，并且还可以一键删除（为啥不早五年出来。。。），以后有机会尝试一下，这次我们要试验的是elasticsearch集群的搭建。</p>
-
+</code></pre></div><p>执行<code>helm search</code>看一下目前可用的charts，现在还不多，但很多大名鼎鼎的中间件，比如<code>rabbit mq</code>、<code>mysql</code>、<code>redis</code>、<code>mangodb</code>等等都针对helm charts出了高可用版本，要知道这些中间件的集群搭建可是非常麻烦的，使用helm可以非常方便的一键搭建集群，并且还可以一键删除（为啥不早五年出来。。。），以后有机会尝试一下，这次我们要试验的是elasticsearch集群的搭建。</p>
 <h3 id="搭建es集群">搭建ES集群</h3>
-
 <p>es集群的具体介绍我这里就不展开了，简单说是一个基于lucene的高效的分布式全文搜索引擎，在搜索领域有着十分广泛的应用。之前弄好了helm环境，这边的操作就十分简单了，登陆es的官方helm charts仓库<a href="https://github.com/elastic/helm-charts">https://github.com/elastic/helm-charts</a>
 按照里面的说明，添加repo源</p>
-
-<pre><code class="language-bash">helm repo add elastic https://helm.elastic.co
-</code></pre>
-
-<p>安装</p>
-
-<pre><code class="language-bash">helm install --name elasticsearch elastic/elasticsearch --version 7.0.0-alpha1
-</code></pre>
-
-<p>执行<code>helm inspect</code>可查看各种helm的安装参数，每个参数都有详细说明，根据需要选择即可</p>
-
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">helm repo add elastic https://helm.elastic.co
+</code></pre></div><p>安装</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">helm install --name elasticsearch elastic/elasticsearch --version 7.0.0-alpha1
+</code></pre></div><p>执行<code>helm inspect</code>可查看各种helm的安装参数，每个参数都有详细说明，根据需要选择即可</p>
 <p>由于es的helm安装的是statefulset（有状态副本），里面用到了pvc，所以还需要添加pv信息，否则pod是起不来的，因为我这边只有一个虚拟机，所以使用的是hostpath方式的pv，实际生产还是要用<code>Local Persistent Volume</code>或者挂载ceph、nfs这样的外置存储，pv文件如下</p>
-
-<pre><code class="language-bash">apiVersion: &quot;v1&quot;
-kind: &quot;PersistentVolume&quot;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">apiVersion: <span style="color:#e6db74">&#34;v1&#34;</span>
+kind: <span style="color:#e6db74">&#34;PersistentVolume&#34;</span>
 metadata:
-  name: &quot;elasticsearch-master-elasticsearch-master-0&quot;
+  name: <span style="color:#e6db74">&#34;elasticsearch-master-elasticsearch-master-0&#34;</span>
 spec:
   capacity:
-    storage: &quot;30Gi&quot;
+    storage: <span style="color:#e6db74">&#34;30Gi&#34;</span>
   accessModes:
-    - &quot;ReadWriteOnce&quot;
+    - <span style="color:#e6db74">&#34;ReadWriteOnce&#34;</span>
   persistentVolumeReclaimPolicy: Recycle
   hostPath:
     path: /root/esdata
-</code></pre>
-
-<p>这样就声明了一个name为<code>elasticsearch-master-elasticsearch-master-0</code>的pv，容量为30G，挂载在本地的<code>/root/esdata</code>目录下
+</code></pre></div><p>这样就声明了一个name为<code>elasticsearch-master-elasticsearch-master-0</code>的pv，容量为30G，挂载在本地的<code>/root/esdata</code>目录下
 执行</p>
-
-<pre><code class="language-bash">kubectl create -f local-pv.yaml
-</code></pre>
-
-<p>创建pv，完成后执行</p>
-
-<pre><code class="language-bash">[root@MiWiFi-R1CM-srv ~]# kubectl get pv
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl create -f local-pv.yaml
+</code></pre></div><p>创建pv，完成后执行</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>root@MiWiFi-R1CM-srv ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get pv</span>
 NAME                                          CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM                                                 STORAGECLASS   REASON   AGE
 elasticsearch-master-elasticsearch-master-0   30Gi       RWO            Recycle          Bound       default/elasticsearch-master-elasticsearch-master-0                           4d1h
-</code></pre>
-
-<p>可以看到状态为<code>BOUND</code>，绑定成功，这里是因为name相同，自动绑定到helm创建的同名pvc上去了。
+</code></pre></div><p>可以看到状态为<code>BOUND</code>，绑定成功，这里是因为name相同，自动绑定到helm创建的同名pvc上去了。
 这时候再执行</p>
-
-<pre><code class="language-bash">[root@MiWiFi-R1CM-srv ~]# kubectl get po
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>root@MiWiFi-R1CM-srv ~<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl get po</span>
 NAME                             READY   STATUS    RESTARTS   AGE
-elasticsearch-master-0           1/1     Running   0          89m
-</code></pre>
-
-<p>可以看到状态都ok了，单节点的es集群搭建完成
-&gt;这里面有一个问题，发现单节点的情况下，一旦往集群内写入数据后，再删除该pod，sts会重新分配一个pod起来，名字还是叫elasticsearch-master-0，挂载目录也不变，但是就无法加入集群，不知道是否和es集群脑裂有关系，有懂的高人请指点一下</p>
-
+elasticsearch-master-0           1/1     Running   <span style="color:#ae81ff">0</span>          89m
+</code></pre></div><p>可以看到状态都ok了，单节点的es集群搭建完成</p>
+<blockquote>
+<p>这里面有一个问题，发现单节点的情况下，一旦往集群内写入数据后，再删除该pod，sts会重新分配一个pod起来，名字还是叫elasticsearch-master-0，挂载目录也不变，但是就无法加入集群，不知道是否和es集群脑裂有关系，有懂的高人请指点一下</p>
+</blockquote>
 <h4 id="kibana安装">kibana安装</h4>
-
 <p>kibana是es官配的ui图形界面，功能十分强大，这边安装也十分简单，直接执行</p>
-
-<pre><code class="language-bash">helm install --name kibana elastic/kibana --version 7.0.0-alpha1
-</code></pre>
-
-<p>即可，集群默认会找<code>http://elasticsearch-master:9200</code>的es集群，之前装es的时候已经设置过（通过k8s的service以及dns服务发现），修改一下kibana的service默认配置，改成nodeport模式，就可以通过浏览器直接访问了
-<img src="https://upload-images.jianshu.io/upload_images/14871146-030f321267b15f6a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="kibana.png" /></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">helm install --name kibana elastic/kibana --version 7.0.0-alpha1
+</code></pre></div><p>即可，集群默认会找<code>http://elasticsearch-master:9200</code>的es集群，之前装es的时候已经设置过（通过k8s的service以及dns服务发现），修改一下kibana的service默认配置，改成nodeport模式，就可以通过浏览器直接访问了
+<img src="https://upload-images.jianshu.io/upload_images/14871146-030f321267b15f6a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="kibana.png"></p>
 
         
                 
@@ -341,12 +274,12 @@ elasticsearch-master-0           1/1     Running   0          89m
               <ul class="pager">
                   
                   <li class="previous">
-                      <a href="/post/vue-cli3.0-proxytable/" data-toggle="tooltip" data-placement="top" title="vue-cli3.0使用proxytable解决跨域问题">&larr; Previous Post</a>
+                      <a href="/post/create-eureka-ha-cluster/" data-toggle="tooltip" data-placement="top" title="搭建eureka高可用集群">&larr; Previous Post</a>
                   </li>
                   
                   
                   <li class="next">
-                      <a href="/post/create-eureka-ha-cluster/" data-toggle="tooltip" data-placement="top" title="搭建eureka高可用集群">Next Post &rarr;</a>
+                      <a href="/post/vue-cli3.0-proxytable/" data-toggle="tooltip" data-placement="top" title="vue-cli3.0使用proxytable解决跨域问题">Next Post &rarr;</a>
                   </li>
                   
               </ul>
@@ -387,76 +320,28 @@ elasticsearch-master-0           1/1     Running   0          89m
                      
                     
                         
-                            <a href="/tags/api-gateway" title="Api Gateway">
-                                Api Gateway
+                            <a href="/tags/api-gateway" title="api-gateway">
+                                api-gateway
                             </a>
                         
                     
                         
                     
                         
-                            <a href="/tags/cloud-native" title="Cloud Native">
-                                Cloud Native
+                            <a href="/tags/cloud-native" title="cloud-native">
+                                cloud-native
                             </a>
                         
                     
                         
-                            <a href="/tags/devops" title="DevOps">
-                                DevOps
+                            <a href="/tags/devops" title="devops">
+                                devops
                             </a>
                         
                     
                         
-                            <a href="/tags/docker" title="Docker">
-                                Docker
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/istio" title="Istio">
-                                Istio
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/kubernetes" title="Kubernetes">
-                                Kubernetes
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/microservice" title="Microservice">
-                                Microservice
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/restful" title="RESTful">
-                                RESTful
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/servicemesh" title="ServiceMesh">
-                                ServiceMesh
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/spring-cloud" title="Spring Cloud">
-                                Spring Cloud
+                            <a href="/tags/docker" title="docker">
+                                docker
                             </a>
                         
                     
@@ -468,12 +353,60 @@ elasticsearch-master-0           1/1     Running   0          89m
                     
                         
                     
+                        
+                            <a href="/tags/istio" title="istio">
+                                istio
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="kubernetes">
+                                kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="microservice">
+                                microservice
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/restful" title="restful">
+                                restful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/servicemesh" title="servicemesh">
+                                servicemesh
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="spring-cloud">
+                                spring-cloud
+                            </a>
                         
                     
                         
                             <a href="/tags/vue" title="vue">
                                 vue
                             </a>
+                        
+                    
                         
                     
                         

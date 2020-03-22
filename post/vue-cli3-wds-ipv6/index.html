@@ -69,11 +69,11 @@
                     </li>
                     
                     <li>
-                        <a href="categories/tech">Tech</a>
+                        <a href="categories/tech">tech</a>
                     </li>
                     
                     <li>
-                        <a href="categories/tips">Tips</a>
+                        <a href="categories/tips">tips</a>
                     </li>
                     
                     <li>
@@ -169,26 +169,20 @@
                         <header>
                         <h2>TOC</h2>
                         </header>
-                        
+                        <nav id="TableOfContents"></nav>
         		
         		<p>项目中的前端工程用到了vue-cli3.0脚手架，启动后console一直报错</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Failed to load resource: net::ERR_EMPTY_RESPONSE <span style="color:#f92672">[</span>http://localhost:8080/sockjs-node/info?t<span style="color:#f92672">=</span>1541988880077<span style="color:#f92672">]</span>
+<span style="color:#f92672">[</span>WDS<span style="color:#f92672">]</span> Disconnected!
+</code></pre></div><p>查了下应该是webpack中的用到的热加载功能需要通过websocket方式连接<code>http://localhost:8080/sockjs-node/info</code>,连不上导致报错。试了下本机<code>http://localhost:8080/sockjs-node/info</code>确认连不上，但是<code>http://127.0.0.1:8080/sockjs-node/info</code>可以连上，感觉有点诡异，遂ping了一下localhost,系统返回</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">C:<span style="color:#ae81ff">\U</span>sers<span style="color:#ae81ff">\u</span>ser&gt;ping localhost
 
-<pre><code class="language-bash">Failed to load resource: net::ERR_EMPTY_RESPONSE [http://localhost:8080/sockjs-node/info?t=1541988880077]
-[WDS] Disconnected!
-</code></pre>
-
-<p>查了下应该是webpack中的用到的热加载功能需要通过websocket方式连接<code>http://localhost:8080/sockjs-node/info</code>,连不上导致报错。试了下本机<code>http://localhost:8080/sockjs-node/info</code>确认连不上，但是<code>http://127.0.0.1:8080/sockjs-node/info</code>可以连上，感觉有点诡异，遂ping了一下localhost,系统返回</p>
-
-<pre><code class="language-bash">C:\Users\user&gt;ping localhost
-
-正在 Ping DESKTOP-RNQGUFA [::1] 具有 32 字节的数据:
+正在 Ping DESKTOP-RNQGUFA <span style="color:#f92672">[</span>::1<span style="color:#f92672">]</span> 具有 <span style="color:#ae81ff">32</span> 字节的数据:
 来自 ::1 的回复: 时间&lt;1ms
 来自 ::1 的回复: 时间&lt;1ms
 来自 ::1 的回复: 时间&lt;1ms
 来自 ::1 的回复: 时间&lt;1ms
-</code></pre>
-
-<p>看来就是这个问题了，一番百度之后原来是win10默认设置的ipv6的优先级高于ipv4，所以把localhost解析到ipv6去了（win7应该不存在这个问题）,解决方案有设置参数及修改注册表等好几种，命令行要打很多相关设置，我这边使用的是比较简单的修改注册表方式,具体方法为打开注册表<code>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\tcpip6\Parameters</code>,增加键值<code>DisabledComponents</code>,类型为<code>DWORD</code>,值为<code>20</code>,指类型为<code>16进制</code>，重启电脑后生效</p>
+</code></pre></div><p>看来就是这个问题了，一番百度之后原来是win10默认设置的ipv6的优先级高于ipv4，所以把localhost解析到ipv6去了（win7应该不存在这个问题）,解决方案有设置参数及修改注册表等好几种，命令行要打很多相关设置，我这边使用的是比较简单的修改注册表方式,具体方法为打开注册表<code>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\tcpip6\Parameters</code>,增加键值<code>DisabledComponents</code>,类型为<code>DWORD</code>,值为<code>20</code>,指类型为<code>16进制</code>，重启电脑后生效</p>
 
         
                 
@@ -197,12 +191,12 @@
               <ul class="pager">
                   
                   <li class="previous">
-                      <a href="/post/thread-pool-task-executor/" data-toggle="tooltip" data-placement="top" title="使用ThreadPoolTaskExecutor对任务进行异步阻塞处理">&larr; Previous Post</a>
+                      <a href="/post/spring-cloud-config-kubernetes-configmap/" data-toggle="tooltip" data-placement="top" title="基于Spring Cloud Config和Kubernetes ConfigMap进行微服务集群的配置管理">&larr; Previous Post</a>
                   </li>
                   
                   
                   <li class="next">
-                      <a href="/post/spring-cloud-config-kubernetes-configmap/" data-toggle="tooltip" data-placement="top" title="基于Spring Cloud Config和Kubernetes ConfigMap进行微服务集群的配置管理">Next Post &rarr;</a>
+                      <a href="/post/thread-pool-task-executor/" data-toggle="tooltip" data-placement="top" title="使用ThreadPoolTaskExecutor对任务进行异步阻塞处理">Next Post &rarr;</a>
                   </li>
                   
               </ul>
@@ -243,76 +237,28 @@
                      
                     
                         
-                            <a href="/tags/api-gateway" title="Api Gateway">
-                                Api Gateway
+                            <a href="/tags/api-gateway" title="api-gateway">
+                                api-gateway
                             </a>
                         
                     
                         
                     
                         
-                            <a href="/tags/cloud-native" title="Cloud Native">
-                                Cloud Native
+                            <a href="/tags/cloud-native" title="cloud-native">
+                                cloud-native
                             </a>
                         
                     
                         
-                            <a href="/tags/devops" title="DevOps">
-                                DevOps
+                            <a href="/tags/devops" title="devops">
+                                devops
                             </a>
                         
                     
                         
-                            <a href="/tags/docker" title="Docker">
-                                Docker
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/istio" title="Istio">
-                                Istio
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/kubernetes" title="Kubernetes">
-                                Kubernetes
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/microservice" title="Microservice">
-                                Microservice
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/restful" title="RESTful">
-                                RESTful
-                            </a>
-                        
-                    
-                        
-                    
-                        
-                            <a href="/tags/servicemesh" title="ServiceMesh">
-                                ServiceMesh
-                            </a>
-                        
-                    
-                        
-                            <a href="/tags/spring-cloud" title="Spring Cloud">
-                                Spring Cloud
+                            <a href="/tags/docker" title="docker">
+                                docker
                             </a>
                         
                     
@@ -324,12 +270,60 @@
                     
                         
                     
+                        
+                            <a href="/tags/istio" title="istio">
+                                istio
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/kubernetes" title="kubernetes">
+                                kubernetes
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/microservice" title="microservice">
+                                microservice
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/restful" title="restful">
+                                restful
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/servicemesh" title="servicemesh">
+                                servicemesh
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/spring-cloud" title="spring-cloud">
+                                spring-cloud
+                            </a>
                         
                     
                         
                             <a href="/tags/vue" title="vue">
                                 vue
                             </a>
+                        
+                    
                         
                     
                         
