@@ -6,10 +6,19 @@
     <description>Recent content in Tech on L&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 21 Mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 27 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/tech/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>源代码分支管理模式</title>
+      <link>/post/branching-patterns/</link>
+      <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/branching-patterns/</guid>
+      <description>现代的源代码控制系统提供了强大的工具，可以非常轻松的在源代码上创建分支。但最终分支还是要合并在一起，许多团队不得不花相当多的时间去处理相互纠</description>
+    </item>
     
     <item>
       <title>介绍 istiod：简化控制平面</title>

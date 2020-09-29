@@ -4,7 +4,32 @@
   
   <url>
     <loc>/categories/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
+    <lastmod>2020-09-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/devops/</loc>
+    <lastmod>2020-09-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2020-09-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2020-09-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/tech/</loc>
+    <lastmod>2020-09-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/branching-patterns/</loc>
+    <lastmod>2020-09-27T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -13,22 +38,7 @@
   </url>
   
   <url>
-    <loc>/post/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/tags/servicemesh/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/</loc>
-    <lastmod>2020-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/tech/</loc>
     <lastmod>2020-03-21T00:00:00+00:00</lastmod>
   </url>
   
@@ -145,11 +155,6 @@
   <url>
     <loc>/post/steps-toward-the-glory-of-rest/</loc>
     <lastmod>2019-06-29T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/devops/</loc>
-    <lastmod>2019-06-15T00:00:00+00:00</lastmod>
   </url>
   
   <url>
