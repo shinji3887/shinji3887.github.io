@@ -309,35 +309,35 @@
 <p>设想一下这个场景，脸盆网不想自建用户体系了，想直接用facebook的用户体系，facebook的用户和脸盆网的用户一一对应（其实在很多中小网站现在都是这种模式，可以选择使用微信、QQ、微博等网站的用户直接登陆），这种情况下，脸盆网在通过OAuth2的认证后，就希望拿到用户信息了。所以现在一般主流的OAuth2认证实现，都会预留一个用户信息获取接口，就是上面提到的<code>https://api.facebook.com/user</code>(虽然这不是OAuth2授权流程中必须的)，这样client在拿到token后，就可以携带token通过这个接口获取用户信息，完成SSO的整个过程。另外从用户体验的角度来说，如果获取不到用户信息，则意味者每次要从脸盆网访问facebook的资源，都需要重定向一次进行认证，用户体验也不好。</p>
 <h3 id="oauth2与sso">OAuth2与SSO</h3>
 <p>首先要明确一点，<strong>OAuth2并不是一个SSO框架，但可以实现SSO功能</strong>。以下是一个使用github作为OAuth2认证服务器的配置文件</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">server</span>:
-  <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">11001</span>
-<span style="color:#66d9ef">security</span>:
-  <span style="color:#66d9ef">user</span>:
-    <span style="color:#66d9ef">password</span>: user  <span style="color:#75715e"># 直接登录时的密码</span>
-  <span style="color:#66d9ef">ignored</span>: /
-  <span style="color:#66d9ef">sessions</span>: never   <span style="color:#75715e"># session策略</span>
-  <span style="color:#66d9ef">oauth2</span>:
-    <span style="color:#66d9ef">sso</span>:
-      <span style="color:#66d9ef">loginPath</span>: /login   <span style="color:#75715e"># 登录路径</span>
-    <span style="color:#66d9ef">client</span>:
-      <span style="color:#66d9ef">clientId</span>: c40fb56cb4sdsdsdsd
-      <span style="color:#66d9ef">clientSecret</span>: c910ec22981daa28e1b59c778sdfjh73j3
-      <span style="color:#66d9ef">accessTokenUri</span>: https://github.com/login/oauth/access_token
-      <span style="color:#66d9ef">userAuthorizationUri</span>: https://github.com/login/oauth/authorize
-    <span style="color:#66d9ef">resource</span>:
-      <span style="color:#66d9ef">userInfoUri</span>: https://api.github.com/user
-      <span style="color:#66d9ef">preferTokenInfo</span>: <span style="color:#66d9ef">false</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">server</span>:
+  <span style="color:#f92672">port</span>: <span style="color:#ae81ff">11001</span>
+<span style="color:#f92672">security</span>:
+  <span style="color:#f92672">user</span>:
+    <span style="color:#f92672">password</span>: <span style="color:#ae81ff">user </span> <span style="color:#75715e"># 直接登录时的密码</span>
+  <span style="color:#f92672">ignored</span>: <span style="color:#ae81ff">/</span>
+  <span style="color:#f92672">sessions</span>: <span style="color:#ae81ff">never  </span> <span style="color:#75715e"># session策略</span>
+  <span style="color:#f92672">oauth2</span>:
+    <span style="color:#f92672">sso</span>:
+      <span style="color:#f92672">loginPath</span>: <span style="color:#ae81ff">/login  </span> <span style="color:#75715e"># 登录路径</span>
+    <span style="color:#f92672">client</span>:
+      <span style="color:#f92672">clientId</span>: <span style="color:#ae81ff">c40fb56cb4sdsdsdsd</span>
+      <span style="color:#f92672">clientSecret</span>: <span style="color:#ae81ff">c910ec22981daa28e1b59c778sdfjh73j3</span>
+      <span style="color:#f92672">accessTokenUri</span>: <span style="color:#ae81ff">https://github.com/login/oauth/access_token</span>
+      <span style="color:#f92672">userAuthorizationUri</span>: <span style="color:#ae81ff">https://github.com/login/oauth/authorize</span>
+    <span style="color:#f92672">resource</span>:
+      <span style="color:#f92672">userInfoUri</span>: <span style="color:#ae81ff">https://api.github.com/user</span>
+      <span style="color:#f92672">preferTokenInfo</span>: <span style="color:#66d9ef">false</span>
 </code></pre></div><p>可以看到<code>accessTokenUri</code>和<code>userAuthorizationUri</code>都是为了完成OAuth2的授权流程所必须的配置，而<code>userInfoUri </code>则是spring security框架为了完成SSO所必须要的。所以总结一下就是：<strong>通过将用户信息这个资源设置为被保护资源，可以使用OAuth2技术实现单点登陆（SSO），而Spring Security OAuth2就是这种OAuth2 SSO方案的一个实现。</strong></p>
 <p>Spring Security在调用user接口成功后，会构造一个<code>OAuth2Authentication</code>对象，这个对象是我们通常使用的<code>UsernamePasswordAuthenticationToken</code>对象的一个超集，里面封装了一个标准的<code>UsernamePasswordAuthenticationToken</code>，同时在<code>detail</code>中还携带了OAuth2认证中需要用到的一些关键信息（比如<code>tokenValue</code>，<code>tokenType</code>等），这时候就完成了SSO的登陆认证过程。后续用户如果再想访问被保护资源，spring security只需要从principal中取出这个用户的token，再去访问资源服务器就行了，而不需要每次进行用户授权。这里要注意的一点是<strong>此时浏览器与client之间仍然是通过传统的cookie-session机制来保持会话，而非通过token。实际上在SSO的过程中，使用到token访问的只有client与resource server之间获取user信息那一次，token的信息是保存在client的session中的，而不是在用户本地</strong>。这也是之前我没搞清楚的地方，以为浏览器和client之间也是使用token，绕了不少弯路，对于Spring Security来说，<strong>不管是用cas、saml2还是Oauth2来实现SSO，最后和用户建立会话保持的方式都是一样的</strong>。</p>
 <h3 id="oauth2-sso与cassaml2的比较">OAuth2 SSO与CAS、SAML2的比较</h3>
 <p>根据前面所说，大家不难看出，OAuth2的SSO方案和CAS、SAML2这样的纯SSO框架是有本质区别的。在CAS和SAML2中，没有资源服务器的概念，只有认证客户端（需要验证客户信息的应用）和认证服务器（提供认证服务的应用）的概念。在CAS中这叫做<code>cas-client</code>和<code>cas-server</code>，SAML2中这叫做<code>Service Providers</code>和<code>Identity Provider</code>，可以看出CAS、SAML2规范天生就是为SSO设计的，在报文结构上都考虑到了用户信息的问题（SAML2规范甚至还带了权限信息），而OAuth2本身不是专门为SSO设计的，主要是为了解决资源第三方授权访问的问题，所以在用户信息方面，还需要额外提供一个接口。</p>
 <h3 id="authorization-server与resource-server分离">Authorization Server与Resource Server分离</h3>
 <p>脸盆网的这个例子中，我们看到资源服务器和认证服务器是在一起的（都是facebook），在互联网场景下一般你很难找到一个独立的、权威的、第三方的认证中心（你很难想像腾讯的QQ空间通过支付宝的认证中心去授权，也很难想像使用谷歌服务要通过亚马逊去授权）。但是如果是在公司内部，这种场景其实是很多的，尤其在微服务架构下，有大量服务会对外提供资源访问，他们都需要做权限控制。那么最合理的当然就是建立一个统一的认证中心，而不是每个服务都做一个认证中心。我们前面也介绍了，token本身是不携带用户信息的，在分离后resouce server在收到请求后，如何检验token的真实性？又如何从token中获取对应的用户信息？这部分的介绍网上其实非常少，幸好我们可以直接从官方文档获取相关的蛛丝马迹，官方文档对于resouce server的配置是这样描述的：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">security</span>:
-  <span style="color:#66d9ef">oauth2</span>:
-    <span style="color:#66d9ef">resource</span>:
-      <span style="color:#66d9ef">userInfoUri</span>: https://api.github.com/user
-      <span style="color:#66d9ef">preferTokenInfo</span>: <span style="color:#66d9ef">false</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">security</span>:
+  <span style="color:#f92672">oauth2</span>:
+    <span style="color:#f92672">resource</span>:
+      <span style="color:#f92672">userInfoUri</span>: <span style="color:#ae81ff">https://api.github.com/user</span>
+      <span style="color:#f92672">preferTokenInfo</span>: <span style="color:#66d9ef">false</span>
 </code></pre></div><p>寥寥数语，但已经足够我们分析了。从这个配置可以看出，client在访问resource server的被保护资源时，如果没有携带token，则资源服务器直接返回一个401未认证的错误</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;oauth&gt;</span>
    <span style="color:#f92672">&lt;error_description&gt;</span>

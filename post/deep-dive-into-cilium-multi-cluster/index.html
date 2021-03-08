@@ -258,18 +258,18 @@
 <p>混合路由模式允许在可用时使用直接路由，这通常在本地集群或同一VPC中的其他集群中，而当跨越VPC或云提供商时可以回退到隧道模式。 这可以限制操作复杂性并且允许仅在需要时支付优化成本。</p>
 <h3 id="服务发现">服务发现</h3>
 <p>Cilium的多集群模型的服务发现是使用标准的Kubernetes <a href="https://kubernetes.io/docs/concepts/services-networking/service/">services</a> 构建的，旨在对现有的Kubernetes应用程序部署完全透明：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-   <span style="color:#66d9ef">kind</span>: Service
-   <span style="color:#66d9ef">metadata</span>:
-     <span style="color:#66d9ef">name</span>: rebel-base
-     <span style="color:#66d9ef">annotations</span>:
-       <span style="color:#66d9ef">io.cilium/global-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
-   <span style="color:#66d9ef">spec</span>:
-     <span style="color:#66d9ef">type</span>: ClusterIP
-     <span style="color:#66d9ef">ports</span>:
-     - <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">80</span>
-     <span style="color:#66d9ef">selector</span>:
-       <span style="color:#66d9ef">name</span>: rebel-base
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+   <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+   <span style="color:#f92672">metadata</span>:
+     <span style="color:#f92672">name</span>: <span style="color:#ae81ff">rebel-base</span>
+     <span style="color:#f92672">annotations</span>:
+       <span style="color:#f92672">io.cilium/global-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
+   <span style="color:#f92672">spec</span>:
+     <span style="color:#f92672">type</span>: <span style="color:#ae81ff">ClusterIP</span>
+     <span style="color:#f92672">ports</span>:
+     - <span style="color:#f92672">port</span>: <span style="color:#ae81ff">80</span>
+     <span style="color:#f92672">selector</span>:
+       <span style="color:#f92672">name</span>: <span style="color:#ae81ff">rebel-base</span>
 </code></pre></div><ul>
 <li>Cilium通过一个注释<code>io.cilium/global-service: &quot;true&quot;</code> 来监控Kubernetes服务和端点以及监听服务。 对于此类服务，具有相同名称和命名空间信息的所有服务将自动合并在一起，并形成跨集群可用的全局服务。</li>
 <li>根据标准Kubernetes运行状况检查逻辑，任何到全局服务的ClusterIP的流量都将自动负载平衡到所有集群中的端点。</li>
@@ -286,21 +286,21 @@
 <p>Cilium<strong>不会</strong>跨集群自动传播NetworkPolicy或CiliumNetworkPolicy。 用户有责任将策略导入所有集群。 这是有意为之，因为这意味着每个集群都可以决定是否允许集群接收来自远程集群的通信或者发出到远程集群的通信。</p>
 <h4 id="允许特定集群的交叉路径">允许特定集群的交叉路径</h4>
 <p>可以仅建立适用于特定集群中的pod的策略。 集群名称由Cilium表示为每个pod上的标签，允许匹配的集群名称可以是<code>endpointSelector</code>或者是由<code>toEndpoints</code>和<code>fromEndpoints</code>构造的<code>matchLabels</code>标签：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: <span style="color:#e6db74">&#34;cilium.io/v2&#34;</span>
-<span style="color:#66d9ef">kind</span>: CiliumNetworkPolicy
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: <span style="color:#e6db74">&#34;allow-cross-cluster&#34;</span>
-  <span style="color:#66d9ef">description</span>: <span style="color:#e6db74">&#34;Allow x-wing in cluster1 to contact rebel-base in cluster2&#34;</span>
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">endpointSelector</span>:
-    <span style="color:#66d9ef">matchLabels</span>:
-      <span style="color:#66d9ef">name</span>: x-wing
-      <span style="color:#66d9ef">io.cilium.k8s.policy.cluster</span>: cluster1
-  <span style="color:#66d9ef">egress</span>:
-  - <span style="color:#66d9ef">toEndpoints</span>:
-    - <span style="color:#66d9ef">matchLabels</span>:
-        <span style="color:#66d9ef">name</span>: rebel-base
-        <span style="color:#66d9ef">io.cilium.k8s.policy.cluster</span>: cluster2
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#e6db74">&#34;cilium.io/v2&#34;</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">CiliumNetworkPolicy</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#e6db74">&#34;allow-cross-cluster&#34;</span>
+  <span style="color:#f92672">description</span>: <span style="color:#e6db74">&#34;Allow x-wing in cluster1 to contact rebel-base in cluster2&#34;</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">endpointSelector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">name</span>: <span style="color:#ae81ff">x-wing</span>
+      <span style="color:#f92672">io.cilium.k8s.policy.cluster</span>: <span style="color:#ae81ff">cluster1</span>
+  <span style="color:#f92672">egress</span>:
+  - <span style="color:#f92672">toEndpoints</span>:
+    - <span style="color:#f92672">matchLabels</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">rebel-base</span>
+        <span style="color:#f92672">io.cilium.k8s.policy.cluster</span>: <span style="color:#ae81ff">cluster2</span>
 </code></pre></div><p>上面的示例策略将允许cluster1中的<code>x-wing</code>与cluster2中的<code>rebel-base</code>对话。 除非存在将通信列入白名单的附加策略，否则x-wing将无法与本地集群中的rebel-base通信。</p>
 <h3 id="与istio多集群的关系">与Istio多集群的关系</h3>
 <p>这两个项目都是独立的，但可以很好地相互补充。 组合Cilium和Istio多集群的常用方法是使用Cilium的多集群Pod IP路由层来满足<a href="https://istio.io/docs/setup/kubernetes/multicluster-install/">Istio多集群指南</a>的以下要求：</p>

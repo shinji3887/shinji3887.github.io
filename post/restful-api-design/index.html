@@ -208,7 +208,7 @@
 </code></pre></div><p>非常的清晰明了（这里暂时先不考虑调用方是否有权限删除服务器上的资源）
 注意这里为了讲述原理没有加资源的后缀.jpg，引用阮一峰老师的话</p>
 <blockquote>
-<p>严格地说，有些网址最后的&rdquo;.html&quot;后缀名是不必要的，因为这个后缀名表示格式，属于&quot;表现层&quot;范畴，而URI应该只代表&quot;资源&quot;的位置。它的具体表现形式，应该在HTTP请求的头信息中用Accept和Content-Type字段指定，这两个字段才是对&quot;表现层&quot;的描述。</p>
+<p>严格地说，有些网址最后的&quot;.html&quot;后缀名是不必要的，因为这个后缀名表示格式，属于&quot;表现层&quot;范畴，而URI应该只代表&quot;资源&quot;的位置。它的具体表现形式，应该在HTTP请求的头信息中用Accept和Content-Type字段指定，这两个字段才是对&quot;表现层&quot;的描述。</p>
 </blockquote>
 <p>在这个例子里，我们可以通过在http header里指定content-type为<code>image/jpeg</code>来申明这个资源是一张jpg格式的图片
 接下来，如果要查询（获取）这张图片呢？自然就是</p>

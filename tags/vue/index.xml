@@ -6,11 +6,7 @@
     <description>Recent content in vue on L&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 17 May 2019 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="/tags/vue/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Fri, 17 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="/tags/vue/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>使用vue集成spring security进行安全登陆</title>
       <link>/post/vue-spring-security-login/</link>

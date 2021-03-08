@@ -9,14 +9,14 @@
     <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <meta name="description" content="常用命令说明">
+    <meta name="description" content="一年之后，让我们再来看看Istio 和 Envoy WebAssembly 可扩展性的发展现状">
     
     <meta name="keyword"  content="暴走的初号机, shinji3887, 暴走的初号机的网络日志, 暴走的初号机的博客, shinji3887 Blog, 博客, 个人网站, 互联网, Web, 云原生, PaaS, Istio, Kubernetes, 微服务, Microservice">
     <link rel="shortcut icon" href="/img/favicon.ico">
 
-    <title>docker与kubernetes常用命令集合-同步率400%</title>
+    <title>一年之后的 Istio 和 Envoy WebAssembly 可扩展性-同步率400%</title>
 
-    <link rel="canonical" href="/post/docker-kubernetes-commands/">
+    <link rel="canonical" href="/post/wasm-progress/">
 
     <link rel="stylesheet" href="https://lupeier.cn-sh2.ufileos.com/iDisqus.min.css"/>
 	
@@ -121,7 +121,7 @@
 
 <style type="text/css">
     header.intro-header{
-        background-image: url('https://lupeier.cn-sh2.ufileos.com/clouds-dawn-dock-891822.jpg')
+        background-image: url('https://lupeier.cn-sh2.ufileos.com/pexels-sails-611328.jpg')
     }
 </style>
 <header class="intro-header" >
@@ -131,18 +131,22 @@
                 <div class="post-heading">
                     <div class="tags">
                        
-                       <a class="tag" href="/tags/docker" title="Docker">
-                           Docker
-                        </a>
-                        
                        <a class="tag" href="/tags/kubernetes" title="Kubernetes">
                            Kubernetes
                         </a>
                         
+                       <a class="tag" href="/tags/istio" title="Istio">
+                           Istio
+                        </a>
+                        
+                       <a class="tag" href="/tags/servicemesh" title="ServiceMesh">
+                           ServiceMesh
+                        </a>
+                        
                     </div>
-                    <h1>docker与kubernetes常用命令集合</h1>
+                    <h1>一年之后的 Istio 和 Envoy WebAssembly 可扩展性</h1>
                     <h2 class="subheading"></h2>
-                    <span  class="meta">Posted by L&#39; on Tuesday, November 20, 2018
+                    <span  class="meta">Posted by Istio.io on Friday, March 5, 2021
                         
                     </span>
 					<br>
@@ -171,134 +175,50 @@
                         </header>
                         <nav id="TableOfContents">
   <ul>
-    <li><a href="#docker命令">docker命令</a></li>
-    <li><a href="#kubectl命令">kubectl命令</a></li>
+    <li>
+      <ul>
+        <li><a href="#webassembly支持在上游-envoy-中被合并">WebAssembly支持在上游 Envoy 中被合并</a></li>
+        <li><a href="#wasm-extensions-ecosystem-仓库">wasm-extensions Ecosystem 仓库</a></li>
+        <li><a href="#通过-istio-agent-分发-wasm-模块">通过 Istio Agent 分发 Wasm 模块</a></li>
+        <li><a href="#istio-wasm-sig-和未来的工作">Istio Wasm SIG 和未来的工作</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
         		
         		<blockquote>
-<p>docker与kubernetes常用命令行集合，做个整理，妈妈再也不用担心我记不住命令了。只根据需要记录了主要的命令和参数，应该足够用了，全量的命令列表请参考官方文档</p>
+<p>译者注：去年3月份，Istio 社区重磅推出了以 Wasm 技术为核心的 Proxy-Wasm plugins 体系，可扩展性和遥测技术的发展都将以 Wasm 技术为基础，具体可以看我之前的《WebAssembly in Envoy》、《重新定义代理的扩展性：WebAssembly在Envoy与Istio中的应用》这两篇文章。社区同时也在大力发展规范体系，这其实也是谷歌的一贯打法，即标准先行，所谓一流企业定标准。具体来说做了两件事情，第一是制定代理无关的 WebAssembly for Proxies (ABI specification)，第二是扶持以 solo 为首的初创企业高调推出 webassemblyhub，大力建设插件生态。如今正好过去了一年，Wasm 生态发展得如何了呢？Wasm Proxy Spec 规范是否能一统代理扩展插件的天下？让我们来看看官方发布的博客。</p>
 </blockquote>
-<h2 id="docker命令">docker命令</h2>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker images
-</code></pre></div><p>列出当前本地的所有镜像</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker ps
-</code></pre></div><p>查看当前所有正在运行的容器进程</p>
+<p>一年前的今天，在 1.5 版本中，我们向 Istio 引入了<a href="https://istio.io/latest/zh/blog/2020/wasm-announce/">基于 WebAssembly 的可扩展性</a>。在这一年中，Istio，Envoy 和 Proxy-Wasm 社区一直在共同努力，以使 WebAssembly（Wasm）的扩展性稳定、可靠且易于采用。 让我们逐一介绍 Istio 1.9 版本中 Wasm 支持的更新以及我们的未来计划。</p>
+<h3 id="webassembly支持在上游-envoy-中被合并">WebAssembly支持在上游 Envoy 中被合并</h3>
+<p>自从在 Istio fork 的 Envoy 分支中添加了对 Wasm 和 WebAssembly for Proxies（Proxy-Wasm）ABI 的实验性支持之后，我们从早期采用者社区中收集了一些宝贵的反馈意见。这与开发核心 Istio Wasm 扩展所获得的经验相结合，帮助我们成熟并稳定了运行时。所有的这些工作，使得 Wasm 支持在2020年10月顺利的合并到 Envoy 上游，使其成为 Envoy 所有正式版本的一部分。 这是一个重要的里程碑，因为它表明：</p>
 <ul>
-<li>-a：查看所有容器（包含不在运行的）</li>
+<li>运行时已为广泛采用做好了准备。</li>
+<li>ABI/API 的编程、扩展配置 API 和运行时行为正在变得稳定。</li>
+<li>您可以期待更大范围的采用和社区支持。</li>
 </ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker pull nginx:latest
-</code></pre></div><p>拉取指定名称及版本的镜像,不指定tag名称时默认拉取latest</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker tag nginx:latest 22.196.66.62:5000/nginx:latest
-</code></pre></div><p>标记本地镜像，将其归入某一仓库(比如内网私有仓库)，也会用来给墙外的一些镜像改名（ex:gcr.io）。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker push 22.196.66.62:5000/nginx:latest
-</code></pre></div><p>将镜像推送入dockerhub或者私有仓库</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker run -p 8080:80 --name mynginx -d nginx:latest
-</code></pre></div><p>运行docker镜像</p>
+<h3 id="wasm-extensions-ecosystem-仓库">wasm-extensions Ecosystem 仓库</h3>
+<p>作为 Envoy Wasm 运行时的早期采用者，Istio 扩展和遥测工作组在开发扩展方面积累了很多经验。我们构建了几个一流的扩展，包括<a href="https://istio.io/latest/docs/reference/config/proxy_extensions/metadata_exchange/">元数据交换</a>，<a href="https://istio.io/latest/docs/reference/config/proxy_extensions/stats/">Prometheus统计信息</a>和<a href="https://istio.io/latest/docs/reference/config/proxy_extensions/attributegen/">属性生成</a>。为了更广泛地分享我们的知识，我们在 <strong>istio-ecosystem</strong> 组织中创建了<a href="https://github.com/istio-ecosystem/wasm-extensions"> wasm-extensions 存储库</a>。 该存储库有两个用途：</p>
 <ul>
-<li>-d: 后台运行容器，并返回容器ID；</li>
-<li>-i: 以交互模式运行容器，通常与 -t 同时使用；</li>
-<li>-p: 端口映射，格式为：主机(宿主)端口:容器端口</li>
-<li>-t: 为容器重新分配一个伪输入终端，通常与 -i 同时使用；</li>
-<li>&ndash;name=&ldquo;mynginx&rdquo;: 为容器指定一个名称；</li>
-<li>&ndash;cpuset=&ldquo;0-2&rdquo; or &ndash;cpuset=&ldquo;0,1,2&rdquo;: 绑定容器到指定CPU运行；</li>
-<li>-m :设置容器使用内存最大值；</li>
-<li>&ndash;net=&ldquo;bridge&rdquo;: 指定容器的网络连接类型，支持 bridge/host/none/container: 四种类型,默认为桥接模式</li>
+<li>它提供了规范的示例扩展，涵盖了一些非常需要的功能（例如<a href="https://github.com/istio-ecosystem/wasm-extensions/tree/master/extensions/basic_auth">基础身份验证</a>）。</li>
+<li>它为 Wasm 扩展的开发、测试和发布提供了指南。该指南基于 Istio 可扩展性团队正在使用、维护和测试的相同的构建工具链和测试框架。</li>
 </ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker exec -it  mynginx /bin/bash
-</code></pre></div><p>以bash方式在容器mynginx中开启一个交互模式的终端</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker rm mynginx
-</code></pre></div><p>删除容器，需要该容器此时是stop状态</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker rmi nginx:latest
-</code></pre></div><p>删除镜像，需要此时没有该镜像创建的关联容器</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker logs --since<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;2016-07-01&#34;</span> --tail<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span> mynginx
-</code></pre></div><p>查看容器日志logs</p>
+<p>该指南目前涵盖使用 C++ 进行 <a href="https://github.com/istio-ecosystem/wasm-extensions/blob/master/doc/write-a-wasm-extension-with-cpp.md">WebAssembly 扩展开发</a>和<a href="https://github.com/istio-ecosystem/wasm-extensions/blob/master/doc/write-cpp-unit-test.md">单元测试</a>，以及使用 Go 测试框架进行<a href="https://github.com/istio-ecosystem/wasm-extensions/blob/master/doc/write-integration-test.md">集成测试</a>，该框架通过使用 Istio 代理二进制文件运行 Wasm 模块来模拟实际运行时。将来，我们还将添加更多规范的扩展，例如与 Open Policy Agent 的集成以及基于 JWT 令牌的标头处理。</p>
+<h3 id="通过-istio-agent-分发-wasm-模块">通过 Istio Agent 分发 Wasm 模块</h3>
+<p>在 Istio 1.9 之前，需要 <a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#config-core-v3-remotedatasource">Envoy 远程数据源</a>才能将远程 Wasm 模块分发到代理。在<a href="https://gist.github.com/bianpengyuan/8377898190e8052ffa36e88a16911910">此示例</a>中，您可以看到定义了两个 <code>EnvoyFilter</code> 资源：一个用于添加远程获取 Envoy 集群，另一个用于将 Wasm 过滤器注入到 HTTP 过滤器链中。这种方法有一个缺点：如果由于配置错误或瞬时错误而导致远程获取失败，Envoy 将被错误的配置阻塞。如果将 Wasm 扩展配置为<a href="https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/wasm/v3/wasm.proto#extensions-wasm-v3-pluginconfig">失败后关闭</a>，则错误的远程提取将停止 Envoy 的服务。若要解决此问题，需要对Envoy xDS 协议进行<a href="https://github.com/envoyproxy/envoy/issues/9447">根本性的修改</a>，以使其允许异步 xDS 响应。</p>
+<p>Istio 1.9 通过利用 istio-agent 内的 xDS 代理和 Envoy 的<a href="https://www.envoyproxy.io/docs/envoy/latest/configuration/overview/extension">扩展配置发现服务</a>（ECDS），提供了一种现成的可靠分发机制。</p>
+<p>istio-agent 从 istiod 拦截扩展配置资源更新，从中读取远程获取提示，下载 Wasm 模块，并使用下载的 Wasm 模块的路径重写 ECDS 配置。如果下载失败，istio-agent 将拒绝 ECDS 更新，并阻止错误的配置到达Envoy。有关更多详细信息，请参阅<a href="https://istio.io/latest/docs/ops/configuration/extensibility/wasm-module-distribution/">有关 Wasm 模块分发的文档</a>。</p>
+<p><img src="https://istio.io/latest/blog/2021/wasm-progress/architecture-istio-agent-downloading-wasm-module.svg" alt="Remote Wasm module fetch flow"></p>
+<h3 id="istio-wasm-sig-和未来的工作">Istio Wasm SIG 和未来的工作</h3>
+<p>尽管我们在 Wasm 可扩展性方面取得了许多进展，但该项目仍有许多方面有待完成。为了巩固各方的努力并更好地应对未来的挑战，我们成立了 <a href="https://discuss.istio.io/t/introducing-wasm-sig/9930">Istio WebAssembly SIG</a>，旨在为 Istio 提供一种标准且可靠的方式来使用 Wasm 扩展。以下是我们正在从事的一些工作：</p>
 <ul>
-<li>-f : 跟踪日志输出</li>
-<li>&ndash;since :显示某个开始时间的所有日志</li>
-<li>-t : 显示时间戳</li>
-<li>&ndash;tail :仅列出最新N条容器日志</li>
+<li><strong>第一等的扩展 API</strong> ：目前需要通过 Istio 的 <code>EnvoyFilter</code> API 注入 Wasm 扩展。第一等的扩展 API 将使 Wasm 与 Istio 的使用更加容易，我们希望在 Istio 1.10 中引入它。</li>
+<li><strong>制品分发的互操作性</strong>：标准的 Wasm 制品格式建立在 Solo.io 的 <a href="https://www.solo.io/blog/announcing-the-webassembly-wasm-oci-image-spec/">WebAssembly OCI 镜像规范工作</a>的基础上，可以轻松地构建、提取、发布和执行。</li>
+<li><strong>基于容器存储接口（CSI）的制品分发</strong>：使用 istio-agent 分发模块很容易被采用，但可能效率不高，因为每个代理都将保留 Wasm 模块的副本。作为更有效的解决方案，使用 <a href="https://kubernetes-csi.github.io/docs/ephemeral-local-volumes.html">Ephemeral CSI</a>，将提供一个 DaemonSet，它可以配置 Pod 的存储。CSI 驱动程序的工作方式类似于 CNI 插件，将在 pod 启动时从 xDS 流中带外提取 Wasm 模块，并将其安装在<code>rootfs</code>中。</li>
 </ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker build -t myapp:v0.1 .
-</code></pre></div><p>构建镜像，需要在当前目录下有Dockerfile文件，.代表为当前路径</p>
-<ul>
-<li>&ndash;tag, -t: 镜像的名字及标签，通常 name:tag 或者 name 格式；可以在一次构建中为一个镜像设置多个标签</li>
-<li>-f :指定要使用的Dockerfile路径</li>
-</ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker save -o mynginx.tar nginx:latest
-</code></pre></div><p>将镜像nginx:latest 生成mynginx.tar归档文件</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker load -i mynginx.tar
-</code></pre></div><p>从mynginx.tar归档中载入镜像</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">docker cp /www/runoob 96f7f14e99ab:/www/
-</code></pre></div><p>将宿主机/www/runoob目录拷贝到容器96f7f14e99ab的/www目录下</p>
-<h2 id="kubectl命令">kubectl命令</h2>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl cluster-info
-</code></pre></div><p>显示集群信息</p>
-<p>k8s中一切皆为对象，对于资源对象操作的关键词分别有get、create、edit、delete等等（传说中的CRUD），下面简单列举一下</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl get pods -o wide
-</code></pre></div><p>get关键词，获取默认namespace下的所有pods信息，pods可替换为k8中其他可以操作的对象，对象太多，这边捡主要的说说，下边其他的操作需要操作资源对象都是一样的</p>
-<ul>
-<li>all  列出全部对象</li>
-<li>clusters (valid only for federation apiservers)</li>
-<li>configmaps (aka &lsquo;cm&rsquo;)</li>
-<li>deployments (aka &lsquo;deploy&rsquo;)</li>
-<li>ingresses (aka &lsquo;ing&rsquo;)</li>
-<li>jobs</li>
-<li>namespaces (aka &lsquo;ns&rsquo;)</li>
-<li>nodes (aka &lsquo;no&rsquo;)</li>
-<li>persistentvolumeclaims (aka &lsquo;pvc&rsquo;)</li>
-<li>persistentvolumes (aka &lsquo;pv&rsquo;)</li>
-<li>pods (aka &lsquo;po&rsquo;)</li>
-<li>replicasets (aka &lsquo;rs&rsquo;)</li>
-<li>replicationcontrollers (aka &lsquo;rc&rsquo;)</li>
-<li>roles</li>
-<li>secrets</li>
-<li>serviceaccounts (aka &lsquo;sa&rsquo;)</li>
-<li>services (aka &lsquo;svc&rsquo;)</li>
-<li>statefulsets</li>
-</ul>
-<p>常用附加的参数有：</p>
-<ul>
-<li>-o yaml  以yaml格式输出</li>
-<li>-o json   以json格式输出</li>
-<li>-o wide  列表输出详细信息</li>
-<li>&ndash;name-space=kube-system 展示kube-system命名空间下的pods</li>
-<li>&ndash;all-namespaces  展示全部命名空间下的pods</li>
-</ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl run nginx --image<span style="color:#f92672">=</span>nginx --replicas<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span> --port<span style="color:#f92672">=</span><span style="color:#ae81ff">80</span>
-</code></pre></div><p>这条命令执行完后会创建一个deployment，里面包含5个副本（pods），暴露容器的80端口，可以使用<code>kubectl get deploy</code>查看刚才创建的deployment</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl expose deploy nginx --port<span style="color:#f92672">=</span><span style="color:#ae81ff">8080</span> --target-port<span style="color:#f92672">=</span><span style="color:#ae81ff">80</span>
-</code></pre></div><p>为刚才创建的deployment对象创建service代理，并通过Service的8080端口转发至容器的80端口上。可代理的资源有pod（po），service（svc），replication controller（rc），deployment（deploy），replica set（rs）</p>
-<ul>
-<li>&ndash;type  有三种，ClusterIP, NodePort, or LoadBalancer. 默认是ClusterIP，这种模式的service只能给集群内的pod访问，若需要外部访问集群内pod，则需要设置为NodePort模式。</li>
-</ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl create -f docker-registry.yaml
-</code></pre></div><p>从一个yaml文件中创建资源，资源类型由yaml文件定义，也可以后面加资源类型直接创建相关对象，比如</p>
-<ul>
-<li>role</li>
-<li>configmap</li>
-<li>quota</li>
-<li>namespace</li>
-<li>secret</li>
-</ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl edit deploy nginx
-</code></pre></div><p>编辑nginx这个deployment的配置文件</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl delete deploy,svc nginx
-</code></pre></div><p>删除标签为nginx的deployment及service对象</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl scale --replicas<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span> deploy nginx
-</code></pre></div><p>K8S当中的重头功能，对pods数量进行水平的扩容或者收缩，该命令将nginx这个deployment的副本数设置为3</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl patch deploy nginx -p <span style="color:#e6db74">&#39;{&#34;spec&#34;:{&#34;unschedulable&#34;:true}}&#39;</span>
-</code></pre></div><p>更新nginx这个deployment中的指定字段</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl set image deployment nginx nginx<span style="color:#f92672">=</span>nginx:1.9.1
-</code></pre></div><p>将nginx这个deployment的镜像更新为nginx:1.9.1，这个操作会触发deployment的滚动更新，通常用于应用更新</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl describe pod podid
-</code></pre></div><p>输出指定资源的详细描述，支持的资源包括但不限于（大小写不限）：pods (po)、services (svc)、 replicationcontrollers (rc)、nodes (no)、events (ev)、componentstatuses (cs)、 limitranges (limits)、persistentvolumes (pv)、persistentvolumeclaims (pvc)、 resourcequotas (quota)和secrets</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl logs -f --tail<span style="color:#f92672">=</span><span style="color:#ae81ff">20</span> nginx
-</code></pre></div><p>仅输出pod nginx中最近的20条日志</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl exec -it 123456-7890 /bin/sh
-</code></pre></div><p>进入pod 123456-7890并分配一个交互终端</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl apply -f FILENAME
-</code></pre></div><p>通过文件名或控制台输入，对资源进行配置。apply命令的使用方式同replace相同，不同的是，apply不会删除原有resource，然后创建新的。apply直接在原有resource的基础上进行更新。同时kubectl apply还会resource中添加一条注释，标记当前的apply。类似于git操作。</p>
+<p>如果您想加入我们，小组将每两周星期二下午2点（太平洋标准时间）开会。 您可以在 <a href="https://github.com/istio/community/blob/master/WORKING-GROUPS.md#working-group-meetings">Istio 工作组日历</a>上找到会议。</p>
+<p>我们期待看到您将如何使用 Wasm 扩展 Istio！</p>
+<p>原文：<a href="https://istio.io/latest/blog/2021/wasm-progress/#webassembly-support-merged-in-upstream-envoy">Istio and Envoy WebAssembly Extensibility, One Year On</a></p>
 
         
                 
@@ -307,13 +227,9 @@
               <ul class="pager">
                   
                   <li class="previous">
-                      <a href="/post/thread-pool-task-executor/" data-toggle="tooltip" data-placement="top" title="使用ThreadPoolTaskExecutor对任务进行异步阻塞处理">&larr; Previous Post</a>
+                      <a href="/post/branching-patterns/" data-toggle="tooltip" data-placement="top" title="源代码分支管理模式">&larr; Previous Post</a>
                   </li>
                   
-                  
-                  <li class="next">
-                      <a href="/post/linux-npm-install-eacces/" data-toggle="tooltip" data-placement="top" title="linux下使用npm install报EACCES的解决方法">Next Post &rarr;</a>
-                  </li>
                   
               </ul>
   
@@ -532,7 +448,7 @@
 		    
                 </ul>
 		<p class="copyright text-muted">
-                    Copyright &copy; L&#39;s Blog , 2018
+                    Copyright &copy; L&#39;s Blog , 2021
                     <br>
                     <br>
                     <a href="http://icp.chinaz.com/info?q=lupeier.com" target="_blank">备案号：沪ICP备19022667号-1</a>                    

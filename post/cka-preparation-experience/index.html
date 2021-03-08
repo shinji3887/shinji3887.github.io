@@ -222,19 +222,19 @@ kubectl run nginx --image<span style="color:#f92672">=</span>nginx --restart<spa
 <span style="color:#75715e">#增加对应参数</span>
 vi 4.yaml
 kubectl apply -f 4.yaml
-</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Pod
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: nginx
-  <span style="color:#66d9ef">labels</span>:
-    <span style="color:#66d9ef">env</span>: test
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">containers</span>:
-  - <span style="color:#66d9ef">name</span>: nginx
-    <span style="color:#66d9ef">image</span>: nginx
-    <span style="color:#66d9ef">imagePullPolicy</span>: IfNotPresent
-  <span style="color:#66d9ef">nodeSelector</span>:
-    <span style="color:#66d9ef">disktype</span>: ssd
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pod</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">env</span>: <span style="color:#ae81ff">test</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">containers</span>:
+  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx</span>
+    <span style="color:#f92672">imagePullPolicy</span>: <span style="color:#ae81ff">IfNotPresent</span>
+  <span style="color:#f92672">nodeSelector</span>:
+    <span style="color:#f92672">disktype</span>: <span style="color:#ae81ff">ssd</span>
 </code></pre></div><p>考点：pod的调度。</p>
 <p>参考：<a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/">assign-pod-node</a></p>
 <p>5.提供一个pod的yaml，要求添加Init Container，Init Container的作用是创建一个空文件，pod的Containers判断文件是否存在，不存在则退出</p>
@@ -305,7 +305,7 @@ spec:
     protocol: TCP
     targetPort: <span style="color:#ae81ff">80</span>
   selector:
-<span style="color:#75715e">#注意要和pod对应</span>  
+<span style="color:#75715e">#注意要和pod对应  </span>
     name: nginx-app
   type: NodePort
 </code></pre></div><p>考点：Service</p>
@@ -378,45 +378,45 @@ kubectl exec -ti busybox -- nslookup &lt;Pod ip&gt;
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#将密码值使用base64加密,记录在Notepad里</span>
 echo -n <span style="color:#e6db74">&#39;bob&#39;</span> | base64
 </code></pre></div><p>secret.yaml</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Secret
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: mysecret
-<span style="color:#66d9ef">type</span>: Opaque
-<span style="color:#66d9ef">data</span>:
-  <span style="color:#66d9ef">password</span>: Ym9i
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Secret</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">mysecret</span>
+<span style="color:#f92672">type</span>: <span style="color:#ae81ff">Opaque</span>
+<span style="color:#f92672">data</span>:
+  <span style="color:#f92672">password</span>: <span style="color:#ae81ff">Ym9i</span>
 </code></pre></div><p>pod1.yaml</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Pod
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: pod1
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">containers</span>:
-  - <span style="color:#66d9ef">name</span>: mypod
-    <span style="color:#66d9ef">image</span>: nginx
-    <span style="color:#66d9ef">volumeMounts</span>:
-    - <span style="color:#66d9ef">name</span>: mysecret
-      <span style="color:#66d9ef">mountPath</span>: <span style="color:#e6db74">&#34;/data&#34;</span>
-      <span style="color:#66d9ef">readOnly</span>: <span style="color:#66d9ef">true</span>
-  <span style="color:#66d9ef">volumes</span>:
-  - <span style="color:#66d9ef">name</span>: mysecret
-    <span style="color:#66d9ef">secret</span>:
-      <span style="color:#66d9ef">secretName</span>: mysecret
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pod</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">pod1</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">containers</span>:
+  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">mypod</span>
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx</span>
+    <span style="color:#f92672">volumeMounts</span>:
+    - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">mysecret</span>
+      <span style="color:#f92672">mountPath</span>: <span style="color:#e6db74">&#34;/data&#34;</span>
+      <span style="color:#f92672">readOnly</span>: <span style="color:#66d9ef">true</span>
+  <span style="color:#f92672">volumes</span>:
+  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">mysecret</span>
+    <span style="color:#f92672">secret</span>:
+      <span style="color:#f92672">secretName</span>: <span style="color:#ae81ff">mysecret</span>
 </code></pre></div><p>pod2.yaml</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Pod
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: pod2
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">containers</span>:
-  - <span style="color:#66d9ef">name</span>: mycontainer
-    <span style="color:#66d9ef">image</span>: redis
-    <span style="color:#66d9ef">env</span>:
-      - <span style="color:#66d9ef">name</span>: SECRET_PASSWORD
-        <span style="color:#66d9ef">valueFrom</span>:
-          <span style="color:#66d9ef">secretKeyRef</span>:
-            <span style="color:#66d9ef">name</span>: mysecret
-            <span style="color:#66d9ef">key</span>: password
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Pod</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">pod2</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">containers</span>:
+  - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">mycontainer</span>
+    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">redis</span>
+    <span style="color:#f92672">env</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">SECRET_PASSWORD</span>
+        <span style="color:#f92672">valueFrom</span>:
+          <span style="color:#f92672">secretKeyRef</span>:
+            <span style="color:#f92672">name</span>: <span style="color:#ae81ff">mysecret</span>
+            <span style="color:#f92672">key</span>: <span style="color:#ae81ff">password</span>
 </code></pre></div><p>考点: Secret</p>
 <p>参考：<a href="https://kubernetes.io/docs/concepts/configuration/secret/">Secret</a></p>
 <p>15.使node1节点不可调度，并重新分配该节点上的pod</p>
@@ -467,17 +467,17 @@ kubectl get nodes <span style="color:#75715e">#正常</span>
 <p>考点：TLS Bootstrapping</p>
 <p>参考：<a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet-tls-bootstrapping/">TLS Bootstrapping</a></p>
 <p>21.创建一个pv，类型是hostPath，位于/data中，大小1G，模式ReadOnlyMany</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: PersistentVolume
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: pv
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">capacity</span>:
-    <span style="color:#66d9ef">storage</span>: 1Gi  
-  <span style="color:#66d9ef">accessModes</span>:
-    - ReadOnlyMany
-  <span style="color:#66d9ef">hostPath</span>:
-    <span style="color:#66d9ef">path</span>: /data
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PersistentVolume</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">pv</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">capacity</span>:
+    <span style="color:#f92672">storage</span>: <span style="color:#ae81ff">1Gi  </span>
+  <span style="color:#f92672">accessModes</span>:
+    - <span style="color:#ae81ff">ReadOnlyMany</span>
+  <span style="color:#f92672">hostPath</span>:
+    <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/data</span>
 </code></pre></div><p>考点：创建PV</p>
 <p>参考：<a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/">persistent volumes</a></p>
 

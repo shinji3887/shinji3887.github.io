@@ -5,11 +5,7 @@
     <link>/tags/http/2/</link>
     <description>Recent content in HTTP/2 on L&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    
-	<atom:link href="/tags/http/2/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <language>en-us</language><atom:link href="/tags/http/2/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>HTTP/2协议介绍</title>
       <link>/post/http2-introduce/</link>

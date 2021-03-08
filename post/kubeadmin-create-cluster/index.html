@@ -208,8 +208,8 @@
 </span><span style="color:#e6db74">        http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 </span><span style="color:#e6db74">EOF</span>
 </code></pre></div><p>执行下列命令刷新yum源缓存</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># yum clean all</span>  
-<span style="color:#75715e"># yum makecache</span>  
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># yum clean all  </span>
+<span style="color:#75715e"># yum makecache  </span>
 <span style="color:#75715e"># yum repolist</span>
 </code></pre></div><p>得到这面这个列表，说明源配置正确</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>root@MiWiFi-R1CM-srv yum.repos.d<span style="color:#f92672">]</span><span style="color:#75715e"># yum repolist</span>
@@ -530,50 +530,50 @@ kube-proxy-9c8cs                          1/1     Running   <span style="color:#
 kube-scheduler-miwifi-r1cm-srv            1/1     Running   <span style="color:#ae81ff">0</span>          4h44m
 kubernetes-dashboard-57df4db6b-bn5vn      1/1     Running   <span style="color:#ae81ff">0</span>          4h8m
 </code></pre></div><p>可以看到多了一个<code>kubernetes-dashboard-57df4db6b-bn5vn</code>，并且已经正常启动。但出于安全性考虑，dashboard是不提供外部访问的，所以我们这边需要添加一个service，并且指定为NodePort类型，以供外部访问，service配置如下</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: Service
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">creationTimestamp</span>: <span style="color:#e6db74">&#34;2019-01-11T18:12:43Z&#34;</span>
-  <span style="color:#66d9ef">labels</span>:
-    <span style="color:#66d9ef">k8s-app</span>: kubernetes-dashboard
-  <span style="color:#66d9ef">name</span>: kubernetes-dashboard
-  <span style="color:#66d9ef">namespace</span>: kube-system
-  <span style="color:#66d9ef">resourceVersion</span>: <span style="color:#e6db74">&#34;6015&#34;</span>
-  <span style="color:#66d9ef">selfLink</span>: /api/v1/namespaces/kube-system/services/kubernetes-dashboard
-  <span style="color:#66d9ef">uid</span>: 7dd0deb6-15cc<span style="color:#ae81ff">-11e9</span>-bb65-08002726d64d
-<span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">clusterIP</span>: <span style="color:#ae81ff">10.102.157.202</span>
-  <span style="color:#66d9ef">externalTrafficPolicy</span>: Cluster
-  <span style="color:#66d9ef">ports</span>:
-  - <span style="color:#66d9ef">nodePort</span>: <span style="color:#ae81ff">30443</span>
-    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">443</span>
-    <span style="color:#66d9ef">protocol</span>: TCP
-    <span style="color:#66d9ef">targetPort</span>: <span style="color:#ae81ff">8443</span>
-  <span style="color:#66d9ef">selector</span>:
-    <span style="color:#66d9ef">k8s-app</span>: kubernetes-dashboard
-  <span style="color:#66d9ef">sessionAffinity</span>: None
-  <span style="color:#66d9ef">type</span>: NodePort
-<span style="color:#66d9ef">status</span>:
-  <span style="color:#66d9ef">loadBalancer</span>: {}
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">creationTimestamp</span>: <span style="color:#e6db74">&#34;2019-01-11T18:12:43Z&#34;</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">k8s-app</span>: <span style="color:#ae81ff">kubernetes-dashboard</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">kubernetes-dashboard</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">kube-system</span>
+  <span style="color:#f92672">resourceVersion</span>: <span style="color:#e6db74">&#34;6015&#34;</span>
+  <span style="color:#f92672">selfLink</span>: <span style="color:#ae81ff">/api/v1/namespaces/kube-system/services/kubernetes-dashboard</span>
+  <span style="color:#f92672">uid</span>: <span style="color:#ae81ff">7dd0deb6-15cc-11e9-bb65-08002726d64d</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">clusterIP</span>: <span style="color:#ae81ff">10.102.157.202</span>
+  <span style="color:#f92672">externalTrafficPolicy</span>: <span style="color:#ae81ff">Cluster</span>
+  <span style="color:#f92672">ports</span>:
+  - <span style="color:#f92672">nodePort</span>: <span style="color:#ae81ff">30443</span>
+    <span style="color:#f92672">port</span>: <span style="color:#ae81ff">443</span>
+    <span style="color:#f92672">protocol</span>: <span style="color:#ae81ff">TCP</span>
+    <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">8443</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">k8s-app</span>: <span style="color:#ae81ff">kubernetes-dashboard</span>
+  <span style="color:#f92672">sessionAffinity</span>: <span style="color:#ae81ff">None</span>
+  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">NodePort</span>
+<span style="color:#f92672">status</span>:
+  <span style="color:#f92672">loadBalancer</span>: {}
 </code></pre></div><p>dashboard应用的默认端口是8443，这边我们指定一个30443端口进行映射，提供外部访问入口。这时候我们就可以通过<code>https://ip:8443</code>来访问dashboard了，注意用官方的yaml创建出来的servcieaccount登陆的话，是啥权限都没有的，全部是forbidden，因为官方的给了一个minimal的role。。。我们这边为了测试方便，直接创建一个超级管理员的账号，配置如下</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">apiVersion</span>: v1
-<span style="color:#66d9ef">kind</span>: ServiceAccount
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: dashboard
-  <span style="color:#66d9ef">namespace</span>: kube-system
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">dashboard</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">kube-system</span>
 ---
-<span style="color:#66d9ef">kind</span>: ClusterRoleBinding
-<span style="color:#66d9ef">apiVersion</span>: rbac.authorization.k8s.io/v1beta1
-<span style="color:#66d9ef">metadata</span>:
-  <span style="color:#66d9ef">name</span>: dashboard
-<span style="color:#66d9ef">subjects</span>:
-  - <span style="color:#66d9ef">kind</span>: ServiceAccount
-    <span style="color:#66d9ef">name</span>: dashboard
-    <span style="color:#66d9ef">namespace</span>: kube-system
-<span style="color:#66d9ef">roleRef</span>:
-  <span style="color:#66d9ef">kind</span>: ClusterRole
-  <span style="color:#66d9ef">name</span>: cluster-admin
-  <span style="color:#66d9ef">apiGroup</span>: rbac.authorization.k8s.io
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRoleBinding</span>
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1beta1</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">dashboard</span>
+<span style="color:#f92672">subjects</span>:
+  - <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
+    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">dashboard</span>
+    <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">kube-system</span>
+<span style="color:#f92672">roleRef</span>:
+  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">cluster-admin</span>
+  <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
 </code></pre></div><p>创建完了之后，系统会自动创建该用户的secret，通过如下命令获取secret</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#f92672">[</span>root@MiWiFi-R1CM-srv yum.repos.d<span style="color:#f92672">]</span><span style="color:#75715e"># kubectl describe secret dashboard -n kube-system</span>
 Name:         dashboard-token-s9hqc

@@ -6,11 +6,7 @@
     <description>Recent content in Microservice on L&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 16 Sep 2019 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="/tags/microservice/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 03 Dec 2018 00:00:00 +0000</lastBuildDate><atom:link href="/tags/microservice/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>protobuf协议介绍及性能实测</title>
       <link>/post/protobuf-introduce-and-test/</link>

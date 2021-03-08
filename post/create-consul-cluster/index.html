@@ -523,35 +523,35 @@ consul agent -server -ui -data-dir<span style="color:#f92672">=</span>/data/cons
   <span style="color:#f92672">&lt;/dependency&gt;</span>
 <span style="color:#f92672">&lt;/dependencies&gt;</span>
 </code></pre></div><p>修改配置文件（注意要使用bootstrap.yml进行配置，不要用application.yml，否则配置不会起作用）</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#66d9ef">spring</span>:
-  <span style="color:#66d9ef">application</span>:
-    <span style="color:#66d9ef">name</span>: bocsh-gateway
-  <span style="color:#66d9ef">cloud</span>:
-    <span style="color:#66d9ef">consul</span>:
-      <span style="color:#66d9ef">host</span>: <span style="color:#ae81ff">22.196.248.71</span>
-      <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">8500</span>
-      <span style="color:#66d9ef">config</span>:
-        <span style="color:#66d9ef">enabled</span>: <span style="color:#66d9ef">true</span>
-        <span style="color:#66d9ef">format</span>: yaml
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml"><span style="color:#f92672">spring</span>:
+  <span style="color:#f92672">application</span>:
+    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">bocsh-gateway</span>
+  <span style="color:#f92672">cloud</span>:
+    <span style="color:#f92672">consul</span>:
+      <span style="color:#f92672">host</span>: <span style="color:#ae81ff">22.196.248.71</span>
+      <span style="color:#f92672">port</span>: <span style="color:#ae81ff">8500</span>
+      <span style="color:#f92672">config</span>:
+        <span style="color:#f92672">enabled</span>: <span style="color:#66d9ef">true</span>
+        <span style="color:#f92672">format</span>: <span style="color:#ae81ff">yaml</span>
         <span style="color:#75715e">#data-key表示consul上面的KEY值(或者说文件的名字) ,默认是data</span>
         <span style="color:#75715e">#prefix设置配置值的基本文件夹，默认为config</span>
         <span style="color:#75715e">#defaultContext设置所有应用程序使用的文件夹名称，默认为spring的应用名称</span>
         <span style="color:#75715e">#profileSeparator设置用于使用配置文件在属性源中分隔配置文件名称的分隔符的值,默认为逗号</span>
-<span style="color:#66d9ef">server</span>:
-  <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">30080</span>
+<span style="color:#f92672">server</span>:
+  <span style="color:#f92672">port</span>: <span style="color:#ae81ff">30080</span>
 </code></pre></div><p>注意<code>data-key</code>,<code>prefix</code>,<code>defaultContext</code>,<code>profileSeparator</code>这几个配置都是可选项，定义了我们的配置文件在consul中存储的目录结构，spring boot 在启动时会在这个路径下获取配置文件信息，如果都是使用默认值得话，在consul中存储的数据结构如下（默认读取的是default配置）：
 <img src="https://upload-images.jianshu.io/upload_images/14871146-a5ce8d1a0a69d055.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png">
 key为<code>config/bocsh-gateway/data</code></p>
 <h4 id="动态配置更新">动态配置更新</h4>
 <p>首先，spring cloud consul组件是有动态更新配置能力的，官方称之为Config Watch。原理是consul客户端定时向consul服务端发起一个http请求，以检测服务端的配置是否有更新（类似于在actuator端点执行/refresh操作，但consul是自动的，不需要专门触发），相关配置如下：</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">spring</span>:
-  <span style="color:#66d9ef">cloud</span>:
-    <span style="color:#66d9ef">consul</span>:
-      <span style="color:#66d9ef">config</span>:
-        <span style="color:#66d9ef">watch</span>: 
-          <span style="color:#66d9ef">enable</span>: <span style="color:#75715e">#default true</span>
-          <span style="color:#66d9ef">wait-time</span>: <span style="color:#75715e">#default 55</span>
-          <span style="color:#66d9ef">delay</span>: <span style="color:#75715e">#default 1000</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">spring</span>:
+  <span style="color:#f92672">cloud</span>:
+    <span style="color:#f92672">consul</span>:
+      <span style="color:#f92672">config</span>:
+        <span style="color:#f92672">watch</span>: 
+          <span style="color:#f92672">enable</span>: <span style="color:#75715e">#default true</span>
+          <span style="color:#f92672">wait-time</span>: <span style="color:#75715e">#default 55</span>
+          <span style="color:#f92672">delay</span>: <span style="color:#75715e">#default 1000</span>
 </code></pre></div><p>可以看到配置更新能力默认是开启的，不想动态更新的话可以通过设置<code>spring.cloud.consul.config.watch.enabled=false</code>关闭Config Watch功能。</p>
 <p>有了上面的知识，我们就可以来配置动态路由了，首先在启动主类下加入如下配置：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@EnableZuulProxy</span>
@@ -571,11 +571,11 @@ key为<code>config/bocsh-gateway/data</code></p>
 
 <span style="color:#f92672">}</span>
 </code></pre></div><p>在配置文件中打开actuator的routes端点，使我们可以观察routes变化的情况</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">management</span>:
-  <span style="color:#66d9ef">endpoints</span>:
-    <span style="color:#66d9ef">web</span>:
-      <span style="color:#66d9ef">exposure</span>:
-        <span style="color:#66d9ef">include</span>: routes
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">management</span>:
+  <span style="color:#f92672">endpoints</span>:
+    <span style="color:#f92672">web</span>:
+      <span style="color:#f92672">exposure</span>:
+        <span style="color:#f92672">include</span>: <span style="color:#ae81ff">routes</span>
 </code></pre></div><p>修改consul中的key/value值，通过访问<code>http://ip:port/actuator/routes</code>可以看到zuul目前的最新路由表，配置实时更新，实现了动态配置功能。</p>
 <blockquote>
 <p>这里需要注意一点，如果你改的是zuul路由表中的<code>path</code>部分，则原有的路由信息不会消息，会新增一条你修改后的路由信息，修改<code>url</code>部分则可以实时生效。</p>

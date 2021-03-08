@@ -6,11 +6,7 @@
     <description>Recent content in RESTful on L&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 29 Jun 2019 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="/tags/restful/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sat, 29 Jun 2019 00:00:00 +0000</lastBuildDate><atom:link href="/tags/restful/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Richardson Maturity Model-迈向REST的顶点</title>
       <link>/post/steps-toward-the-glory-of-rest/</link>

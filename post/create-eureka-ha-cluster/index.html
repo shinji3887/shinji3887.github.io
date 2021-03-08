@@ -173,44 +173,44 @@
 <p>通常来说，高可用集群需要3个节点，通过各个节点之间进行复制和互相注册来保障注册中心的高可用。任何一个注册中心节点挂掉对集群都不会有影响，甚至全部的eureka节点挂掉，客户端之间的调用也不受影响（客户端的ribbon会缓存服务注册列表，当然此时新的服务就没法注册了），集群架构图如下
 <img src="https://upload-images.jianshu.io/upload_images/14871146-4de9ba7fd9f2ba01.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="eureka-cluster.png"></p>
 <p>废话不多说，直接上配置文件</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">spring</span>:
-    <span style="color:#66d9ef">application</span>:
-        <span style="color:#66d9ef">name</span>: eureka-server
-<span style="color:#66d9ef">server</span>:
-    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">10001</span>
-<span style="color:#66d9ef">eureka</span>:
-    <span style="color:#66d9ef">client</span>:
-        <span style="color:#66d9ef">register-with-eureka</span>: <span style="color:#66d9ef">true</span>
-        <span style="color:#66d9ef">fetch-registry</span>: <span style="color:#66d9ef">true</span>
-    <span style="color:#66d9ef">server</span>:
-        <span style="color:#66d9ef">enable-self-preservation</span>: <span style="color:#66d9ef">false</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">spring</span>:
+    <span style="color:#f92672">application</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">eureka-server</span>
+<span style="color:#f92672">server</span>:
+    <span style="color:#f92672">port</span>: <span style="color:#ae81ff">10001</span>
+<span style="color:#f92672">eureka</span>:
+    <span style="color:#f92672">client</span>:
+        <span style="color:#f92672">register-with-eureka</span>: <span style="color:#66d9ef">true</span>
+        <span style="color:#f92672">fetch-registry</span>: <span style="color:#66d9ef">true</span>
+    <span style="color:#f92672">server</span>:
+        <span style="color:#f92672">enable-self-preservation</span>: <span style="color:#66d9ef">false</span>
 ---
-<span style="color:#66d9ef">spring</span>:
-  <span style="color:#66d9ef">profiles</span>: peer1_test
-<span style="color:#66d9ef">eureka</span>:
-  <span style="color:#66d9ef">instance</span>:
-    <span style="color:#66d9ef">hostname</span>: dce304-master-vm1
-  <span style="color:#66d9ef">client</span>:
-    <span style="color:#66d9ef">serviceUrl</span>:
-      <span style="color:#66d9ef">defaultZone</span>: http://dce304-master-vm2:<span style="color:#ae81ff">10001</span>/eureka/,http://dce304-master-vm3:<span style="color:#ae81ff">10001</span>/eureka/
+<span style="color:#f92672">spring</span>:
+  <span style="color:#f92672">profiles</span>: <span style="color:#ae81ff">peer1_test</span>
+<span style="color:#f92672">eureka</span>:
+  <span style="color:#f92672">instance</span>:
+    <span style="color:#f92672">hostname</span>: <span style="color:#ae81ff">dce304-master-vm1</span>
+  <span style="color:#f92672">client</span>:
+    <span style="color:#f92672">serviceUrl</span>:
+      <span style="color:#f92672">defaultZone</span>: <span style="color:#ae81ff">http://dce304-master-vm2:10001/eureka/,http://dce304-master-vm3:10001/eureka/</span>
 ---
-<span style="color:#66d9ef">spring</span>:
-  <span style="color:#66d9ef">profiles</span>: peer2_test
-<span style="color:#66d9ef">eureka</span>:
-  <span style="color:#66d9ef">instance</span>:
-    <span style="color:#66d9ef">hostname</span>: dce304-master-vm2
-  <span style="color:#66d9ef">client</span>:
-    <span style="color:#66d9ef">serviceUrl</span>:
-      <span style="color:#66d9ef">defaultZone</span>: http://dce304-master-vm1:<span style="color:#ae81ff">10001</span>/eureka/,http://dce304-master-vm3:<span style="color:#ae81ff">10001</span>/eureka/
+<span style="color:#f92672">spring</span>:
+  <span style="color:#f92672">profiles</span>: <span style="color:#ae81ff">peer2_test</span>
+<span style="color:#f92672">eureka</span>:
+  <span style="color:#f92672">instance</span>:
+    <span style="color:#f92672">hostname</span>: <span style="color:#ae81ff">dce304-master-vm2</span>
+  <span style="color:#f92672">client</span>:
+    <span style="color:#f92672">serviceUrl</span>:
+      <span style="color:#f92672">defaultZone</span>: <span style="color:#ae81ff">http://dce304-master-vm1:10001/eureka/,http://dce304-master-vm3:10001/eureka/</span>
 ---
-<span style="color:#66d9ef">spring</span>:
-  <span style="color:#66d9ef">profiles</span>: peer3_test
-<span style="color:#66d9ef">eureka</span>:
-  <span style="color:#66d9ef">instance</span>:
-    <span style="color:#66d9ef">hostname</span>: dce304-master-vm3
-  <span style="color:#66d9ef">client</span>:
-    <span style="color:#66d9ef">serviceUrl</span>:
-      <span style="color:#66d9ef">defaultZone</span>: http://dce304-master-vm1:<span style="color:#ae81ff">10001</span>/eureka/,http://dce304-master-vm2:<span style="color:#ae81ff">10001</span>/eureka/
+<span style="color:#f92672">spring</span>:
+  <span style="color:#f92672">profiles</span>: <span style="color:#ae81ff">peer3_test</span>
+<span style="color:#f92672">eureka</span>:
+  <span style="color:#f92672">instance</span>:
+    <span style="color:#f92672">hostname</span>: <span style="color:#ae81ff">dce304-master-vm3</span>
+  <span style="color:#f92672">client</span>:
+    <span style="color:#f92672">serviceUrl</span>:
+      <span style="color:#f92672">defaultZone</span>: <span style="color:#ae81ff">http://dce304-master-vm1:10001/eureka/,http://dce304-master-vm2:10001/eureka/</span>
 </code></pre></div><p>这边有两点需要注意</p>
 <ul>
 <li><code>register-with-eureka</code>和<code>fetch-registry</code>两个参数要设置为<code>true</code>，这样eureka会自注册，否则的话其他eureka发现不了这个节点（当然也可以不设置这两个参数，默认值就是true）</li>

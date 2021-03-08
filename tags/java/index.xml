@@ -6,11 +6,7 @@
     <description>Recent content in java on L&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 19 Nov 2018 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="/tags/java/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Mon, 19 Nov 2018 00:00:00 +0000</lastBuildDate><atom:link href="/tags/java/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>使用ThreadPoolTaskExecutor对任务进行异步阻塞处理</title>
       <link>/post/thread-pool-task-executor/</link>

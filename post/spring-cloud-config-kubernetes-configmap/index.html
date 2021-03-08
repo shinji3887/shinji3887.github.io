@@ -206,7 +206,7 @@
 <h3 id="环境变量配置">环境变量配置</h3>
 <p>使用环境变量的原因，是开发和测试的环境不一致，开发一般在自己电脑上进行开发，所以需要设置自己终端的环境变量，而测试及生产环境都是在K8S集群内，所以需要通过ConfigMap来进行环境变量配置，从而实现了配置中心地址与环境的解耦。</p>
 <h4 id="开发终端配置">开发终端配置</h4>
-<p>比较简单，直接在环境变量中设置如下参数，注意这里设置的是dev环境的配置中心
+<p>比较简单，直接在环境变量中设置如下参数，注意这里设置的是dev环境的配置中心 
 <img src="https://lupeier.cn-sh2.ufileos.com/config1.jpg" alt="env.jpg"></p>
 <p>注意设置完之后eclipse需要重启一下，否则读不到变更的环境变量（IDEA我没有测过，不知道是不是一样）。可以通过下面这段代码看看环境变量是否正确获取</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@RestController</span>
@@ -241,92 +241,92 @@ metadata:
    selfLink: /api/v1/namespaces/default/configmaps/config-server
    uid: 4a4b3713-e27e-11e8-8088-005056bd4c7c
 </code></pre></div><p>将configmap对象注入我们创建的应用deployment对象中，可以直接edit资源，也可以使用patch方式，注意<code>spec.containers.env</code>部分，即是我们注入的configmap信息</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">spec</span>:
-  <span style="color:#66d9ef">replicas</span>: <span style="color:#ae81ff">1</span>
-  <span style="color:#66d9ef">selector</span>:
-    <span style="color:#66d9ef">matchLabels</span>:
-      <span style="color:#66d9ef">run</span>: service-base
-  <span style="color:#66d9ef">strategy</span>:
-    <span style="color:#66d9ef">rollingUpdate</span>:
-      <span style="color:#66d9ef">maxSurge</span>: <span style="color:#ae81ff">1</span>
-      <span style="color:#66d9ef">maxUnavailable</span>: <span style="color:#ae81ff">1</span>
-    <span style="color:#66d9ef">type</span>: RollingUpdate
-  <span style="color:#66d9ef">template</span>:
-    <span style="color:#66d9ef">metadata</span>:
-      <span style="color:#66d9ef">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
-      <span style="color:#66d9ef">labels</span>:
-        <span style="color:#66d9ef">run</span>: service-base
-    <span style="color:#66d9ef">spec</span>:
-      <span style="color:#66d9ef">containers</span>:
-      - <span style="color:#66d9ef">command</span>:
-        - java
-        - -Djava.security.egd=file:/dev/./urandom
-        - -jar
-        - /home/app.jar
-        <span style="color:#66d9ef">env</span>:
-        - <span style="color:#66d9ef">name</span>: CONFIG_SERVER_ADDRESS
-          <span style="color:#66d9ef">valueFrom</span>:
-            <span style="color:#66d9ef">configMapKeyRef</span>:
-              <span style="color:#66d9ef">key</span>: config.uri
-              <span style="color:#66d9ef">name</span>: config-server
-        - <span style="color:#66d9ef">name</span>: CONFIG_SERVER_PROFILE
-          <span style="color:#66d9ef">valueFrom</span>:
-            <span style="color:#66d9ef">configMapKeyRef</span>:
-              <span style="color:#66d9ef">key</span>: config.profile
-              <span style="color:#66d9ef">name</span>: config-server
-        <span style="color:#66d9ef">image</span>: <span style="color:#ae81ff">10.0.0.62</span>:<span style="color:#ae81ff">5000</span>/alpine/jre:<span style="color:#ae81ff">8</span>
-        <span style="color:#66d9ef">imagePullPolicy</span>: IfNotPresent
-        <span style="color:#66d9ef">name</span>: service-base
-        <span style="color:#66d9ef">ports</span>:
-        - <span style="color:#66d9ef">containerPort</span>: <span style="color:#ae81ff">33300</span>
-          <span style="color:#66d9ef">protocol</span>: TCP
-        <span style="color:#66d9ef">resources</span>: {}
-        <span style="color:#66d9ef">terminationMessagePath</span>: /dev/termination-log
-        <span style="color:#66d9ef">terminationMessagePolicy</span>: File
-        <span style="color:#66d9ef">volumeMounts</span>:
-        - <span style="color:#66d9ef">mountPath</span>: /home
-          <span style="color:#66d9ef">name</span>: app-volume
-      <span style="color:#66d9ef">dnsPolicy</span>: ClusterFirst
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">1</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">run</span>: <span style="color:#ae81ff">service-base</span>
+  <span style="color:#f92672">strategy</span>:
+    <span style="color:#f92672">rollingUpdate</span>:
+      <span style="color:#f92672">maxSurge</span>: <span style="color:#ae81ff">1</span>
+      <span style="color:#f92672">maxUnavailable</span>: <span style="color:#ae81ff">1</span>
+    <span style="color:#f92672">type</span>: <span style="color:#ae81ff">RollingUpdate</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">creationTimestamp</span>: <span style="color:#66d9ef">null</span>
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">run</span>: <span style="color:#ae81ff">service-base</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">command</span>:
+        - <span style="color:#ae81ff">java</span>
+        - -<span style="color:#ae81ff">Djava.security.egd=file:/dev/./urandom</span>
+        - -<span style="color:#ae81ff">jar</span>
+        - <span style="color:#ae81ff">/home/app.jar</span>
+        <span style="color:#f92672">env</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">CONFIG_SERVER_ADDRESS</span>
+          <span style="color:#f92672">valueFrom</span>:
+            <span style="color:#f92672">configMapKeyRef</span>:
+              <span style="color:#f92672">key</span>: <span style="color:#ae81ff">config.uri</span>
+              <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config-server</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">CONFIG_SERVER_PROFILE</span>
+          <span style="color:#f92672">valueFrom</span>:
+            <span style="color:#f92672">configMapKeyRef</span>:
+              <span style="color:#f92672">key</span>: <span style="color:#ae81ff">config.profile</span>
+              <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config-server</span>
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">10.0.0.62</span>:<span style="color:#ae81ff">5000</span><span style="color:#ae81ff">/alpine/jre:8</span>
+        <span style="color:#f92672">imagePullPolicy</span>: <span style="color:#ae81ff">IfNotPresent</span>
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">service-base</span>
+        <span style="color:#f92672">ports</span>:
+        - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">33300</span>
+          <span style="color:#f92672">protocol</span>: <span style="color:#ae81ff">TCP</span>
+        <span style="color:#f92672">resources</span>: {}
+        <span style="color:#f92672">terminationMessagePath</span>: <span style="color:#ae81ff">/dev/termination-log</span>
+        <span style="color:#f92672">terminationMessagePolicy</span>: <span style="color:#ae81ff">File</span>
+        <span style="color:#f92672">volumeMounts</span>:
+        - <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/home</span>
+          <span style="color:#f92672">name</span>: <span style="color:#ae81ff">app-volume</span>
+      <span style="color:#f92672">dnsPolicy</span>: <span style="color:#ae81ff">ClusterFirst</span>
 </code></pre></div><h3 id="spring-cloud-config配置">Spring Cloud Config配置</h3>
 <p>这其实就是一个标准的Spring Cloud Config配置中心配置，这里不展开了，需要的同学可以直接看<a href="http://blog.didispace.com/spring-cloud-starter-dalston-3">这篇教程</a>。考虑到开发生产环境的隔离、管理和可靠性的需要，我这边使用的是db存储模式（需要edgware以上版本），配置文件如下</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">spring</span>:
-    <span style="color:#66d9ef">application</span>:
-        <span style="color:#66d9ef">name</span>: config-server
-    <span style="color:#66d9ef">datasource</span>:  
-        <span style="color:#66d9ef">driver-class-name</span>: oracle.jdbc.driver.OracleDriver
-        <span style="color:#66d9ef">url</span>: jdbc:oracle:thin:@<span style="color:#ae81ff">10.0.0.56</span>:<span style="color:#ae81ff">1521</span>/orac
-        <span style="color:#66d9ef">username</span>: test
-        <span style="color:#66d9ef">password</span>: test
-    <span style="color:#66d9ef">jpa</span>:
-        <span style="color:#66d9ef">properties</span>:
-            <span style="color:#66d9ef">hibernate</span>:
-                <span style="color:#66d9ef">dialect</span>: org.hibernate.dialect.Oracle10gDialect
-    <span style="color:#66d9ef">profiles</span>:
-        <span style="color:#66d9ef">active</span>: jdbc
-    <span style="color:#66d9ef">cloud</span>:
-         <span style="color:#66d9ef">config</span>:
-             <span style="color:#66d9ef">server</span>:
-                 <span style="color:#66d9ef">jdbc</span>: 
-                     <span style="color:#66d9ef">sql</span>: SELECT P_KEY, P_VALUE from PROPERTY where APPLICATION=? and PROFILE=? and LABEL=?
-<span style="color:#66d9ef">server</span>:
-    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">10002</span>
-<span style="color:#66d9ef">encrypt</span>:
-    <span style="color:#66d9ef">key</span>: test
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">spring</span>:
+    <span style="color:#f92672">application</span>:
+        <span style="color:#f92672">name</span>: <span style="color:#ae81ff">config-server</span>
+    <span style="color:#f92672">datasource</span>:  
+        <span style="color:#f92672">driver-class-name</span>: <span style="color:#ae81ff">oracle.jdbc.driver.OracleDriver</span>
+        <span style="color:#f92672">url</span>: <span style="color:#ae81ff">jdbc:oracle:thin:@10.0.0.56:1521/orac</span>
+        <span style="color:#f92672">username</span>: <span style="color:#ae81ff">test</span>
+        <span style="color:#f92672">password</span>: <span style="color:#ae81ff">test</span>
+    <span style="color:#f92672">jpa</span>:
+        <span style="color:#f92672">properties</span>:
+            <span style="color:#f92672">hibernate</span>:
+                <span style="color:#f92672">dialect</span>: <span style="color:#ae81ff">org.hibernate.dialect.Oracle10gDialect</span>
+    <span style="color:#f92672">profiles</span>:
+        <span style="color:#f92672">active</span>: <span style="color:#ae81ff">jdbc</span>
+    <span style="color:#f92672">cloud</span>:
+         <span style="color:#f92672">config</span>:
+             <span style="color:#f92672">server</span>:
+                 <span style="color:#f92672">jdbc</span>: 
+                     <span style="color:#f92672">sql</span>: <span style="color:#ae81ff">SELECT P_KEY, P_VALUE from PROPERTY where APPLICATION=? and PROFILE=? and LABEL=?</span>
+<span style="color:#f92672">server</span>:
+    <span style="color:#f92672">port</span>: <span style="color:#ae81ff">10002</span>
+<span style="color:#f92672">encrypt</span>:
+    <span style="color:#f92672">key</span>: <span style="color:#ae81ff">test</span>
 </code></pre></div><p>之后配合一个程序猿DD同学开源的配置管理项目SCCA（<a href="https://github.com/dyc87112/spring-cloud-config-admin">github地址</a>）,能以可视化方式管理各环境配置，基本满足目前要求。如果想和内部已有的服务管理平台集成，也非常方便，只要实现对property这张配置表的CRUD就行了，spring cloud config会自动监听property里的变化并刷新参数，这也是我比较推荐db模式的原因。SCCA配置界面如下：</p>
 <p><img src="https://lupeier.cn-sh2.ufileos.com/admin1.jpg" alt="admin1.jpg">
 <img src="https://lupeier.cn-sh2.ufileos.com/admin2.jpg" alt="admin2.jpg"></p>
 <h3 id="应用配置">应用配置</h3>
 <p>至此所有准备工作完成，在应用里直接配置上配置中心的环境变量，就可以在各环境中无缝切换了，应用配置如下</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">spring</span>:
-    <span style="color:#66d9ef">application</span>:
-         <span style="color:#66d9ef">name</span>: service-base
-    <span style="color:#66d9ef">cloud</span>:
-         <span style="color:#66d9ef">config</span>:
-             <span style="color:#66d9ef">uri</span>: ${CONFIG_SERVER_ADDRESS}
-             <span style="color:#66d9ef">profile</span>: ${CONFIG_SERVER_PROFILE}
-             <span style="color:#66d9ef">label</span>: master
-<span style="color:#66d9ef">server</span>:
-    <span style="color:#66d9ef">port</span>: <span style="color:#ae81ff">33000</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">spring</span>:
+    <span style="color:#f92672">application</span>:
+         <span style="color:#f92672">name</span>: <span style="color:#ae81ff">service-base</span>
+    <span style="color:#f92672">cloud</span>:
+         <span style="color:#f92672">config</span>:
+             <span style="color:#f92672">uri</span>: <span style="color:#ae81ff">${CONFIG_SERVER_ADDRESS}</span>
+             <span style="color:#f92672">profile</span>: <span style="color:#ae81ff">${CONFIG_SERVER_PROFILE}</span>
+             <span style="color:#f92672">label</span>: <span style="color:#ae81ff">master</span>
+<span style="color:#f92672">server</span>:
+    <span style="color:#f92672">port</span>: <span style="color:#ae81ff">33000</span>
 </code></pre></div>
         
                 
